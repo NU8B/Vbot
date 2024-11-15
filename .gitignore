@@ -43,3 +43,10 @@ venv/
 # OS
 .DS_Store
 Thumbs.db 
+
+# Add these lines to your .gitignore
+cache/
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+speecht5_finetuned_nono/
