@@ -206,6 +206,8 @@ class AIAssistant:
         if not text:
             return "I'm sorry, I couldn't process that."
 
+        start_time = time.time()  # Start timing LLM processing
+
         # Modified prompt to be more specific about format
         prompt = f"""<|system|>You are Amelia Watson, a time-traveling detective VTuber. Keep responses under 40 words. Be energetic and playful.
 <|user|>{text}
@@ -235,6 +237,9 @@ class AIAssistant:
                 eos_token_id=self.tokenizer.eos_token_id,
                 early_stopping=True,
             )
+
+        llm_time = time.time() - start_time  # Calculate LLM processing time
+        print(f"LLM Processing Time: {llm_time:.2f} seconds")
 
         # Get the response and clean it up
         response = self.tokenizer.decode(
@@ -313,9 +318,10 @@ class AIAssistant:
 
     def speak(self, text):
         try:
-            # Only speak the exact text that was shown
+            start_time = time.time()  # Start timing TTS processing
+
             inputs = self.processor(
-                text=text.strip(),  # Remove any extra whitespace
+                text=text.strip(),
                 return_tensors="pt",
                 padding=True,
                 return_attention_mask=True,
@@ -329,6 +335,9 @@ class AIAssistant:
                 ),
                 vocoder=self.vocoder,
             )
+
+            tts_time = time.time() - start_time  # Calculate TTS processing time
+            print(f"TTS Generation Time: {tts_time:.2f} seconds")
 
             audio_data = speech.cpu().numpy()
             duration = len(audio_data) / 16000
@@ -400,14 +409,19 @@ class AIAssistant:
     def record_audio(self):
         import pyaudio
         import wave
+        import numpy as np
 
         CHUNK = 1024
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
         RATE = 16000
-        RECORD_SECONDS = 5
+        SILENCE_THRESHOLD = 500  # Adjust this value based on your needs
+        SILENCE_DURATION = 2  # Seconds of silence before stopping
 
         p = pyaudio.PyAudio()
+        frames = []
+        silent_chunks = 0
+        has_speech = False
 
         stream = p.open(
             format=FORMAT,
@@ -417,25 +431,44 @@ class AIAssistant:
             frames_per_buffer=CHUNK,
         )
 
-        frames = []
+        try:
+            while self.is_listening:
+                data = stream.read(CHUNK)
+                frames.append(data)
 
-        for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-            data = stream.read(CHUNK)
-            frames.append(data)
+                # Convert audio chunk to numpy array for analysis
+                audio_data = np.frombuffer(data, dtype=np.int16)
+                volume = np.abs(audio_data).mean()
 
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+                if volume > SILENCE_THRESHOLD:
+                    has_speech = True
+                    silent_chunks = 0
+                else:
+                    silent_chunks += 1
 
-        audio_data = b"".join(frames)
+                # Stop if silence for SILENCE_DURATION seconds
+                if has_speech and silent_chunks > int(RATE / CHUNK * SILENCE_DURATION):
+                    break
 
-        with wave.open("output.wav", "wb") as wf:
-            wf.setnchannels(CHANNELS)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
-            wf.setframerate(RATE)
-            wf.writeframes(audio_data)
+                # Also break if stop button was pressed
+                if not self.is_listening:
+                    break
 
-        return "output.wav"
+        finally:
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
+
+        # Only save and return if we detected speech
+        if has_speech and len(frames) > 0:
+            with wave.open("output.wav", "wb") as wf:
+                wf.setnchannels(CHANNELS)
+                wf.setsampwidth(p.get_sample_size(FORMAT))
+                wf.setframerate(RATE)
+                wf.writeframes(b"".join(frames))
+            return "output.wav"
+
+        return None
 
     def process_audio(self, audio_file):
         try:

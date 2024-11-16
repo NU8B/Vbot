@@ -197,9 +197,13 @@ class AIAssistant:
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
         RATE = 16000
-        RECORD_SECONDS = 5
+        SILENCE_THRESHOLD = 500
+        SILENCE_DURATION = 2
 
         p = pyaudio.PyAudio()
+        frames = []
+        silent_chunks = 0
+        has_speech = False
 
         stream = p.open(
             format=FORMAT,
@@ -209,26 +213,44 @@ class AIAssistant:
             frames_per_buffer=CHUNK,
         )
 
-        frames = []
+        try:
+            while self.is_listening:
+                data = stream.read(CHUNK)
+                frames.append(data)
 
-        for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-            data = stream.read(CHUNK)
-            frames.append(data)
+                # Convert audio chunk to numpy array for analysis
+                audio_data = np.frombuffer(data, dtype=np.int16)
+                volume = np.abs(audio_data).mean()
 
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+                if volume > SILENCE_THRESHOLD:
+                    has_speech = True
+                    silent_chunks = 0
+                else:
+                    silent_chunks += 1
 
-        audio_data = b"".join(frames)
+                # Stop if silence for SILENCE_DURATION seconds
+                if has_speech and silent_chunks > int(RATE / CHUNK * SILENCE_DURATION):
+                    break
 
-        # Save the audio as a WAV file
-        with wave.open("output.wav", "wb") as wf:
-            wf.setnchannels(CHANNELS)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
-            wf.setframerate(RATE)
-            wf.writeframes(audio_data)
+                # Also break if stop button was pressed
+                if not self.is_listening:
+                    break
 
-        return "output.wav"
+        finally:
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
+
+        # Only save and return if we detected speech
+        if has_speech and len(frames) > 0:
+            with wave.open("output.wav", "wb") as wf:
+                wf.setnchannels(CHANNELS)
+                wf.setsampwidth(p.get_sample_size(FORMAT))
+                wf.setframerate(RATE)
+                wf.writeframes(b"".join(frames))
+            return "output.wav"
+
+        return None
 
     def process_audio(self, audio_file):
         try:
@@ -253,7 +275,8 @@ class AIAssistant:
 
     def process(self, text):
         if text:
-            # Remove clean_up_tokenization_spaces from encode
+            start_time = time.time()  # Start timing LLM processing
+
             new_user_input_ids = self.tokenizer.encode(
                 text + self.tokenizer.eos_token, return_tensors="pt"
             )
@@ -275,7 +298,9 @@ class AIAssistant:
                 temperature=0.8,
             )
 
-            # Keep clean_up_tokenization_spaces only for decode
+            llm_time = time.time() - start_time  # Calculate LLM processing time
+            print(f"LLM Processing Time: {llm_time:.2f} seconds")
+
             response = self.tokenizer.decode(
                 self.chat_history_ids[:, bot_input_ids.shape[-1] :][0],
                 skip_special_tokens=True,
@@ -290,35 +315,39 @@ class AIAssistant:
         threading.Thread(target=self.speak, args=(text,), daemon=True).start()
 
     def speak(self, text):
-        # Process text through SpeechT5 with attention mask
-        inputs = self.processor(
-            text=text, return_tensors="pt", padding=True, return_attention_mask=True
-        )
+        try:
+            start_time = time.time()  # Start timing TTS processing
 
-        # Generate speech with attention mask
-        speech = self.model.generate_speech(
-            inputs["input_ids"],
-            attention_mask=inputs["attention_mask"],
-            speaker_embeddings=self.speaker_embeddings.unsqueeze(0),
-            vocoder=self.vocoder,
-        )
+            inputs = self.processor(
+                text=text.strip(),
+                return_tensors="pt",
+                padding=True,
+                return_attention_mask=True,
+            )
 
-        audio_data = speech.numpy()
+            speech = self.model.generate_speech(
+                inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
+                speaker_embeddings=self.speaker_embeddings.unsqueeze(0),
+                vocoder=self.vocoder,
+            )
 
-        # Calculate actual duration from audio length
-        duration = len(audio_data) / 16000  # audio length / sample rate
+            tts_time = time.time() - start_time  # Calculate TTS processing time
+            print(f"TTS Generation Time: {tts_time:.2f} seconds")
 
-        # Start mouth animation with actual duration
-        threading.Thread(
-            target=self.avatar.animate_mouth, args=(duration,), daemon=True
-        ).start()
+            audio_data = speech.numpy()
+            duration = len(audio_data) / 16000
 
-        # Play audio
-        sd.play(audio_data, samplerate=16000)
+            threading.Thread(
+                target=self.avatar.animate_mouth, args=(duration,), daemon=True
+            ).start()
 
-        # Add a small buffer to ensure audio completes
-        time.sleep(duration + 0.1)  # Add 100ms buffer
-        sd.stop()
+            sd.play(audio_data, samplerate=16000)
+            time.sleep(duration + 0.1)
+            sd.stop()
+
+        except Exception as e:
+            print(f"Error in speech generation: {str(e)}")
 
     def on_send(self):
         user_input = self.input_entry.get()
