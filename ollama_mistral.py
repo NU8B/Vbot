@@ -252,7 +252,7 @@ Assistant:"""
             ).start()
 
             sd.play(audio_data, samplerate=16000)
-            time.sleep(duration + 0.1)
+            time.sleep(duration + 0.5)
             sd.stop()
 
         except Exception as e:
