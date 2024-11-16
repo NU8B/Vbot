@@ -50,7 +50,7 @@ class AnimatedAvatar:
                     self.image_on_canvas, image=self.mouth_closed_photo
                 )
             self.canvas.update()
-            time.sleep(0.5)
+            time.sleep(0.1)
         self.canvas.itemconfig(self.image_on_canvas, image=self.mouth_closed_photo)
 
 
@@ -89,7 +89,7 @@ class AIAssistant:
         self.speaker_embeddings = self.create_speaker_embeddings()
 
         # Add system prompt as a class attribute
-        self.system_prompt = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. Keep your response consise and under 30 words."""
+        self.system_prompt = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
 
         self.chat_history = []
         self.is_listening = False
@@ -299,7 +299,7 @@ Assistant:"""
                     target=self.avatar.animate_mouth, args=(duration,), daemon=True
                 ).start()
                 sd.play(audio_data, samplerate=16000)
-                time.sleep(duration)  # Wait for audio to finish
+                time.sleep(duration + 0.5)  # Wait for audio to finish
                 sd.stop()
 
                 # Cleanup after audio is done
