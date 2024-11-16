@@ -50,7 +50,7 @@ class AnimatedAvatar:
                     self.image_on_canvas, image=self.mouth_closed_photo
                 )
             self.canvas.update()
-            time.sleep(0.1)
+            time.sleep(0.5)
         self.canvas.itemconfig(self.image_on_canvas, image=self.mouth_closed_photo)
 
 
