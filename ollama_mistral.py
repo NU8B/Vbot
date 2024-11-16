@@ -136,6 +136,8 @@ class AIAssistant:
         if not text:
             return "I'm sorry, I couldn't process that."
 
+        start_time = time.time()  # Start timing LLM processing
+
         # Add the new message to chat history
         self.chat_history.append({"role": "user", "content": text})
 
@@ -171,6 +173,9 @@ Assistant:"""
             ).json()
 
             response_text = response["response"].strip()
+
+            llm_time = time.time() - start_time  # Calculate LLM processing time
+            print(f"LLM Processing Time: {llm_time:.2f} seconds")
 
             # cleanup
             if not response_text.endswith((".", "!", "?")):
@@ -216,12 +221,14 @@ Assistant:"""
         self.voice_button.pack(side=tk.LEFT, padx=5)
 
     def update_ui_and_speak(self, text):
-        self.text_area.insert(tk.END, f"AI: {text}\n")
-        self.text_area.see(tk.END)
-        threading.Thread(target=self.speak, args=(text,), daemon=True).start()
+        threading.Thread(
+            target=self.speak_and_update_text, args=(text,), daemon=True
+        ).start()
 
-    def speak(self, text):
+    def speak_and_update_text(self, text):
         try:
+            start_time = time.time()
+
             inputs = self.processor(
                 text=text.strip(),
                 return_tensors="pt",
@@ -237,6 +244,12 @@ Assistant:"""
                 ),
                 vocoder=self.vocoder,
             )
+
+            tts_time = time.time() - start_time
+            print(f"TTS Generation Time: {tts_time:.2f} seconds")
+
+            self.root.after(0, lambda: self.text_area.insert(tk.END, f"AI: {text}\n"))
+            self.root.after(0, self.text_area.see, tk.END)
 
             audio_data = speech.cpu().numpy()
             duration = len(audio_data) / 16000
