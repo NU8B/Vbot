@@ -2,6 +2,7 @@
 transformers
 datasets
 soundfile
+librosa
 accelerate
 sounddevice
 soundfile
@@ -11,6 +12,7 @@ scipy
 huggingface-hub
 ipykernel
 jupyter
+tensorboard
 bitsandbytes
 faster_whisper
 pyaudio
