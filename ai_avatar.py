@@ -18,6 +18,8 @@ import sounddevice as sd
 import warnings
 from pathlib import Path
 import requests
+import re
+from num2words import num2words
 
 warnings.filterwarnings("ignore")
 os.makedirs("./cache", exist_ok=True)
@@ -247,9 +249,7 @@ Assistant:"""
             print(f"Error in audio processing: {str(e)}")
 
     def _process_text(self, text):
-        """Unified text processing for both voice and text input"""
         try:
-            # Get the correct start time based on input method
             processing_start = self.timings.get("processing_start", time.time())
 
             # LLM Processing
@@ -257,9 +257,12 @@ Assistant:"""
             response = self.process(text)
             self.timings["llm"] = time.time() - llm_start
 
+            # Clean the response text for TTS
+            cleaned_response = self.clean_text_for_tts(response.strip())
+
             # Text to Speech - prepare inputs
             inputs = self.processor(
-                text=response.strip(),
+                text=cleaned_response,
                 return_tensors="pt",
                 padding=True,
                 return_attention_mask=True,
@@ -442,6 +445,38 @@ Assistant:"""
             return "output.wav"
 
         return None
+
+    def normalize_text(self, text):
+        """Normalize text by converting to lowercase and cleaning punctuation."""
+        # Convert to lowercase
+        text = text.lower()
+
+        # Only remove specific punctuation, keeping important ones
+        # Keep: periods, commas, question marks, exclamation marks
+        text = re.sub(r"[^\w\s\',.!?]", "", text)
+
+        # Ensure single spaces between words and punctuation
+        text = " ".join(text.split())
+
+        return text
+
+    def clean_text_for_tts(self, text):
+        """Process text through all cleaning steps."""
+        print(f"Original text: {text}")
+
+        # Convert numbers to words using num2words
+        def replace_num(match):
+            try:
+                return num2words(int(match.group()))
+            except ValueError:
+                return match.group()
+
+        converted_text = re.sub(r"\b\d+\b", replace_num, text)
+
+        final_text = self.normalize_text(converted_text)
+        print(f"Clean text: {final_text}\n")
+
+        return final_text
 
 
 def main():
