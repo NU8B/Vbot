@@ -1,0 +1,54 @@
+# Cache directory
+cache/
+*.cache
+
+# Configuration files with sensitive data
+config.py
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+
+# Environment
+.env
+.venv
+env/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db 
+
+# Audio files
+output.wav
+
+# Add these lines to your .gitignore
+*.pyc
+__pycache__/
+/Data_prep/Data
+

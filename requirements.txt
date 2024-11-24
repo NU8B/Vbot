@@ -1,0 +1,33 @@
+# conda create -n VBOT python=3.10
+
+# Core numerical and scientific libraries
+numpy==2.0.2
+scipy==1.14.1
+pandas==2.2.3
+
+# ML/DL framework dependencies
+accelerate==1.1.1
+tensorboard==2.18.0
+huggingface-hub==0.26.2
+transformers==4.46.3
+datasets==3.1.0
+bitsandbytes==0.44.1
+
+# Audio processing libraries
+soundfile==0.12.1
+librosa==0.10.2.post1
+sounddevice==0.5.1
+pyaudio==0.2.14
+speechbrain==1.0.2
+faster-whisper==1.0.3
+
+# Utilities and other dependencies
+requests==2.32.3
+pillow==11.0.0
+ipykernel==6.29.5
+jupyter==1.1.1
+num2words==0.5.13
+eng_to_ipa
+
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# install ollama at https://ollama.com/download
