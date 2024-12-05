@@ -57,3 +57,4 @@ __pycache__/
 /examples
 /StyleTTS2
 Tree.py
+/cached_model
