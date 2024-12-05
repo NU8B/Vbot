@@ -1,199 +1,121 @@
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torchaudio
+import numpy as np
 from tqdm import tqdm
-import random
 from faster_whisper import WhisperModel
-import eng_to_ipa as ipa
-import torch
-from transformers import AlbertTokenizer
-
-# Initialize models
-model = WhisperModel("distil-large-v3", device="cuda", compute_type="float16")
-tokenizer = AlbertTokenizer.from_pretrained("albert-base-v2")
-
-
-def count_tokens(text):
-    """Accurate token count using BERT tokenizer"""
-    tokens = tokenizer.encode(text, add_special_tokens=True)
-    return len(tokens)
+from StyleTTS2.text_utils import TextCleaner, symbols
+from phonemizer.backend import EspeakBackend
 
 
 def clean_text(text):
-    """Clean text before conversion"""
-    if not isinstance(text, str):
-        text = str(text)
-
-    # Remove repetitive sentences
-    sentences = text.split(".")
-    unique_sentences = []
-    for sent in sentences:
-        sent = sent.strip()
-        if sent and sent not in unique_sentences:
-            unique_sentences.append(sent)
-    text = ". ".join(unique_sentences)
-
-    # Basic cleaning
-    text = (
-        text.replace(".", "").replace(",", "").replace("?", "").replace("!", "").strip()
-    )
-
-    # Remove repetitive words or phrases
-    words = text.split()
-    unique_words = []
-    prev_words = []
-    for word in words:
-        # Check for repetition within a window of 3 words
-        if len(prev_words) < 3 or word not in prev_words[-3:]:
-            unique_words.append(word)
-            prev_words.append(word)
-
-    return " ".join(unique_words)
+    """Clean text to only include allowed characters"""
+    allowed_chars = set(symbols)
+    return "".join(c for c in text if c in allowed_chars)
 
 
-def add_stress_marks(text):
-    """Add stress marks to IPA text"""
-    words = text.split()
-    marked_words = []
-    for word in words:
-        if len(word) > 1 and not any(c in word for c in "ˈˌ"):
-            word = "ˈ" + word
-        marked_words.append(word)
-    return " ".join(marked_words)
-
-
-def text_to_ipa(text):
-    """Convert text to IPA using eng_to_ipa"""
+def phonemize_text(text):
+    """Convert text to phonemes using espeak with stress marks"""
     try:
-        # Clean the text
-        text = clean_text(text)
-
-        # Convert to IPA
-        ipa_text = ipa.convert(text)
-
-        # Remove the period at the end if present
-        if ipa_text.endswith("."):
-            ipa_text = ipa_text[:-1]
-
-        return ipa_text.strip()
-
+        # Initialize backend directly for more control
+        backend = EspeakBackend(
+            "en-us", with_stress=True, punctuation_marks=';:,.!?¡¿—…"«»“” '
+        )
+        phonemes = backend.phonemize([text])[0]
+        return clean_text(phonemes)
     except Exception as e:
-        print(f"Error converting to IPA: {text} - {str(e)}")
-        return text
+        print(f"Error phonemizing text: {e}")
+        return None
 
 
-def get_transcription(audio_path):
-    """Get transcription using Whisper"""
+def transcribe_audio(model, audio_path):
+    """Transcribe audio using Whisper"""
     segments, _ = model.transcribe(
         audio_path,
         beam_size=5,
         language="en",
         condition_on_previous_text=False,
     )
-    return " ".join(segment.text.strip() for segment in segments)
+    text = " ".join(segment.text.strip() for segment in segments)
+    # Convert to phonemes
+    return phonemize_text(text)
 
 
-def prepare_styletts2_data(raw_audio_dir, output_dir, max_tokens=510):
-    """Prepare data in StyleTTS2 format with token limit"""
-    # Create necessary directories
+def prepare_data(data_dir, output_dir, sr=24000):
+    """Prepare data for StyleTTS2 training"""
+    # Initialize Whisper and TextCleaner
+    model = WhisperModel("distil-large-v3", device="cuda", compute_type="float16")
+    text_cleaner = TextCleaner()
+
+    # Create output directory structure
     os.makedirs(os.path.join(output_dir, "wavs"), exist_ok=True)
 
-    # Process audio files and create metadata
-    metadata = []
-    wav_files = [f for f in os.listdir(raw_audio_dir) if f.endswith(".wav")]
-    skipped_count = 0
-    token_skipped = 0
+    train_list = []
+    val_list = []
 
-    for idx, filename in enumerate(tqdm(wav_files, desc="Processing files")):
+    # Get all wav files
+    audio_files = [f for f in os.listdir(data_dir) if f.endswith(".wav")]
+
+    # Sort files to ensure consistent ordering
+    audio_files.sort()
+
+    for i, audio_file in enumerate(tqdm(audio_files, desc="Processing files")):
         try:
-            wav_path = os.path.join(raw_audio_dir, filename)
+            # Load and process audio
+            wav_path = os.path.join(data_dir, audio_file)
+            wav, sr_orig = torchaudio.load(wav_path)
 
-            # Get transcription
-            transcription = get_transcription(wav_path)
+            # Convert to mono if necessary
+            if wav.shape[0] > 1:
+                wav = wav.mean(dim=0, keepdim=True)
 
-            # Clean text
-            cleaned_text = clean_text(transcription)
+            # Resample if needed
+            if sr_orig != sr:
+                wav = torchaudio.transforms.Resample(sr_orig, sr)(wav)
 
-            # Check token count using BERT tokenizer
-            token_count = count_tokens(cleaned_text)
-            if token_count > max_tokens:
-                print(
-                    f"\nSkipping {filename} - too many tokens ({token_count} > {max_tokens})"
-                )
-                token_skipped += 1
-                skipped_count += 1
+            # Transcribe audio and convert to phonemes
+            phonemes = transcribe_audio(model, wav_path)
+
+            # Skip if phonemes is None or empty
+            if not phonemes or not phonemes.strip():
+                print(f"Skipping {audio_file}: Empty or invalid phonemes")
                 continue
 
-            # Load and check audio
-            waveform, sample_rate = torchaudio.load(wav_path)
+            # Verify phonemes can be processed by TextCleaner
+            _ = text_cleaner(phonemes)
 
-            # Check minimum duration and pad if possible
-            min_samples = int(0.5 * sample_rate)
-            if waveform.size(1) < min_samples:
-                if waveform.size(1) < min_samples * 0.5:  # If less than 0.25 seconds
-                    print(f"\nSkipping {filename} - too short")
-                    skipped_count += 1
-                    continue
-                padding = min_samples - waveform.size(1)
-                waveform = torch.nn.functional.pad(waveform, (0, padding))
+            # Create new filename without spaces
+            new_filename = f"{i:04d}.wav"
 
-            # Convert transcription to IPA
-            ipa_text = text_to_ipa(cleaned_text)
+            # Save processed wav in wavs subdirectory
+            output_wav_path = os.path.join(output_dir, "wavs", new_filename)
+            torchaudio.save(output_wav_path, wav, sr)
 
-            if not ipa_text:
-                print(f"\nSkipping {filename} - empty IPA conversion")
-                skipped_count += 1
-                continue
+            # Create metadata entry (filename|phonemes|speaker_id) without 'wavs/' prefix
+            metadata_entry = f"{new_filename}|{phonemes}|0"
 
-            # Process audio
-            if sample_rate != 24000:
-                resampler = torchaudio.transforms.Resample(sample_rate, 24000)
-                waveform = resampler(waveform)
-
-            # Save processed audio
-            new_filename = f"{idx+1:04d}.wav"
-            output_path = os.path.join(output_dir, "wavs", new_filename)
-            torchaudio.save(output_path, waveform, 24000)
-
-            metadata.append((new_filename, ipa_text))
+            # Split into train/val (90/10)
+            if np.random.random() < 0.9:
+                train_list.append(metadata_entry)
+            else:
+                val_list.append(metadata_entry)
 
         except Exception as e:
-            print(f"\nError processing {filename}: {e}")
-            skipped_count += 1
+            print(f"Error processing {audio_file}: {e}")
             continue
 
-    print(f"\nProcessing complete:")
-    print(f"Total files processed: {len(wav_files)}")
-    print(f"Files skipped due to token length: {token_skipped}")
-    print(f"Total files skipped: {skipped_count}")
-    print(f"Files included: {len(metadata)}")
-
-    if not metadata:
-        raise ValueError("No valid files to process!")
-
-    # Split into train/val sets (90/10 split)
-    random.shuffle(metadata)
-    split_idx = int(len(metadata) * 0.9)
-    train_data = metadata[:split_idx]
-    val_data = metadata[split_idx:]
-
-    # Write train_list.txt
+    # Save metadata files
     with open(os.path.join(output_dir, "train_list.txt"), "w", encoding="utf-8") as f:
-        for filename, phonemes in train_data:
-            f.write(f"{filename}|{phonemes}|0\n")
-
-    # Write val_list.txt
+        f.write("\n".join(train_list))
     with open(os.path.join(output_dir, "val_list.txt"), "w", encoding="utf-8") as f:
-        for filename, phonemes in val_data:
-            f.write(f"{filename}|{phonemes}|0\n")
+        f.write("\n".join(val_list))
 
 
 if __name__ == "__main__":
-    try:
-        raw_audio_dir = "raw_data/raw_audio"
-        output_dir = "Data"
+    data_dir = "Data_prep/raw_data/raw_audio"
+    output_dir = "Data_prep/Data"
+    sr = 24000
 
-        print(f"Processing audio files from: {raw_audio_dir}")
-        prepare_styletts2_data(raw_audio_dir, output_dir, max_tokens=510)
-        print("Processing completed successfully!")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+    prepare_data(data_dir, output_dir, sr)

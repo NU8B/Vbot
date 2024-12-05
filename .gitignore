@@ -52,3 +52,7 @@ output.wav
 __pycache__/
 /Data_prep/Data
 
+/models
+*.zip
+/examples
+/StyleTTS2
