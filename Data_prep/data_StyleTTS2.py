@@ -10,6 +10,7 @@ from faster_whisper import WhisperModel
 from StyleTTS2.text_utils import TextCleaner, symbols
 from phonemizer.backend import EspeakBackend
 from transformers import AlbertTokenizer
+import torchaudio.transforms as T
 
 
 def clean_text(text):
@@ -70,8 +71,13 @@ def prepare_data(data_dir, output_dir, sr, max_tokens):
             wav_path = os.path.join(data_dir, audio_file)
             wav, sr_orig = torchaudio.load(wav_path)
 
+            # Resample if necessary
+            if sr_orig != sr:
+                resampler = T.Resample(orig_freq=sr_orig, new_freq=sr)
+                wav = resampler(wav)
+
             # Check minimum duration (0.5 seconds)
-            min_samples = int(0.5 * sr_orig)
+            min_samples = int(0.5 * sr)
             if wav.size(1) < min_samples:
                 if wav.size(1) < min_samples * 0.5:  # If less than 0.25 seconds
                     print(f"\nSkipping {audio_file} - too short")

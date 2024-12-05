@@ -56,3 +56,4 @@ __pycache__/
 *.zip
 /examples
 /StyleTTS2
+Tree.py
