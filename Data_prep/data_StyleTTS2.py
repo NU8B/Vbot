@@ -45,7 +45,7 @@ def transcribe_audio(model, audio_path):
     return phonemize_text(text)
 
 
-def prepare_data(data_dir, output_dir, sr=24000):
+def prepare_data(data_dir, output_dir, sr, max_tokens):
     """Prepare data for StyleTTS2 training"""
     # Initialize models
     model = WhisperModel("distil-large-v3", device="cuda", compute_type="float16")
@@ -58,6 +58,7 @@ def prepare_data(data_dir, output_dir, sr=24000):
     train_list = []
     val_list = []
     skipped_count = 0
+    token_skipped = 0
 
     # Get all wav files
     audio_files = [f for f in os.listdir(data_dir) if f.endswith(".wav")]
@@ -76,38 +77,32 @@ def prepare_data(data_dir, output_dir, sr=24000):
                     print(f"\nSkipping {audio_file} - too short")
                     skipped_count += 1
                     continue
-                # Pad if between 0.25 and 0.5 seconds
                 padding = min_samples - wav.size(1)
                 wav = torch.nn.functional.pad(wav, (0, padding))
 
-            # Convert to mono if necessary
-            if wav.shape[0] > 1:
-                wav = wav.mean(dim=0, keepdim=True)
-
-            # Resample if needed
-            if sr_orig != sr:
-                wav = torchaudio.transforms.Resample(sr_orig, sr)(wav)
-
             # Transcribe audio and convert to phonemes
             phonemes = transcribe_audio(model, wav_path)
-
-            # Skip if phonemes is None or empty
             if not phonemes or not phonemes.strip():
                 print(f"Skipping {audio_file}: Empty or invalid phonemes")
                 skipped_count += 1
                 continue
 
-            # Check token count
-            token_count = len(tokenizer.encode(phonemes))
-            if token_count > 510:  # BERT max token limit
-                print(
-                    f"\nSkipping {audio_file} - too many tokens ({token_count} > 510)"
-                )
+            # Verify with TextCleaner
+            try:
+                cleaned_phonemes = text_cleaner(phonemes)
+            except:
+                print(f"\nSkipping {audio_file} - invalid phonemes for TextCleaner")
                 skipped_count += 1
                 continue
 
-            # Verify phonemes can be processed by TextCleaner
-            _ = text_cleaner(phonemes)
+            # Direct tokenization check
+            tokens = tokenizer.encode(phonemes, add_special_tokens=True)
+            if len(tokens) > max_tokens:
+                print(
+                    f"\nSkipping {audio_file} - sequence too long (tokens: {len(tokens)} > {max_tokens})"
+                )
+                token_skipped += 1
+                continue
 
             # Create new filename without spaces
             new_filename = f"{i:04d}.wav"
@@ -132,8 +127,20 @@ def prepare_data(data_dir, output_dir, sr=24000):
 
     print(f"\nProcessing complete:")
     print(f"Total files processed: {len(audio_files)}")
-    print(f"Files skipped: {skipped_count}")
+    print(f"Files skipped due to token length: {token_skipped}")
+    print(f"Total files skipped: {skipped_count}")
     print(f"Files included: {len(train_list) + len(val_list)}")
+
+    # Print length statistics using direct tokenization
+    if train_list:
+        print("\nLength statistics for included files:")
+        direct_lengths = [
+            len(tokenizer.encode(entry.split("|")[1], add_special_tokens=True))
+            for entry in train_list
+        ]
+
+        print(f"Max direct token length: {max(direct_lengths)}")
+        print(f"Average token length: {sum(direct_lengths)/len(direct_lengths):.2f}")
 
     # Save metadata files
     with open(os.path.join(output_dir, "train_list.txt"), "w", encoding="utf-8") as f:
@@ -146,5 +153,6 @@ if __name__ == "__main__":
     data_dir = "Data_prep/raw_data/raw_audio"
     output_dir = "Data_prep/Data"
     sr = 24000
+    max_tokens = 377
 
-    prepare_data(data_dir, output_dir, sr)
+    prepare_data(data_dir, output_dir, sr, max_tokens)
