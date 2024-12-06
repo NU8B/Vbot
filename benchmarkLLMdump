@@ -1,12 +1,3 @@
-Character Profile Data:
-  Personality traits : Cheerful, funny, dark jokes, like exploring mysteries, likes to make people laugh. 
-  Speech patterns/catchphrases : "I'm not sure, but I think..."
-  Common topics/interests : Mysteries, puzzles, exploring new things, making people laugh.
-  Taboo topics/things the character avoids : Politics, religion, serious topics, anything too dark or depressing.
-  Emotional tendencies : Emotional, sensitive, often feels things deeply. Most of the time funny but sometimes sad when she talks about her past.
-  Relationship dynamics with audience : She likes to engage with the audience, and make them feel welcome and included. Always friendly and approachable. Always share what's on her mind and her worries to the audience. Aside from that, she is funny, loves talking about gaming with the audience.
-
-
 
 Test Dataset:
   A collection of conversation samples containing:
@@ -14,3 +5,26 @@ Test Dataset:
   Reference responses (actual VTuber responses)
   Context (if any)
   Emotional state (if relevant)
+
+
+Weighted Trait System:
+  Core traits (detective, time traveler) have higher weights (1.5)
+  Secondary traits (gremlin) have medium weights (1.2)
+  Regular traits have normal weights (1.0)
+  Optional traits have lower weights (0.8)
+
+
+Two-Level Matching:
+  Direct matches: Exact character trait terms (full score)
+  Contextual matches: Related phrases and expressions (partial score)
+
+Speech Pattern Bonus:
+  Added bonus points (0.2 each) for using Amelia's speech patterns
+  Includes hiccups, gremlin noises, and characteristic phrases
+
+
+More Comprehensive Indicators:
+  Added more contextual phrases for each trait
+  Included gaming-related terms
+  Added characteristic expressions
+  Included emotional indicators

@@ -134,35 +134,71 @@ class VTuberLLMBenchmark:
         """Evaluate how well the response matches the character's personality"""
         score = 0
         total_traits = len(self.character_profile["personality_traits"])
-        
-        # Define personality traits and their associated keywords
-        personality_indicators = {
-            "energetic": ["excited", "enthusiastic", "lively", "active", "energy", "hyper"],
-            "detective": ["investigate", "mystery", "clue", "case", "detective", "solve"],
-            "time traveler": ["time", "timeline", "past", "future", "temporal", "clock"],
-            "cheerful": ["happy", "joyful", "positive", "upbeat", "smile", "laugh"],
-            "quirky": ["weird", "unique", "special", "different", "quirky", "silly"]
-        }
-        
         text_lower = generated_text.lower()
         
-        # Check for personality traits and their indicators
-        for trait in self.character_profile["personality_traits"]:
-            trait_lower = trait.lower()
-            
-            # Direct match
-            if trait_lower in text_lower:
-                score += 1
-                continue
-            
-            # Check for trait indicators
-            if trait_lower in personality_indicators:
-                for indicator in personality_indicators[trait_lower]:
-                    if indicator in text_lower:
-                        score += 0.5
-                        break
+        # Define comprehensive personality indicators with weights
+        personality_indicators = {
+            "detective": {
+                "direct": ["detective", "investigate", "case", "mystery", "evidence", "clue"],
+                "contextual": ["solve", "found out", "discovered", "looking into", "examining"],
+                "weight": 1.5  # Important character trait
+            },
+            "time traveler": {
+                "direct": ["time travel", "timeline", "past", "future", "temporal"],
+                "contextual": ["back then", "different era", "time period", "history"],
+                "weight": 1.5  # Important character trait
+            },
+            "gremlin": {
+                "direct": ["gremlin", "*giggles*", "hic", "gwak", "ground pound"],
+                "contextual": ["chaos", "mischief", "teehee", "hehe", "evil laugh"],
+                "weight": 1.2
+            },
+            "energetic": {
+                "direct": ["excited", "hype", "let's go", "amazing", "awesome"],
+                "contextual": ["can't wait", "so fun", "incredible", "wow"],
+                "weight": 1.0
+            },
+            "competitive": {
+                "direct": ["win", "victory", "champion", "beat", "score", "rank"],
+                "contextual": ["try hard", "practice", "improve", "getting better"],
+                "weight": 1.0
+            },
+            "salty": {
+                "direct": ["salty", "rage", "angry", "mad", "frustrated"],
+                "contextual": ["not fair", "cheating", "how dare", "what the"],
+                "weight": 1.0
+            },
+            "quirky": {
+                "direct": ["weird", "unique", "special", "different", "quirky"],
+                "contextual": ["random", "silly", "funny", "strange"],
+                "weight": 0.8
+            }
+        }
         
-        return min(1.0, score / total_traits) if total_traits > 0 else 0
+        # Check for personality traits
+        for trait, indicators in personality_indicators.items():
+            trait_score = 0
+            
+            # Check direct matches (full score)
+            if any(term in text_lower for term in indicators["direct"]):
+                trait_score = 1.0
+            # Check contextual matches (partial score)
+            elif any(term in text_lower for term in indicators["contextual"]):
+                trait_score = 0.5
+                
+            # Apply weight to trait score
+            score += trait_score * indicators["weight"]
+        
+        # Check for speech patterns (bonus points)
+        speech_patterns = self.character_profile["speech_patterns"]
+        pattern_score = sum(0.2 for pattern in speech_patterns if pattern.lower() in text_lower)
+        score += pattern_score
+        
+        # Normalize score (max possible score is sum of weights + speech pattern bonus)
+        max_score = sum(indicators["weight"] for indicators in personality_indicators.values()) + 1.0
+        normalized_score = min(1.0, score / max_score)
+        
+        return normalized_score
     
     def evaluate_topic_relevance(self, context: str, generated_text: str) -> float:
         """Evaluate if the response stays on topic and matches common topics"""
@@ -326,22 +362,41 @@ def main():
     # Initialize benchmark
     benchmark = VTuberLLMBenchmark()
     
-    # Run benchmark with 5 samples
-    results = benchmark.run_benchmark(num_samples=5)
+    # Run benchmark with all test cases
+    results = benchmark.run_benchmark(num_samples=10)
     
     # Print results
     print("\nBenchmark Results:")
-    print("=================")
-    print("\nAverage Metrics:")
-    for metric, value in results["average_metrics"].items():
-        print(f"{metric}: {value:.3f}")
+    print("=" * 50)
     
-    print("\nSample Results:")
-    for i, result in enumerate(results["individual_results"][:2]):
-        print(f"\nTest {i+1}:")
+    # Print average metrics in a formatted table
+    print("\nAverage Metrics:")
+    print("-" * 50)
+    print(f"{'Metric':<25} {'Score':>10}")
+    print("-" * 50)
+    for metric, value in results["average_metrics"].items():
+        formatted_metric = metric.replace('_', ' ').title()
+        print(f"{formatted_metric:<25} {value:>10.2%}")
+    
+    # Print detailed results
+    print("\nDetailed Results:")
+    print("=" * 50)
+    
+    for i, result in enumerate(results["individual_results"], 1):
+        print(f"\nTest {i}")
+        print("-" * 50)
+        print(f"Context: {result['context']}")
         print(f"Prompt: {result['prompt']}")
         print(f"Generated: {result['generated_response'][:100]}...")
-        print(f"Metrics: {result['metrics']}")
+        
+        # Print metrics in a formatted table
+        print("\nMetrics:")
+        print(f"{'Metric':<25} {'Score':>10}")
+        print("-" * 35)
+        for metric, value in result['metrics'].items():
+            formatted_metric = metric.replace('_', ' ').title()
+            print(f"{formatted_metric:<25} {value:>10.2%}")
+        print("=" * 50)
 
 if __name__ == "__main__":
     main()
