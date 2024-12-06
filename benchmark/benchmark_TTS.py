@@ -252,7 +252,7 @@ class VoiceBenchmark:
                 indent=2,
             )
 
-        # Save summary
+        # Save summary with explanations
         summary_file = output_dir / "summary.txt"
         with open(summary_file, "w") as f:
             f.write("StyleTTS2 Benchmark Summary\n")
@@ -262,12 +262,24 @@ class VoiceBenchmark:
             f.write(f"Total files: {len(wav_files)}\n")
             f.write(f"Processed files: {processed_files}\n")
             f.write(f"Valid PESQ scores: {valid_pesq_scores}\n\n")
+
             f.write("Average Metrics:\n")
             f.write("--------------\n")
             f.write(f"Speaker Similarity: {avg_metrics['speaker_similarity']:.4f}\n")
+            f.write(
+                "(Range: 0-1, Higher is better. Measures how well the voice characteristics match)\n\n"
+            )
+
             f.write(f"PESQ Score: {avg_metrics['pesq_score']:.4f}\n")
             f.write(
+                "(Range: 1-4.5, Higher is better. Industry standard for audio quality)\n"
+            )
+
+            f.write(
                 f"Transcription Accuracy: {avg_metrics['transcription_accuracy']:.4f}\n"
+            )
+            f.write(
+                "(Range: 0-1, Higher is better. Measures how well the content/words are preserved)\n"
             )
 
         print(
@@ -284,16 +296,30 @@ def main():
     # Run the benchmark and get results
     avg_metrics = benchmark.benchmark_dataset(
         dataset_path="Data_prep/raw_data/raw_audio2",
-        output_dir="benchmark/results",  # Updated default output directory
+        output_dir="benchmark/results",
     )
 
-    # Print the results
+    # Print the results with explanations
     if avg_metrics:
         print("\nBenchmark Results:")
         print("------------------")
         print(f"Speaker Similarity: {avg_metrics['speaker_similarity']:.4f}")
+        print("(Range: 0-1, Higher is better)")
+        print(
+            "Measures how well the generated voice matches the characteristics of the original voice"
+        )
+        print()
+
         print(f"PESQ Score: {avg_metrics['pesq_score']:.4f}")
+        print("(Range: 1-4.5, Higher is better)")
+        print("Industry standard measure of audio quality:")
+        print()
+
         print(f"Transcription Accuracy: {avg_metrics['transcription_accuracy']:.4f}")
+        print("(Range: 0-1, Higher is better)")
+        print(
+            "Measures how well the generated speech preserves the original text content"
+        )
     else:
         print("\nBenchmark failed: No results to display")
 
