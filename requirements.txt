@@ -6,6 +6,9 @@ scipy==1.14.1
 pandas==2.2.3
 
 # ML/DL framework dependencies
+torch
+torchvision
+torchaudio
 accelerate==1.1.1
 tensorboard==2.18.0
 huggingface-hub==0.26.2
@@ -20,14 +23,16 @@ sounddevice==0.5.1
 pyaudio==0.2.14
 speechbrain==1.0.2
 faster-whisper==1.0.3
+phonemizer
+
+# Text processing and NLP
+nltk
+munch
+eng_to_ipa
+num2words==0.5.13
 
 # Utilities and other dependencies
 requests==2.32.3
 pillow==11.0.0
 ipykernel==6.29.5
 jupyter==1.1.1
-num2words==0.5.13
-eng_to_ipa
-
-# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-# install ollama at https://ollama.com/download
