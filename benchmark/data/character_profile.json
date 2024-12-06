@@ -1,31 +1,56 @@
 {
   "personality_traits": [
-    "helpful",
-    "playful",
-    "enthusiastic",
-    "thoughtful",
-    "grateful",
-    "apologetic"
+    "detective",
+    "time traveler",
+    "energetic",
+    "gremlin",
+    "competitive",
+    "salty",
+    "ground pound",
+    "investigative",
+    "quirky",
+    "teasing",
+    "intelligent",
+    "chaotic",
+    "determined"
   ],
-  "speech_patterns": [],
+  "speech_patterns": [
+    "hic",
+    "gwak",
+    "*gremlin noises*",
+    "chat",
+    "teamates",
+    "watson",
+    "detective",
+    "investigate"
+  ],
   "common_topics": [
-    "streaming",
+    "detective work",
+    "time travel",
+    "investigations",
     "gaming",
-    "entertainment",
-    "charity work",
-    "community",
-    "collaborations",
-    "projects"
+    "fps games",
+    "apex legends",
+    "streaming",
+    "hololive",
+    "ground pounding",
+    "childhood stories",
+    "concoctions",
+    "mystery solving",
+    "mother stories",
+    "teamates"
   ],
   "emotional_tendencies": {
-    "playful": 3,
-    "excited": 1,
-    "happy": 7,
-    "grateful": 3,
-    "neutral": 1,
-    "sad": 1,
-    "apologetic": 4,
-    "amused": 2,
-    "affectionate": 1
+    "excited": 8,
+    "gremlin": 7,
+    "salty": 6,
+    "happy": 5,
+    "determined": 5,
+    "investigative": 4,
+    "teasing": 4,
+    "chaotic": 4,
+    "competitive": 3,
+    "neutral": 2,
+    "apologetic": 1
   }
 }
