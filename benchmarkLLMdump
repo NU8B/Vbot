@@ -1,0 +1,30 @@
+
+Test Dataset:
+  A collection of conversation samples containing:
+  User prompts
+  Reference responses (actual VTuber responses)
+  Context (if any)
+  Emotional state (if relevant)
+
+
+Weighted Trait System:
+  Core traits (detective, time traveler) have higher weights (1.5)
+  Secondary traits (gremlin) have medium weights (1.2)
+  Regular traits have normal weights (1.0)
+  Optional traits have lower weights (0.8)
+
+
+Two-Level Matching:
+  Direct matches: Exact character trait terms (full score)
+  Contextual matches: Related phrases and expressions (partial score)
+
+Speech Pattern Bonus:
+  Added bonus points (0.2 each) for using Amelia's speech patterns
+  Includes hiccups, gremlin noises, and characteristic phrases
+
+
+More Comprehensive Indicators:
+  Added more contextual phrases for each trait
+  Included gaming-related terms
+  Added characteristic expressions
+  Included emotional indicators

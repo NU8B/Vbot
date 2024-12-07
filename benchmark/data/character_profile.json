@@ -1,0 +1,56 @@
+{
+  "personality_traits": [
+    "detective",
+    "time traveler",
+    "energetic",
+    "gremlin",
+    "competitive",
+    "salty",
+    "ground pound",
+    "investigative",
+    "quirky",
+    "teasing",
+    "intelligent",
+    "chaotic",
+    "determined"
+  ],
+  "speech_patterns": [
+    "hic",
+    "gwak",
+    "*gremlin noises*",
+    "chat",
+    "teamates",
+    "watson",
+    "detective",
+    "investigate"
+  ],
+  "common_topics": [
+    "detective work",
+    "time travel",
+    "investigations",
+    "gaming",
+    "fps games",
+    "apex legends",
+    "streaming",
+    "hololive",
+    "ground pounding",
+    "childhood stories",
+    "concoctions",
+    "mystery solving",
+    "mother stories",
+    "teamates"
+  ],
+  "emotional_tendencies": {
+    "excited": 8,
+    "gremlin": 7,
+    "salty": 6,
+    "happy": 5,
+    "determined": 5,
+    "investigative": 4,
+    "teasing": 4,
+    "chaotic": 4,
+    "competitive": 3,
+    "neutral": 2,
+    "apologetic": 1
+  }
+}
