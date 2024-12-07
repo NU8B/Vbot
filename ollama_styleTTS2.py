@@ -1,25 +1,15 @@
-from transformers import (
-    SpeechT5Processor,
-    SpeechT5ForTextToSpeech,
-    SpeechT5HifiGan,
-    AutoModelForCausalLM, 
-    AutoTokenizer,
-    BitsAndBytesConfig
-)
-from faster_whisper import WhisperModel
 import tkinter as tk
 from tkinter import scrolledtext, ttk
+from pathlib import Path
 import threading
 import torch
-from PIL import Image, ImageTk
 import time
-import soundfile as sf
-import os
-import numpy as np
-from speechbrain.inference import EncoderClassifier
 import sounddevice as sd
 import warnings
-from pathlib import Path
+import numpy as np
+from faster_whisper import WhisperModel
+from ollama_speecht5 import AnimatedAvatar
+import os
 import requests
 import re
 from num2words import num2words
@@ -28,47 +18,14 @@ warnings.filterwarnings("ignore")
 os.makedirs("./cache", exist_ok=True)
 
 
-class AnimatedAvatar:
-    def __init__(self, canvas, width, height):
-        self.canvas = canvas
-        self.width = width
-        self.height = height
-        self.mouth_closed = Image.open("./asset/pic-close.png")
-        self.mouth_open = Image.open("./asset/pic-open.png")
-        self.mouth_closed = self.mouth_closed.resize((width, height))
-        self.mouth_open = self.mouth_open.resize((width, height))
-        self.mouth_closed_photo = ImageTk.PhotoImage(self.mouth_closed)
-        self.mouth_open_photo = ImageTk.PhotoImage(self.mouth_open)
-        self.image_on_canvas = self.canvas.create_image(
-            0, 0, anchor=tk.NW, image=self.mouth_closed_photo
-        )
-
-    def animate_mouth(self, duration):
-        frames = int(duration * 10)
-        for i in range(frames):
-            if i % 2 == 0:
-                self.canvas.itemconfig(
-                    self.image_on_canvas, image=self.mouth_open_photo
-                )
-            else:
-                self.canvas.itemconfig(
-                    self.image_on_canvas, image=self.mouth_closed_photo
-                )
-            self.canvas.update()
-            time.sleep(0.1)
-        self.canvas.itemconfig(self.image_on_canvas, image=self.mouth_closed_photo)
-
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from transformers import BitsAndBytesConfig
-
-class AIAssistant:
+class AIStyleTTS2:
     def __init__(self, root):
+        # Initialize GUI
         self.root = root
-        self.root.title("AI Assistant (Mistral)")
+        self.root.title("AI Chatbot")
         self.root.geometry("700x400")
 
-        cache_dir = Path("./cache")
+        cache_dir = Path("./cache/style_tts2_ft")
         cache_dir.mkdir(exist_ok=True)
 
         # Initialize Whisper model
@@ -79,45 +36,14 @@ class AIAssistant:
             download_root=str(cache_dir / "whisper"),
         )
 
-        # Initialize SpeechT5
-        self.processor = SpeechT5Processor.from_pretrained(
-            "microsoft/speecht5_tts", cache_dir=cache_dir / "speecht5"
-        )
-        self.model = SpeechT5ForTextToSpeech.from_pretrained(
-            "nonoJDWAOIDAWKDA/speecht5_finetuned_nono",
-            cache_dir=cache_dir / "speecht5_finetuned",
-        ).to("cuda" if torch.cuda.is_available() else "cpu")
+        # Initialize StyleTTS2
+        from inference_styleTTS2 import StyleTTS2Inference
 
-        self.vocoder = SpeechT5HifiGan.from_pretrained(
-            "microsoft/speecht5_hifigan",
-            cache_dir=cache_dir / "hifigan",
-        ).to("cuda" if torch.cuda.is_available() else "cpu")
+        self.tts_model = StyleTTS2Inference()
 
-        # Configure 4-bit quantization
-        quantization_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_use_double_quant=True,
-        )
-
-        # Initialize LLM model and tokenizer
-        self.model_id = "bluuwhale/L3-SthenoMaidBlackroot-8B-V1"
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_id,
-            cache_dir=cache_dir / "llm",
-            trust_remote_code=True
-        )
-        self.llm_model = AutoModelForCausalLM.from_pretrained(
-            self.model_id,
-            cache_dir=cache_dir / "llm",
-            quantization_config=quantization_config,
-            device_map="auto",
-            trust_remote_code=True
-        )
-
-        # Create speaker embeddings
-        self.speaker_embeddings = self.create_speaker_embeddings()
+        # Load reference audio for style
+        ref_path = "ref.wav"  # Using the same reference audio
+        self.ref_style = self.tts_model.compute_style(ref_path)
 
         # Add system prompt as a class attribute
         self.system_prompt = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
@@ -128,95 +54,8 @@ class AIAssistant:
         self.is_processing = False
         self.setup_gui()
 
-    def create_speaker_embeddings(self):
-        speaker_encoder = EncoderClassifier.from_hparams(
-            source="speechbrain/spkrec-xvect-voxceleb",
-            savedir=os.path.join("./cache", "spkrec-xvect-voxceleb"),
-            run_opts={"device": "cuda" if torch.cuda.is_available() else "cpu"},
-        )
-
-        audio_path = "data_train/raw_audio/Sound 121.wav"
-        waveform, sample_rate = sf.read(audio_path)
-
-        if len(waveform.shape) > 1:
-            waveform = waveform.mean(axis=1)
-
-        if sample_rate != 16000:
-            from scipy import signal
-
-            samples = len(waveform)
-            waveform = signal.resample(waveform, int(samples * 16000 / sample_rate))
-
-        waveform = waveform / np.abs(waveform).max()
-
-        with torch.no_grad():
-            speaker_embeddings = speaker_encoder.encode_batch(
-                torch.tensor(waveform).unsqueeze(0)
-            )
-            speaker_embeddings = torch.nn.functional.normalize(
-                speaker_embeddings, dim=2
-            )
-            speaker_embeddings = speaker_embeddings.squeeze().cpu()
-            return speaker_embeddings
-
-    def process(self, text):
-        if not text:
-            return "I'm sorry, I couldn't process that."
-
-        llm_start_time = time.time()
-
-        # Add the new message to chat history
-        self.chat_history.append({"role": "user", "content": text})
-
-        # Construct the conversation history
-        conversation = "\n".join(
-            [
-                f"{'Assistant' if msg['role'] == 'assistant' else 'User'}: {msg['content']}"
-                for msg in self.chat_history[-4:]
-            ]
-        )
-
-        # Construct the complete prompt
-        prompt = f"""{self.system_prompt}
-
-Previous conversation:
-{conversation}
-
-User: {text}
-Assistant:"""
-
-        try:
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.llm_model.device)
-            outputs = self.llm_model.generate(
-                **inputs,
-                max_new_tokens=100,
-                temperature=0.7,
-                top_p=0.9,
-                pad_token_id=self.tokenizer.eos_token_id
-            )
-            response_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
-            # Extract only the assistant's response
-            response_text = response_text.split("Assistant:")[-1].strip()
-
-            self.llm_time = time.time() - llm_start_time
-
-            # cleanup
-            if not response_text.endswith((".", "!", "?")):
-                response_text += "!"
-
-            # Store the AI's response in chat history
-            self.chat_history.append({"role": "assistant", "content": response_text})
-
-            return response_text
-
-        except Exception as e:
-            print(f"Error in model inference: {str(e)}")
-            self.llm_time = time.time() - llm_start_time
-            return "Sorry, I'm having trouble thinking right now!"
-
     def setup_gui(self):
-        # GUI setup remains the same as original
+        # GUI setup
         self.avatar_frame = ttk.Frame(self.root)
         self.avatar_frame.pack(side=tk.LEFT, padx=10, pady=10)
         self.avatar_canvas = tk.Canvas(self.avatar_frame, width=200, height=200)
@@ -245,33 +84,63 @@ Assistant:"""
         )
         self.voice_button.pack(side=tk.LEFT, padx=5)
 
-    def process_audio(self, audio_file):
+    def process(self, text):
+        if not text:
+            return "I'm sorry, I couldn't process that."
+
+        llm_start_time = time.time()
+
+        # Add the new message to chat history
+        self.chat_history.append({"role": "user", "content": text})
+
+        # Construct the conversation history
+        conversation = "\n".join(
+            [
+                f"{'Assistant' if msg['role'] == 'assistant' else 'User'}: {msg['content']}"
+                for msg in self.chat_history[-4:]  # Keep last 4 messages for context
+            ]
+        )
+
+        # Construct the complete prompt
+        prompt = f"""{self.system_prompt}
+
+Previous conversation:
+{conversation}
+
+User: {text}
+Assistant:"""
+
         try:
-            processing_start = time.time()  # Start total timing here
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "stheno",
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.7,
+                        "top_p": 0.9,
+                    },
+                },
+            ).json()
 
-            # Speech to Text
-            stt_start = time.time()
-            segments, _ = self.whisper_model.transcribe(
-                audio_file,
-                beam_size=5,
-                language="en",
-                condition_on_previous_text=False,
-            )
-            text = " ".join(segment.text.strip() for segment in segments)
-            self.timings = {
-                "stt": time.time() - stt_start,
-                "processing_start": processing_start,  # Store the start time
-            }
+            response_text = response["response"].strip()
 
-            # Batch UI updates
-            self.root.after(
-                0, lambda: self.text_area.insert(tk.END, f"You said: {text}\n")
-            )
+            self.llm_time = time.time() - llm_start_time
 
-            self._process_text(text)
+            # cleanup
+            if not response_text.endswith((".", "!", "?")):
+                response_text += "!"
+
+            # Store the AI's response in chat history
+            self.chat_history.append({"role": "assistant", "content": response_text})
+
+            return response_text
 
         except Exception as e:
-            print(f"Error in audio processing: {str(e)}")
+            print(f"Error in API call: {str(e)}")
+            self.llm_time = time.time() - llm_start_time
+            return "Sorry, I'm having trouble connecting to my brain right now!"
 
     def _process_text(self, text):
         try:
@@ -285,25 +154,16 @@ Assistant:"""
             # Clean the response text for TTS
             cleaned_response = self.clean_text_for_tts(response.strip())
 
-            # Text to Speech - prepare inputs
-            inputs = self.processor(
-                text=cleaned_response,
-                return_tensors="pt",
-                padding=True,
-                return_attention_mask=True,
-            ).to(self.model.device)
-
-            # Generate speech
+            # Text to Speech
             tts_start = time.time()
-            with torch.inference_mode():
-                speech = self.model.generate_speech(
-                    inputs["input_ids"],
-                    attention_mask=inputs["attention_mask"],
-                    speaker_embeddings=self.speaker_embeddings.unsqueeze(0).to(
-                        self.model.device
-                    ),
-                    vocoder=self.vocoder,
-                )
+            speech = self.tts_model.inference(
+                text=cleaned_response,
+                ref_s=self.ref_style,
+                alpha=0.3,
+                beta=0.7,
+                diffusion_steps=5,
+                embedding_scale=1,
+            )
             self.timings["tts"] = time.time() - tts_start
 
             # Calculate and print timing metrics
@@ -316,8 +176,7 @@ Assistant:"""
             print(f"├─ TTS: {self.timings['tts']:.2f}s")
 
             # Prepare audio playback
-            audio_data = speech.cpu().numpy()
-            duration = len(audio_data) / 16000
+            duration = len(speech) / 24000  # StyleTTS2 uses 24kHz sampling rate
 
             # Update UI and start playback
             def update_and_play():
@@ -326,7 +185,7 @@ Assistant:"""
                 threading.Thread(
                     target=self.avatar.animate_mouth, args=(duration,), daemon=True
                 ).start()
-                sd.play(audio_data, samplerate=16000)
+                sd.play(speech, samplerate=24000)  # StyleTTS2 uses 24kHz
                 time.sleep(duration + 0.5)  # Wait for audio to finish
                 sd.stop()
 
@@ -399,9 +258,7 @@ Assistant:"""
             if audio_data:
                 self.is_processing = True
                 self.disable_input_controls()
-                self.total_start_time = (
-                    time.time()
-                )  # Move timing start to here, after recording
+                self.total_start_time = time.time()
                 self.process_audio(audio_data)
         except Exception as e:
             self.text_area.insert(tk.END, f"Error capturing audio: {str(e)}\n")
@@ -415,7 +272,6 @@ Assistant:"""
     def record_audio(self):
         import pyaudio
         import wave
-        import numpy as np
 
         CHUNK = 1024
         FORMAT = pyaudio.paInt16
@@ -471,6 +327,34 @@ Assistant:"""
 
         return None
 
+    def process_audio(self, audio_file):
+        try:
+            processing_start = time.time()
+
+            # Speech to Text
+            stt_start = time.time()
+            segments, _ = self.whisper_model.transcribe(
+                audio_file,
+                beam_size=5,
+                language="en",
+                condition_on_previous_text=False,
+            )
+            text = " ".join(segment.text.strip() for segment in segments)
+            self.timings = {
+                "stt": time.time() - stt_start,
+                "processing_start": processing_start,
+            }
+
+            # Batch UI updates
+            self.root.after(
+                0, lambda: self.text_area.insert(tk.END, f"You said: {text}\n")
+            )
+
+            self._process_text(text)
+
+        except Exception as e:
+            print(f"Error in audio processing: {str(e)}")
+
     def normalize_text(self, text):
         """Normalize text by converting to lowercase and cleaning punctuation."""
         # Convert to lowercase
@@ -489,24 +373,64 @@ Assistant:"""
         """Process text through all cleaning steps."""
         print(f"Original text: {text}")
 
-        # Convert numbers to words using num2words
+        # Remove speaker labels and colons
+        text = re.sub(r"^.*?:", "", text).strip()
+
+        # Convert numbers to words
         def replace_num(match):
             try:
-                return num2words(int(match.group()))
+                num = int(match.group())
+                # Use 'year' for 4-digit numbers
+                if len(str(num)) == 4:
+                    return num2words(num, to="year")
+                # Use 'ordinal' for dates, 'cardinal' for other numbers
+                return num2words(num, to="cardinal")
             except ValueError:
                 return match.group()
 
-        converted_text = re.sub(r"\b\d+\b", replace_num, text)
+        # Convert numbers including years (e.g., 1920s)
+        text = re.sub(r"\b\d+s?\b", lambda m: replace_num(m).replace("-", " "), text)
 
-        final_text = self.normalize_text(converted_text)
-        print(f"Clean text: {final_text}\n")
+        # Preserve only allowed punctuation (.,!?) and handle spacing
+        text = re.sub(r"[^a-zA-Z0-9\s,.!?]", "", text)
+        text = re.sub(r"\s+([,.!?])", r"\1", text)
+        text = re.sub(r"([,.!?])\s+", r"\1 ", text)
 
-        return final_text
+        # Ensure proper word separation
+        text = " ".join(text.split())
+
+        print(f"Clean text: {text}\n")
+        return text
+
+    def warm_up(self):
+        """Warm up the LLM with a simple prompt to reduce initial latency."""
+        try:
+            print("Warming up LLM...")
+            warm_up_prompt = f"""{self.system_prompt}
+
+User: Hi there!
+Assistant:"""
+
+            requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "stheno",
+                    "prompt": warm_up_prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.7,
+                        "top_p": 0.9,
+                    },
+                },
+            )
+            print("LLM warm-up complete!")
+        except Exception as e:
+            print(f"LLM warm-up error (this is not critical): {str(e)}")
 
 
 def main():
     root = tk.Tk()
-    app = AIAssistant(root)
+    app = AIStyleTTS2(root)
     root.mainloop()
 
 

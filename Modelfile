@@ -1,4 +1,0 @@
-FROM bluuwhale/L3-SthenoMaidBlackroot-8B-V1
-
-PARAMETER temperature 0.7
-PARAMETER top_p 0.9 
