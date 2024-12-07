@@ -272,7 +272,7 @@ class VoiceBenchmark:
 
             f.write(f"PESQ Score: {avg_metrics['pesq_score']:.4f}\n")
             f.write(
-                "(Range: 1-4.5, Higher is better. Industry standard for audio quality)\n"
+                "(Range: -0.5 to 4.5, Higher is better. Industry standard for audio quality)\n\n"
             )
 
             f.write(
@@ -311,7 +311,7 @@ def main():
         print()
 
         print(f"PESQ Score: {avg_metrics['pesq_score']:.4f}")
-        print("(Range: 1-4.5, Higher is better)")
+        print("(Range: -0.5 to 4.5, Higher is better)")
         print("Industry standard measure of audio quality:")
         print()
 
