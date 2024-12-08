@@ -1,3 +1,6 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
 from transformers import (
     SpeechT5Processor,
     SpeechT5ForTextToSpeech,
@@ -135,7 +138,7 @@ class AIAssistant:
             run_opts={"device": "cuda" if torch.cuda.is_available() else "cpu"},
         )
 
-        audio_path = "data_train/raw_audio/Sound 121.wav"
+        audio_path = "Data_prep/raw_data/raw_audio/Sound 121.wav"
         waveform, sample_rate = sf.read(audio_path)
 
         if len(waveform.shape) > 1:
