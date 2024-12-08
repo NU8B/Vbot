@@ -1,15 +1,52 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
 import tkinter as tk
 import threading
 import torch
 import time
 import warnings
-import os
 from pathlib import Path
 import requests
+import shutil
 
 from util.audio_utils import AudioProcessor
 from util.gui import ChatGUI
 from util.inference_styleTTS2 import StyleTTS2Inference
+
+import os
+import nltk
+import nltk.data
+from pathlib import Path
+
+try:
+    # Try to load punkt from default locations first
+    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+except LookupError:
+    # If not found, use project directory as fallback
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    nltk_data_dir = os.path.join(current_dir, 'nltk_data')
+    os.makedirs(nltk_data_dir, exist_ok=True)
+    nltk.data.path.insert(0, nltk_data_dir)
+    
+    # Download required data to project directory
+    nltk.download('punkt', download_dir=nltk_data_dir)
+    nltk.download('punkt_tab', download_dir=nltk_data_dir)
+
+# Verify the file exists
+punkt_file = Path(nltk_data_dir) / 'tokenizers' / 'punkt' / 'english.pickle'
+if punkt_file.exists():
+    print(f"Found punkt file at: {punkt_file}")
+else:
+    print(f"Punkt file not found at expected location: {punkt_file}")
+
+try:
+    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+    print("Punkt is properly installed")
+except LookupError as e:
+    print(f"Punkt is not installed correctly: {str(e)}")
+    print(f"Current NLTK data paths: {nltk.data.path}")
+
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")

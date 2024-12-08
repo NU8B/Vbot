@@ -59,3 +59,7 @@ __pycache__/
 Tree.py
 /cached_model
 /benchmark/results
+
+
+# NLTK data directory
+nltk_data/
