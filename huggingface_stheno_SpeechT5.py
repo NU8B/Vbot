@@ -1,13 +1,14 @@
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 from transformers import (
     SpeechT5Processor,
     SpeechT5ForTextToSpeech,
     SpeechT5HifiGan,
-    AutoModelForCausalLM, 
+    AutoModelForCausalLM,
     AutoTokenizer,
-    BitsAndBytesConfig
+    BitsAndBytesConfig,
 )
 from faster_whisper import WhisperModel
 import tkinter as tk
@@ -65,6 +66,7 @@ class AnimatedAvatar:
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers import BitsAndBytesConfig
 
+
 class AIAssistant:
     def __init__(self, root):
         self.root = root
@@ -107,16 +109,14 @@ class AIAssistant:
         # Initialize LLM model and tokenizer
         self.model_id = "bluuwhale/L3-SthenoMaidBlackroot-8B-V1"
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_id,
-            cache_dir=cache_dir / "llm",
-            trust_remote_code=True
+            self.model_id, cache_dir=cache_dir / "llm", trust_remote_code=True
         )
         self.llm_model = AutoModelForCausalLM.from_pretrained(
             self.model_id,
             cache_dir=cache_dir / "llm",
             quantization_config=quantization_config,
             device_map="auto",
-            trust_remote_code=True
+            trust_remote_code=True,
         )
 
         # Create speaker embeddings
@@ -189,16 +189,18 @@ User: {text}
 Assistant:"""
 
         try:
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.llm_model.device)
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(
+                self.llm_model.device
+            )
             outputs = self.llm_model.generate(
                 **inputs,
                 max_new_tokens=100,
                 temperature=0.7,
                 top_p=0.9,
-                pad_token_id=self.tokenizer.eos_token_id
+                pad_token_id=self.tokenizer.eos_token_id,
             )
             response_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
+
             # Extract only the assistant's response
             response_text = response_text.split("Assistant:")[-1].strip()
 
