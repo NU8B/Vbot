@@ -1,6 +1,5 @@
 from faster_whisper import WhisperModel
 import os
-import torch
 import torchaudio
 from datasets import Dataset, Audio
 import pandas as pd

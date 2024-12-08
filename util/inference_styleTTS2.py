@@ -3,8 +3,6 @@ import random
 import yaml
 import time
 import numpy as np
-from munch import Munch
-import torch.nn.functional as F
 import torchaudio
 import librosa
 from nltk.tokenize import word_tokenize
@@ -15,13 +13,27 @@ import phonemizer
 from pathlib import Path
 import sys
 import shutil
+import warnings
+import logging
+
+# Suppress all warnings
+warnings.filterwarnings("ignore")
+logging.getLogger("phonemizer").setLevel(logging.ERROR)
+logging.getLogger().setLevel(logging.ERROR)
+
+# Disable tokenizers parallelism warning
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Add StyleTTS2 directory to Python path
-styletts2_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "StyleTTS2")
+styletts2_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "StyleTTS2"
+)
 sys.path.append(styletts2_path)
 
+from StyleTTS2.text_utils import TextCleaner
+
 # Download NLTK punkt if not already downloaded
-nltk.download("punkt")
+nltk.download("punkt", quiet=True)
 
 
 class StyleTTS2Inference:
@@ -32,6 +44,9 @@ class StyleTTS2Inference:
         )
         self.cache_dir = Path("cache/style_tts2_ft")
         self.cache_dir.mkdir(exist_ok=True)
+
+        # Initialize text cleaner (only once)
+        self.text_cleaner = TextCleaner()
 
         # Set seeds for reproducibility
         torch.manual_seed(0)
@@ -68,10 +83,6 @@ class StyleTTS2Inference:
         # Import necessary modules
         from StyleTTS2.models import build_model, load_ASR_models, load_F0_models
         from StyleTTS2.utils import recursive_munch
-        from StyleTTS2.text_utils import TextCleaner
-
-        # Initialize text cleaner
-        self.textcleaner = TextCleaner()
 
         # Create cache directories for utility models
         cache_dir = Path(self.cache_dir)
@@ -176,14 +187,34 @@ class StyleTTS2Inference:
 
         return torch.cat([ref_s, ref_p], dim=1)
 
+    def clean_text(self, text):
+        """Clean text before phonemization"""
+        # Basic cleanup only - let phonemizer handle the rest
+        text = " ".join(text.split())  # normalize whitespace
+        text = text.replace('"', "")  # remove quotes
+        text = text.replace('"', "")  # remove smart quotes
+        text = text.replace('"', "")  # remove smart quotes
+        text = text.replace("—", "-")  # normalize dashes
+        return text
+
     def inference(self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale):
         """Generate speech from text"""
-        text = text.strip()
+        # Clean text minimally
+        text = self.clean_text(text)
+
+        # Phonemize text - let it handle most of the normalization
         ps = self.global_phonemizer.phonemize([text])
+
+        # Tokenize the phonemized text
         ps = word_tokenize(ps[0])
         ps = " ".join(ps)
-        tokens = self.textcleaner(ps)
-        tokens.insert(0, 0)
+
+        # Convert to tokens using the simple TextCleaner
+        tokens = self.text_cleaner(ps)
+        if not tokens:  # If tokenization failed
+            raise ValueError("Text tokenization failed")
+
+        tokens.insert(0, 0)  # Add start token
         tokens = torch.LongTensor(tokens).to(self.device).unsqueeze(0)
 
         with torch.no_grad():
@@ -241,29 +272,3 @@ class StyleTTS2Inference:
             out = self.model.decoder(asr, F0_pred, N_pred, ref.squeeze().unsqueeze(0))
 
         return out.squeeze().cpu().numpy()[..., :-50]
-
-
-# Example usage:
-if __name__ == "__main__":
-    # Initialize the model
-    tts = StyleTTS2Inference()
-
-    # Text to synthesize
-    text = "Hello, this is a test of the StyleTTS2 model."
-
-    # Load reference audio (you need to provide a path to a reference audio file)
-    ref_path = "ref.wav"
-    ref_s = tts.compute_style(ref_path)
-
-    # Generate speech
-    start_time = time.time()
-    wav = tts.inference(
-        text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=10, embedding_scale=1
-    )
-    rtf = (time.time() - start_time) / (len(wav) / 24000)
-    print(f"RTF = {rtf:5f}")
-
-    # Save the generated audio
-    import soundfile as sf
-
-    sf.write("output.wav", wav, 24000)
