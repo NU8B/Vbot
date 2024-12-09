@@ -195,19 +195,34 @@ class AIStyleTTS2:
                         {"role": "system", "content": self.system_prompt},
                         {"role": "user", "content": prompt},
                     ],
-                    "stream": False,
+                    "stream": False,  # Default: False. Stream=True: ↓slower for short responses, ↑faster for long ones
                     "options": {
-                        # Optimized for Docker GPU setup
-                        "num_gpu": 100,
-                        "num_thread": 8,
-                        "batch_size": 1024,
-                        "f16_kv": True,
-                        "num_ctx": 4096,
-                        "temperature": 0.7,
-                        "top_p": 0.9,
-                        "top_k": 40,
-                        "repeat_penalty": 1.1,
-                        "use_flash_attn": True,
+                        # Core Performance Parameters
+                        "num_gpu": 100,  # Range: 0-100, Default: 50. ↑=faster (more GPU layers used). 0=CPU only
+                        "num_thread": 32,  # Range: 1-n, Default: 4. ↑=faster on multi-core CPUs, but may saturate
+                        "batch_size": 2048,  # Range: 1-2048, Default: 128. ↑=faster processing but ↑VRAM usage
+                        "f16_kv": True,  # Default: false. True=faster on modern GPUs, halves VRAM usage
+                        # Memory Management
+                        "num_ctx": 8192,  # Range: 512-32000, Default: 2048. ↓=faster but less context, ↑=more context but slower
+                        "num_keep": 5,  # Range: 1-25, Default: 5. ↓=faster & less memory, ↑=better context but slower
+                        "num_beam": 1,  # Range: 1-n, Default: 1. ↑=slower but better quality. 1=fastest (greedy)
+                        "num_gqa": 8,  # Range: 1-8, Default: 8. Model specific. ↑=faster on some models, no effect on others
+                        # Generation Quality vs Speed
+                        "temperature": 0.8,  # Range: 0.0-1.0, Default: 0.8. ↓=faster & focused, ↑=more creative but slower
+                        "top_p": 0.9,  # Range: 0.0-1.0, Default: 0.9. ↓=faster & focused, ↑=more variety but slower
+                        "top_k": 40,  # Range: 0-100, Default: 40. ↓=faster & focused, ↑=more variety but slower
+                        "repeat_penalty": 1.1,  # Range: 1.0-2.0, Default: 1.1. ↑=slower but less repetition, ↓=faster but may repeat
+                        # Advanced Tuning
+                        "rope_frequency_base": 10000,  # Default: 10000. ↓=faster but may affect quality
+                        "rope_frequency_scale": 1.0,  # Default: 1.0. Affects context scaling, optimal=1.0 for most cases
+                        "mirostat": 0,  # Range: 0-2, Default: 0. 0=fastest, 2=slowest but most adaptive
+                        "mirostat_eta": 0.1,  # Range: 0.0-1.0, Default: 0.1. Only affects speed if mirostat>0
+                        "mirostat_tau": 5.0,  # Range: 0.0-10.0, Default: 5.0. Only affects speed if mirostat>0
+                        # Optimization Flags
+                        "use_flash_attn": True,  # Default: false. True=significantly faster on modern GPUs
+                        "compress_pos_emb": 1.0,  # Range: 1.0-4.0, Default: 1.0. ↑=faster but experimental
+                        # Reproducibility
+                        # "seed": 42,  # Range: 0-MAX_INT, Default: random. Fixed seed can improve cache hits=faster
                     },
                 },
             )
