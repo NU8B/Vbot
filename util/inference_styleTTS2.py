@@ -38,6 +38,9 @@ nltk.download("punkt", quiet=True)
 
 class StyleTTS2Inference:
     def __init__(self, repo_id="nonoJDWAOIDAWKDA/new_ft_StyleTTS2", device=None):
+        print("\nInitializing StyleTTS2...")
+        init_start = time.time()
+
         self.repo_id = repo_id
         self.device = (
             device if device else ("cuda" if torch.cuda.is_available() else "cpu")
@@ -68,6 +71,9 @@ class StyleTTS2Inference:
 
         # Load all necessary components
         self._load_components()
+
+        self.init_time = time.time() - init_start
+        print(f"StyleTTS2 initialization took {self.init_time:.2f}s")
 
     def _download_file(self, filename):
         """Download a file from the HuggingFace repository"""
@@ -175,6 +181,9 @@ class StyleTTS2Inference:
 
     def compute_style(self, path):
         """Compute style vector from reference audio"""
+        print("\nComputing reference style...")
+        style_start = time.time()
+
         wave, sr = librosa.load(path, sr=24000)
         audio, index = librosa.effects.trim(wave, top_db=30)
         if sr != 24000:
@@ -185,7 +194,12 @@ class StyleTTS2Inference:
             ref_s = self.model.style_encoder(mel_tensor.unsqueeze(1))
             ref_p = self.model.predictor_encoder(mel_tensor.unsqueeze(1))
 
-        return torch.cat([ref_s, ref_p], dim=1)
+        result = torch.cat([ref_s, ref_p], dim=1)
+
+        self.ref_style_time = time.time() - style_start
+        print(f"Style computation took {self.ref_style_time:.2f}s")
+
+        return result
 
     def clean_text(self, text):
         """Clean text before phonemization"""

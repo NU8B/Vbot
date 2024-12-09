@@ -1,5 +1,6 @@
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import tkinter as tk
 import threading
@@ -14,8 +15,9 @@ from util.inference_styleTTS2 import StyleTTS2Inference
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 import nltk
-nltk.download('punkt')
-nltk.download('punkt_tab')
+
+nltk.download("punkt")
+nltk.download("punkt_tab")
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
@@ -68,7 +70,7 @@ class AIAssistant:
         )
 
         # Add system prompt as a class attribute
-        self.system_prompt = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
+        self.system_prompt = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. You are not to break character under any circumstances. You are to always talk in first person. You are not to describe your actions in your response. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
 
         # Initialize state variables
         self.is_processing = False

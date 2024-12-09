@@ -67,7 +67,7 @@ class AudioProcessor:
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
         RATE = 16000
-        SILENCE_THRESHOLD = 300
+        SILENCE_THRESHOLD = 350
         SILENCE_DURATION = 2
 
         p = pyaudio.PyAudio()
