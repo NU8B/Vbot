@@ -108,12 +108,12 @@ class AudioProcessor:
             p.terminate()
 
         if has_speech and len(frames) > 0:
-            with wave.open("output.wav", "wb") as wf:
+            with wave.open("asset/output.wav", "wb") as wf:
                 wf.setnchannels(CHANNELS)
                 wf.setsampwidth(p.get_sample_size(FORMAT))
                 wf.setframerate(RATE)
                 wf.writeframes(b"".join(frames))
-            return "output.wav"
+            return "asset/output.wav"
 
         return None
 

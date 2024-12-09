@@ -1,7 +1,18 @@
+import os
+import sys
+
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 from transformers import (
     SpeechT5Processor,
     SpeechT5ForTextToSpeech,
     SpeechT5HifiGan,
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
 )
 from faster_whisper import WhisperModel
 import tkinter as tk
@@ -56,6 +67,10 @@ class AnimatedAvatar:
         self.canvas.itemconfig(self.image_on_canvas, image=self.mouth_closed_photo)
 
 
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import BitsAndBytesConfig
+
+
 class AIAssistant:
     def __init__(self, root):
         self.root = root
@@ -87,6 +102,27 @@ class AIAssistant:
             cache_dir=cache_dir / "hifigan",
         ).to("cuda" if torch.cuda.is_available() else "cpu")
 
+        # Configure 4-bit quantization
+        quantization_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+        )
+
+        # Initialize LLM model and tokenizer
+        self.model_id = "bluuwhale/L3-SthenoMaidBlackroot-8B-V1"
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.model_id, cache_dir=cache_dir / "llm", trust_remote_code=True
+        )
+        self.llm_model = AutoModelForCausalLM.from_pretrained(
+            self.model_id,
+            cache_dir=cache_dir / "llm",
+            quantization_config=quantization_config,
+            device_map="auto",
+            trust_remote_code=True,
+        )
+
         # Create speaker embeddings
         self.speaker_embeddings = self.create_speaker_embeddings()
 
@@ -106,7 +142,7 @@ class AIAssistant:
             run_opts={"device": "cuda" if torch.cuda.is_available() else "cpu"},
         )
 
-        audio_path = "asset/ref.wav"
+        audio_path = "Data_prep/raw_data/raw_audio/Sound 121.wav"
         waveform, sample_rate = sf.read(audio_path)
 
         if len(waveform.shape) > 1:
@@ -143,7 +179,7 @@ class AIAssistant:
         conversation = "\n".join(
             [
                 f"{'Assistant' if msg['role'] == 'assistant' else 'User'}: {msg['content']}"
-                for msg in self.chat_history[-4:]  # Keep last 4 messages for context
+                for msg in self.chat_history[-4:]
             ]
         )
 
@@ -157,22 +193,22 @@ User: {text}
 Assistant:"""
 
         try:
-            response = requests.post(
-                "http://localhost:11434/api/generate",
-                json={
-                    "model": "mistral",
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.7,
-                        "top_p": 0.9,
-                    },
-                },
-            ).json()
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(
+                self.llm_model.device
+            )
+            outputs = self.llm_model.generate(
+                **inputs,
+                max_new_tokens=100,
+                temperature=0.7,
+                top_p=0.9,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
+            response_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-            response_text = response["response"].strip()
+            # Extract only the assistant's response
+            response_text = response_text.split("Assistant:")[-1].strip()
 
-            self.llm_time = time.time() - llm_start_time  # Make sure this line is here
+            self.llm_time = time.time() - llm_start_time
 
             # cleanup
             if not response_text.endswith((".", "!", "?")):
@@ -184,11 +220,9 @@ Assistant:"""
             return response_text
 
         except Exception as e:
-            print(f"Error in API call: {str(e)}")
-            self.llm_time = (
-                time.time() - llm_start_time
-            )  # Add here too in case of error
-            return "Sorry, I'm having trouble connecting to my brain right now!"
+            print(f"Error in model inference: {str(e)}")
+            self.llm_time = time.time() - llm_start_time
+            return "Sorry, I'm having trouble thinking right now!"
 
     def setup_gui(self):
         # GUI setup remains the same as original
@@ -437,12 +471,12 @@ Assistant:"""
             p.terminate()
 
         if has_speech and len(frames) > 0:
-            with wave.open("output.wav", "wb") as wf:
+            with wave.open("asset/output.wav", "wb") as wf:
                 wf.setnchannels(CHANNELS)
                 wf.setsampwidth(p.get_sample_size(FORMAT))
                 wf.setframerate(RATE)
                 wf.writeframes(b"".join(frames))
-            return "output.wav"
+            return "asset/output.wav"
 
         return None
 
