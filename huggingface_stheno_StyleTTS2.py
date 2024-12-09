@@ -1,15 +1,21 @@
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
+
 import tkinter as tk
 import threading
 import torch
 import time
 import warnings
-import os
 from pathlib import Path
 
 from util.audio_utils import AudioProcessor
 from util.gui import ChatGUI
 from util.inference_styleTTS2 import StyleTTS2Inference
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
+import nltk
+nltk.download('punkt')
+nltk.download('punkt_tab')
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")

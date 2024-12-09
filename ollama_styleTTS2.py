@@ -6,47 +6,15 @@ import threading
 import torch
 import time
 import warnings
-from pathlib import Path
 import requests
-import shutil
 
 from util.audio_utils import AudioProcessor
 from util.gui import ChatGUI
 from util.inference_styleTTS2 import StyleTTS2Inference
 
-import os
 import nltk
-import nltk.data
-from pathlib import Path
-
-try:
-    # Try to load punkt from default locations first
-    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-except LookupError:
-    # If not found, use project directory as fallback
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    nltk_data_dir = os.path.join(current_dir, 'nltk_data')
-    os.makedirs(nltk_data_dir, exist_ok=True)
-    nltk.data.path.insert(0, nltk_data_dir)
-    
-    # Download required data to project directory
-    nltk.download('punkt', download_dir=nltk_data_dir)
-    nltk.download('punkt_tab', download_dir=nltk_data_dir)
-
-# Verify the file exists
-punkt_file = Path(nltk_data_dir) / 'tokenizers' / 'punkt' / 'english.pickle'
-if punkt_file.exists():
-    print(f"Found punkt file at: {punkt_file}")
-else:
-    print(f"Punkt file not found at expected location: {punkt_file}")
-
-try:
-    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-    print("Punkt is properly installed")
-except LookupError as e:
-    print(f"Punkt is not installed correctly: {str(e)}")
-    print(f"Current NLTK data paths: {nltk.data.path}")
-
+nltk.download('punkt')
+nltk.download('punkt_tab')
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
@@ -135,8 +103,8 @@ class AIStyleTTS2:
                     "options": {
                         # Core Performance Parameters
                         "num_gpu": 100,  # Range: 0-100, Default: 50. ↑=faster (more GPU layers used). 0=CPU only
-                        "num_thread": 20,  # Range: 1-n, Default: 4. ↑=faster on multi-core CPUs, but may saturate
-                        "batch_size": 512,  # Range: 1-2048, Default: 128. ↑=faster processing but ↑VRAM usage
+                        "num_thread": 32,  # Range: 1-n, Default: 4. ↑=faster on multi-core CPUs, but may saturate
+                        "batch_size": 2048,  # Range: 1-2048, Default: 128. ↑=faster processing but ↑VRAM usage
                         "f16_kv": True,  # Default: false. True=faster on modern GPUs, halves VRAM usage
                         # Memory Management
                         "num_ctx": 8192,  # Range: 512-32000, Default: 2048. ↓=faster but less context, ↑=more context but slower
