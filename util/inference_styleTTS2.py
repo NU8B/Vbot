@@ -126,7 +126,9 @@ class StyleTTS2Inference:
 
         # Load model weights with weights_only=True
         checkpoint = torch.load(
-            self._download_file("checkpoint.pth"), map_location="cpu", weights_only=True
+            self._download_file("checkpoint.pth"),
+            map_location=self.device,
+            weights_only=True,
         )
         params = checkpoint["net"]
 
