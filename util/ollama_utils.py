@@ -1,7 +1,6 @@
 import requests
 import threading
 import time
-import torch
 
 # Ollama settings
 MAX_HISTORY = (
@@ -146,17 +145,14 @@ class OllamaHandler:
 
             # Text to Speech
             tts_start = time.time()
-            with torch.inference_mode():
-                torch.cuda.empty_cache()  # Clear any residual GPU memory
-                speech = self.tts_model.inference(
-                    text=response.strip(),
-                    ref_s=self.ref_style,
-                    alpha=0.3,
-                    beta=0.7,
-                    diffusion_steps=5,
-                    embedding_scale=1.0,
-                )
-                torch.cuda.synchronize()  # Ensure GPU operations are complete
+            speech = self.tts_model.inference(
+                text=response.strip(),
+                ref_s=self.ref_style,
+                alpha=0.3,
+                beta=0.7,
+                diffusion_steps=5,
+                embedding_scale=1,
+            )
             self.timings["tts"] = time.time() - tts_start
 
             # Calculate timing metrics
