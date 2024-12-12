@@ -134,7 +134,7 @@ class StyleTTS2Inference:
             if key in params:
                 try:
                     self.model[key].load_state_dict(params[key])
-                except:
+                except Exception:
                     from collections import OrderedDict
 
                     state_dict = params[key]
@@ -191,7 +191,7 @@ class StyleTTS2Inference:
             audio = librosa.resample(audio, sr, 24000)
         mel_tensor = self._preprocess(audio).to(self.device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             ref_s = self.model.style_encoder(mel_tensor.unsqueeze(1))
             ref_p = self.model.predictor_encoder(mel_tensor.unsqueeze(1))
 
@@ -205,16 +205,13 @@ class StyleTTS2Inference:
     def clean_text(self, text):
         """Clean text before phonemization"""
         # Basic cleanup only - let phonemizer handle the rest
-        text = " ".join(text.split())  # normalize whitespace
-        text = text.replace('"', "")  # remove quotes
-        text = text.replace('"', "")  # remove smart quotes
-        text = text.replace("—", "-")  # normalize dashes
+        text = re.sub(r"\s+", " ", text.strip())  # normalize whitespace
+        text = text.replace('"', "").replace(
+            "—", "-"
+        )  # remove quotes and normalize dashes
 
         # Remove content inside parentheses, brackets, curly braces, and double asterisks
-        text = re.sub(r"\(.*?\)", "", text)  # Remove parentheses
-        text = re.sub(r"\{.*?\}", "", text)  # Remove curly braces
-        text = re.sub(r"\[.*?\]", "", text)  # Remove square brackets
-        text = re.sub(r"\*.*?\*", "", text)  # Remove content inside double asterisks
+        text = re.sub(r"\(.*?\)|\{.*?\}|\[.*?\]|\*.*?\*", "", text)
 
         return text
 
@@ -238,7 +235,7 @@ class StyleTTS2Inference:
         tokens.insert(0, 0)  # Add start token
         tokens = torch.LongTensor(tokens).to(self.device).unsqueeze(0)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             input_lengths = torch.LongTensor([tokens.shape[-1]]).to(self.device)
             text_mask = self._length_to_mask(input_lengths).to(self.device)
 

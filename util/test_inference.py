@@ -11,7 +11,7 @@ import time
 warnings.filterwarnings("ignore")
 
 
-text = "Hello, this is a test of the Style-TTS 2 system. (Should not read this.) Pass 1. [Should not read this.] Pass 2. {Should not read this.} Pass 3. *Should not read this.* Pass 4. 5984."
+text = "Hello, this is a test of the Style-TTS 2 system. (Should not read this.) Pass 1. [Should not read this.] Pass 2. {Should not read this.} Pass 3. *Should not read this.* Pass 4. 5984. This is just a longer test so I can see if there's any change! I hope so because I'v been trying to make it faster all this time!"
 tts = StyleTTS2Inference()
 
 style = tts.compute_style("asset/ref.wav")
