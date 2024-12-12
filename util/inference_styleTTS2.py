@@ -208,9 +208,9 @@ class StyleTTS2Inference:
         """Clean text before phonemization"""
         # Basic cleanup only - let phonemizer handle the rest
         text = re.sub(r"\s+", " ", text.strip())  # normalize whitespace
-        text = text.replace('"', "").replace(
-            "—", "-"
-        )  # remove quotes and normalize dashes
+        text = (
+            text.replace('"', "").replace("~", "").replace("—", "-")
+        )  # remove quotes, tilde and normalize dashes
 
         # Remove content inside parentheses, brackets, curly braces, and double asterisks
         text = re.sub(r"\(.*?\)|\{.*?\}|\[.*?\]|\*.*?\*", "", text)
@@ -237,16 +237,21 @@ class StyleTTS2Inference:
         tokens.insert(0, 0)  # Add start token
         tokens = torch.LongTensor(tokens).to(self.device).unsqueeze(0)
 
-        with torch.inference_mode():
-            input_lengths = torch.LongTensor([tokens.shape[-1]]).to(self.device)
-            text_mask = self._length_to_mask(input_lengths).to(self.device)
+        # Precompute input lengths and text mask
+        input_lengths = torch.LongTensor([tokens.shape[-1]]).to(self.device)
+        text_mask = self._length_to_mask(input_lengths).to(self.device)
 
+        # Use no_grad for inference
+        with torch.inference_mode():
             t_en = self.model.text_encoder(tokens, input_lengths, text_mask)
             bert_dur = self.model.bert(tokens, attention_mask=(~text_mask).int())
             d_en = self.model.bert_encoder(bert_dur).transpose(-1, -2)
 
+            # Create noise directly on the device
+            noise = torch.randn((1, 256), device=self.device).unsqueeze(1)
+
             s_pred = self.sampler(
-                noise=torch.randn((1, 256)).unsqueeze(1).to(self.device),
+                noise=noise,
                 embedding=bert_dur,
                 embedding_scale=embedding_scale,
                 features=ref_s,
@@ -267,7 +272,10 @@ class StyleTTS2Inference:
             duration = torch.sigmoid(duration).sum(axis=-1)
             pred_dur = torch.round(duration.squeeze()).clamp(min=1)
 
-            pred_aln_trg = torch.zeros(input_lengths, int(pred_dur.sum().data))
+            # Precompute pred_aln_trg tensor on the device
+            pred_aln_trg = torch.zeros(
+                input_lengths, int(pred_dur.sum().data), device=self.device
+            )
             c_frame = 0
             for i in range(pred_aln_trg.size(0)):
                 pred_aln_trg[i, c_frame : c_frame + int(pred_dur[i].data)] = 1
@@ -275,7 +283,9 @@ class StyleTTS2Inference:
 
             en = d.transpose(-1, -2) @ pred_aln_trg.unsqueeze(0).to(self.device)
             if self.config["model_params"]["decoder"]["type"] == "hifigan":
-                asr_new = torch.zeros_like(en)
+                asr_new = torch.zeros_like(
+                    en, device=self.device
+                )  # Create tensor on device
                 asr_new[:, :, 0] = en[:, :, 0]
                 asr_new[:, :, 1:] = en[:, :, 0:-1]
                 en = asr_new
@@ -284,7 +294,9 @@ class StyleTTS2Inference:
 
             asr = t_en @ pred_aln_trg.unsqueeze(0).to(self.device)
             if self.config["model_params"]["decoder"]["type"] == "hifigan":
-                asr_new = torch.zeros_like(asr)
+                asr_new = torch.zeros_like(
+                    asr, device=self.device
+                )  # Create tensor on device
                 asr_new[:, :, 0] = asr[:, :, 0]
                 asr_new[:, :, 1:] = asr[:, :, 0:-1]
                 asr = asr_new
