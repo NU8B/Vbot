@@ -11,7 +11,7 @@ import time
 warnings.filterwarnings("ignore")
 
 
-text = "Hello, this is a test of the Style-TTS 2 system. It's currently 1945 2005 and 2015."
+text = "Hello, this is a test of the Style-TTS 2 system. (Should not read this.) Pass 1. [Should not read this.] Pass 2. {Should not read this.} Pass 3. *Should not read this.* Pass 4. 5984."
 tts = StyleTTS2Inference()
 
 style = tts.compute_style("asset/ref.wav")
@@ -28,4 +28,5 @@ audio = tts.inference(
 )
 print(f"Time taken: {time.time() - start:.2f}s")
 output_path = "asset/output.wav"
+print("Saved to:", output_path)
 sf.write(output_path, audio, 24000)

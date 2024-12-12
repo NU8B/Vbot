@@ -15,6 +15,7 @@ import sys
 import shutil
 import warnings
 import logging
+import re
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
@@ -207,8 +208,14 @@ class StyleTTS2Inference:
         text = " ".join(text.split())  # normalize whitespace
         text = text.replace('"', "")  # remove quotes
         text = text.replace('"', "")  # remove smart quotes
-        text = text.replace('"', "")  # remove smart quotes
         text = text.replace("—", "-")  # normalize dashes
+
+        # Remove content inside parentheses, brackets, curly braces, and double asterisks
+        text = re.sub(r"\(.*?\)", "", text)  # Remove parentheses
+        text = re.sub(r"\{.*?\}", "", text)  # Remove curly braces
+        text = re.sub(r"\[.*?\]", "", text)  # Remove square brackets
+        text = re.sub(r"\*.*?\*", "", text)  # Remove content inside double asterisks
+
         return text
 
     def inference(self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale):

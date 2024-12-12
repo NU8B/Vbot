@@ -1,0 +1,32 @@
+# developed on python=3.10
+# pip install torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# StyleTTS2 requirements.txt as well
+# espeak = https://www.youtube.com/watch?v=BBlivx6o0WM
+# view docker setup instuctions in asset\docker_setup_instructions.md
+numpy==2.0.2
+scipy==1.14.1
+pandas==2.2.3
+accelerate==1.1.1
+tensorboard==2.18.0
+huggingface-hub==0.26.2
+transformers==4.46.3
+bitsandbytes==0.44.1
+soundfile==0.12.1
+librosa==0.10.2.post1
+sounddevice==0.5.1
+pyaudio==0.2.14
+speechbrain==1.0.2
+faster-whisper==1.0.3
+phonemizer==3.3.0
+nltk==3.9.1
+munch==4.0.0
+num2words==0.5.13
+requests==2.32.3
+pillow==11.0.0
+resemblyzer==0.1.4
+tqdm==4.67.0
+pesq==0.0.4
+bert_score==0.3.13
+rouge_score==0.1.2
+evaluate==0.4.3
+docker==7.1.0
