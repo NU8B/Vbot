@@ -15,7 +15,7 @@ import sys
 
 # Add parent directory to Python path
 sys.path.append(str(Path(__file__).parent.parent))
-from util.inference_styleTTS2 import StyleTTS2Inference
+from utils.inference_styleTTS2 import StyleTTS2Inference
 
 
 class VoiceBenchmark:

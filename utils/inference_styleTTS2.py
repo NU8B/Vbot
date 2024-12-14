@@ -16,6 +16,7 @@ import shutil
 import warnings
 import logging
 import re
+import contextlib
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
@@ -31,15 +32,28 @@ styletts2_path = os.path.join(
 )
 sys.path.append(styletts2_path)
 
-from StyleTTS2.text_utils import TextCleaner
+
+# Redirect stdout temporarily
+@contextlib.contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
 
 # Download NLTK punkt if not already downloaded
-nltk.download("punkt", quiet=True)
+with suppress_stdout():
+    nltk.download("punkt", quiet=True)
+
+from StyleTTS2.text_utils. import TextCleaner
 
 
 class StyleTTS2Inference:
     def __init__(self, repo_id="nonoJDWAOIDAWKDA/new_ft_StyleTTS2", device=None):
-        print("\nInitializing StyleTTS2...")
         init_start = time.time()
 
         self.repo_id = repo_id
@@ -49,8 +63,14 @@ class StyleTTS2Inference:
         self.cache_dir = Path("cache/style_tts2_ft")
         self.cache_dir.mkdir(exist_ok=True)
 
+        # Add style cache
+        self._style_cache = {}
+        self._style_cache_dir = self.cache_dir / "style_cache"
+        self._style_cache_dir.mkdir(exist_ok=True)
+
         # Initialize text cleaner (only once)
-        self.text_cleaner = TextCleaner()
+        with suppress_stdout():
+            self.text_cleaner = TextCleaner()
 
         # Set seeds for reproducibility
         torch.manual_seed(0)
@@ -73,9 +93,6 @@ class StyleTTS2Inference:
         # Load all necessary components
         self._load_components()
 
-        self.init_time = time.time() - init_start
-        print(f"StyleTTS2 initialization took {self.init_time:.2f}s")
-
     def _download_file(self, filename):
         """Download a file from the HuggingFace repository"""
         return hf_hub_download(repo_id=self.repo_id, filename=filename)
@@ -89,32 +106,32 @@ class StyleTTS2Inference:
 
         # Import necessary modules
         from StyleTTS2.models import build_model, load_ASR_models, load_F0_models
-        from StyleTTS2.utils import recursive_munch
+        from StyleTTS2.utils. import recursive_munch
 
         # Create cache directories for utility models
         cache_dir = Path(self.cache_dir)
         for util_dir in ["ASR", "JDC", "PLBERT"]:
-            (cache_dir / "Utils" / util_dir).mkdir(parents=True, exist_ok=True)
+            (cache_dir / "utils." / util_dir).mkdir(parents=True, exist_ok=True)
 
         # Load ASR model with weights_only=True
-        asr_config = self._download_file("Utils/ASR/config.yml")
-        asr_model = self._download_file("Utils/ASR/epoch_00080.pth")
+        asr_config = self._download_file("utils./ASR/config.yml")
+        asr_model = self._download_file("utils./ASR/epoch_00080.pth")
         self.text_aligner = load_ASR_models(asr_model, asr_config)
 
         # Load F0 model
-        f0_model = self._download_file("Utils/JDC/bst.t7")
+        f0_model = self._download_file("utils./JDC/bst.t7")
         self.pitch_extractor = load_F0_models(f0_model)
 
         # Load PLBERT
-        from StyleTTS2.Utils.PLBERT.util import load_plbert
+        from StyleTTS2.utils..PLBERT.util import load_plbert
 
-        plbert_model = self._download_file("Utils/PLBERT/step_1000000.t7")
-        plbert_config = self._download_file("Utils/PLBERT/config.yml")
+        plbert_model = self._download_file("utils./PLBERT/step_1000000.t7")
+        plbert_config = self._download_file("utils./PLBERT/config.yml")
 
         # Create a temporary directory structure for PLBERT
-        plbert_dir = cache_dir / "Utils" / "PLBERT"
-        shutil.copy(plbert_model, plbert_dir / "step_1000000.t7")
-        shutil.copy(plbert_config, plbert_dir / "config.yml")
+        plbert_dir = cache_dir / "utils." / "PLBERT"
+        shutils.copy(plbert_model, plbert_dir / "step_1000000.t7")
+        shutils.copy(plbert_config, plbert_dir / "config.yml")
 
         self.plbert = load_plbert(str(plbert_dir))
 
@@ -182,11 +199,48 @@ class StyleTTS2Inference:
         mel_tensor = (torch.log(1e-5 + mel_tensor.unsqueeze(0)) - self.mean) / self.std
         return mel_tensor
 
-    def compute_style(self, path):
-        """Compute style vector from reference audio"""
-        print("\nComputing reference style...")
-        style_start = time.time()
+    def _get_cache_path(self, style_path):
+        """Get the cache file path for a style"""
+        style_name = Path(style_path).name
+        return self._style_cache_dir / f"{style_name}.pt"
 
+    def is_style_cached(self, path):
+        """Check if a style is already cached"""
+        if path in self._style_cache:
+            return True
+        cache_path = self._get_cache_path(path)
+        return cache_path.exists()
+
+    def get_cached_style(self, path):
+        """Get a cached style vector without recomputing"""
+        # Check memory cache first (fastest)
+        if path in self._style_cache:
+            return self._style_cache[path]
+
+        # Load from disk cache if not in memory
+        cache_path = self._get_cache_path(path)
+        if cache_path.exists():
+            with suppress_stdout():  # Suppress any potential PyTorch messages
+                self._style_cache[path] = torch.load(
+                    cache_path, map_location=self.device
+                )
+            return self._style_cache[path]
+
+        raise ValueError(f"Style for {path} not found in cache")
+
+    def compute_style(self, path):
+        """Compute style vector from reference audio with caching"""
+        # Check memory cache first
+        if path in self._style_cache:
+            return self._style_cache[path]
+
+        # Check disk cache
+        cache_path = self._get_cache_path(path)
+        if cache_path.exists():
+            self._style_cache[path] = torch.load(cache_path, map_location=self.device)
+            return self._style_cache[path]
+
+        # Compute new style
         wave, sr = librosa.load(path, sr=24000)
         audio, index = librosa.effects.trim(wave, top_db=30)
         if sr != 24000:
@@ -199,8 +253,11 @@ class StyleTTS2Inference:
 
         result = torch.cat([ref_s, ref_p], dim=1)
 
-        self.ref_style_time = time.time() - style_start
-        print(f"Style computation took {self.ref_style_time:.2f}s")
+        # Cache in memory
+        self._style_cache[path] = result
+
+        # Cache to disk
+        torch.save(result, cache_path)
 
         return result
 

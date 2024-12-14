@@ -113,7 +113,7 @@ class AIAssistant:
             run_opts={"device": "cuda" if torch.cuda.is_available() else "cpu"},
         )
 
-        audio_path = "asset/ref.wav"
+        audio_path = "asset/ref_sound/neutral.wav"
         waveform, sample_rate = sf.read(audio_path)
 
         if len(waveform.shape) > 1:

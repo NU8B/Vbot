@@ -14,19 +14,21 @@ class AudioProcessor:
         cache_dir = Path("./cache/style_tts2_ft")
         cache_dir.mkdir(exist_ok=True)
 
-        print("\nInitializing Whisper model...")
-        whisper_start = time.time()
         self.whisper_model = WhisperModel(
             "small",
             device="cuda" if torch.cuda.is_available() else "cpu",
-            compute_type="int8",
+            compute_type="float16" if torch.cuda.is_available() else "int8",
             download_root=str(cache_dir / "whisper"),
+            num_workers=2,
         )
-        self.init_time = time.time() - whisper_start
-        print(f"Whisper initialization took {self.init_time:.2f}s")
 
         # Voice input state
         self.is_listening = False
+
+        # Pre-warm the model silently
+        if torch.cuda.is_available():
+            self.transcribe_audio("asset/ref_sound/neutral.wav")
+            torch.cuda.empty_cache()
 
     def toggle_listening(self, gui, process_callback, is_processing):
         """Toggle voice input recording"""
@@ -124,6 +126,9 @@ class AudioProcessor:
             beam_size=5,
             language="en",
             condition_on_previous_text=False,
+            initial_prompt="Transcribe the following audio:",
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=500),
         )
         return " ".join(segment.text.strip() for segment in segments)
 

@@ -12,9 +12,9 @@ import time
 import warnings
 from pathlib import Path
 
-from util.audio_utils import AudioProcessor
-from util.gui import ChatGUI
-from util.inference_styleTTS2 import StyleTTS2Inference
+from utils.audio_utils. import AudioProcessor
+from utils.gui import ChatGUI
+from utils.inference_styleTTS2 import StyleTTS2Inference
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 import nltk
@@ -46,7 +46,7 @@ class AIAssistant:
         # Compute reference style
         print("\nComputing reference style...")
         style_start = time.time()
-        self.ref_style = self.tts_model.compute_style("asset/ref.wav")
+        self.ref_style = self.tts_model.compute_style("asset/ref_sound/neutral.wav")
         style_time = time.time() - style_start
         print(f"Style computation took {style_time:.2f}s")
 

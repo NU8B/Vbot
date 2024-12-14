@@ -12,11 +12,11 @@ import nltk
 import nltk.data
 import time
 
-from util.audio_utils import AudioProcessor
-from util.gui import ChatGUI
-from util.inference_styleTTS2 import StyleTTS2Inference
-from util.ollama_utils import OllamaHandler
-from util.timing_utils import ParallelInitializer
+from utils.audio_utils. import AudioProcessor
+from utils.gui import ChatGUI
+from utils.inference_styleTTS2 import StyleTTS2Inference
+from utils.ollama_utils. import OllamaHandler
+from utils.timing_utils. import ParallelInitializer
 
 """Initialize NLTK
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -59,7 +59,9 @@ tts_model = parallel_init_1.get_result("tts")
 group2_start = time.time()
 parallel_init_2 = ParallelInitializer()
 parallel_init_2.add_task("whisper", AudioProcessor)
-parallel_init_2.add_task("ref_style", lambda: tts_model.compute_style("asset/ref.wav"))
+parallel_init_2.add_task(
+    "ref_style", lambda: tts_model.compute_style("asset/ref_sound/neutral.wav")
+)
 results_2 = parallel_init_2.run()
 group2_time = time.time() - group2_start
 

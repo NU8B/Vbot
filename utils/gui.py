@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import scrolledtext, ttk
-import threading
 from .avatar import AnimatedAvatar
 
 
