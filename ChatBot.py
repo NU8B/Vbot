@@ -2,7 +2,7 @@ import tkinter as tk
 import warnings
 
 from utils.gui import ChatGUI
-from utils.initialization_handler import InitializationHandler
+from utils.initialization_utils import InitializationHandler
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
