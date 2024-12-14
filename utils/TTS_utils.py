@@ -1,6 +1,6 @@
 import threading
 import time
-from .emotion_handler import EMOTION_CONFIG, DIFFUSION_STEPS
+from .emotion_utils import EMOTION_CONFIG, DIFFUSION_STEPS
 
 
 class InferenceHandler:

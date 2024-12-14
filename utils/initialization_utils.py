@@ -6,7 +6,7 @@ from .inference_styleTTS2 import StyleTTS2Inference
 from .docker_utils import DockerHandler
 from .ollama_utils import OllamaHandler
 from .emotion_utils import EmotionHandler, EMOTION_MAPPING
-from .StyleTTS_utils import InferenceHandler
+from .TTS_utils import InferenceHandler
 
 
 class InitializationHandler:
