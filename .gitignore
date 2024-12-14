@@ -44,21 +44,19 @@ venv/
 .DS_Store
 Thumbs.db 
 
-# Audio files
-output.wav
+
 
 # Add these lines to your .gitignore
 *.pyc
 __pycache__/
 /Data_prep/Data
 
-/models
+
 *.zip
-/examples
-Tree.py
 /cached_model
 /benchmark/results
 
 
 # NLTK data directory
 nltk_data/
+/asset/outputs

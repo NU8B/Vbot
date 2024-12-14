@@ -1,6 +1,7 @@
 import requests
 import threading
 import time
+from pathlib import Path
 
 # Ollama settings
 MAX_HISTORY = 4  # Maximum number of conversation turns to keep
@@ -20,6 +21,10 @@ class OllamaHandler:
         self.is_processing = False
         self.is_speaking = False
         self.timings = {}
+
+        # Create outputs directory if it doesn't exist
+        self.output_dir = Path("asset/outputs")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     @classmethod
     def initialize(cls):
@@ -143,6 +148,10 @@ class OllamaHandler:
             print("Output:", response)
             print("Detected emotion:", detected_emotion)
             print(f"\nProcessing took {total_time:.2f}s")
+
+            # Print timing breakdown
+            if "stt" in self.timings:
+                print(f"├─ STT: {self.timings['stt']:.2f}s")
             print(
                 f"├─ LLM: {self.timings['llm']:.2f}s ({len(response.split()) / self.timings['llm']:.1f} words/s)"
             )

@@ -1,5 +1,7 @@
 import threading
 import time
+import soundfile as sf
+from pathlib import Path
 from .emotion_utils import EMOTION_CONFIG, DIFFUSION_STEPS
 
 
@@ -9,6 +11,10 @@ class InferenceHandler:
         self.emotion_handler = emotion_handler
         self.timings = {}
         self.last_style = None
+
+        # Create outputs directory if it doesn't exist
+        self.output_dir = Path("asset/outputs")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def process_text(self, text, response, timings=None):
         """Process text and generate speech with emotion."""
@@ -42,6 +48,10 @@ class InferenceHandler:
 
     def play_audio(self, speech, duration, avatar, audio_processor):
         """Play audio with mouth animation."""
+        # Save audio to outputs directory
+        output_path = self.output_dir / "output.wav"
+        sf.write(str(output_path), speech, 24000)
+
         # Start mouth animation
         threading.Thread(
             target=avatar.animate_mouth, args=(duration,), daemon=True

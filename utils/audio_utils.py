@@ -14,6 +14,10 @@ class AudioProcessor:
         cache_dir = Path("./cache/style_tts2_ft")
         cache_dir.mkdir(exist_ok=True)
 
+        # Create outputs directory if it doesn't exist
+        self.output_dir = Path("asset/outputs")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
         self.whisper_model = WhisperModel(
             "small",
             device="cuda" if torch.cuda.is_available() else "cpu",
@@ -110,12 +114,13 @@ class AudioProcessor:
             p.terminate()
 
         if has_speech and len(frames) > 0:
-            with wave.open("asset/output.wav", "wb") as wf:
+            output_path = self.output_dir / "recorded_input.wav"
+            with wave.open(str(output_path), "wb") as wf:
                 wf.setnchannels(CHANNELS)
                 wf.setsampwidth(p.get_sample_size(FORMAT))
                 wf.setframerate(RATE)
                 wf.writeframes(b"".join(frames))
-            return "asset/output.wav"
+            return str(output_path)
 
         return None
 

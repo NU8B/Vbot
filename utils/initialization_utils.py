@@ -19,6 +19,7 @@ class InitializationHandler:
         self.inference_handler = None
         self.ollama_handler = None
         self.warmup_time = None
+        self.styles_were_cached = None  # Store initial cache state
 
         # Timing information
         self.group1_time = None
@@ -93,18 +94,19 @@ class InitializationHandler:
         print("Initializing emotion classifier...")
 
         # Check if all styles are cached
-        all_styles_cached = True
+        self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
             style_path = f"asset/ref_sound/{style_file}"
             if not self.tts_model.is_style_cached(style_path):
-                all_styles_cached = False
+                self.styles_were_cached = False
                 break
 
-        if all_styles_cached:
-            print("Using cached styles\n")
+        if self.styles_were_cached:
+            print("Using cached styles")
+            print("Warming up inference...")
         else:
-            print("Computing reference styles...\n")
+            print("Computing reference styles...")
 
         tasks = {
             "whisper": (AudioProcessor, [], {}),
@@ -116,12 +118,45 @@ class InitializationHandler:
         self.audio_processor = self.results["whisper"]["result"]
         ref_style = self.results["ref_style"]["result"]
         self.emotion_handler = self.results["emotion"]["result"]
-        self.group2_time = time.time() - group2_start
 
+        # Print timings after operations
         print(
-            f"Emotion classifier initialization took {self.results['emotion']['time']:.2f}s"
+            f"\nEmotion classifier initialization took {self.results['emotion']['time']:.2f}s"
         )
         print(f"Whisper initialization took {self.results['whisper']['time']:.2f}s")
+        if "style_computation" in self.results:
+            print(
+                f"Styles computation took {self.results['style_computation']['time']:.2f}s"
+            )
+
+        # Warm up inference
+        if self.styles_were_cached:
+            warmup_start = time.time()
+            _ = self.tts_model.inference(
+                text="This is a warm-up inference.",
+                ref_s=ref_style,
+                alpha=0.3,
+                beta=0.7,
+                diffusion_steps=5,
+                embedding_scale=1.0,
+            )
+            self.results["warmup"] = {"time": time.time() - warmup_start}
+            print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
+        else:
+            print("\nWarming up inference...")
+            warmup_start = time.time()
+            _ = self.tts_model.inference(
+                text="This is a warm-up inference.",
+                ref_s=ref_style,
+                alpha=0.3,
+                beta=0.7,
+                diffusion_steps=5,
+                embedding_scale=1.0,
+            )
+            self.results["warmup"] = {"time": time.time() - warmup_start}
+            print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
+
+        self.group2_time = time.time() - group2_start
 
     def _cache_all_styles(self):
         """Cache all unique style files"""
@@ -132,7 +167,7 @@ class InitializationHandler:
         for style_file in unique_styles:
             style_path = f"asset/ref_sound/{style_file}"
             if not self.tts_model.is_style_cached(style_path):
-                all_cached = True
+                all_cached = False
                 break
 
         if all_cached:
@@ -146,10 +181,8 @@ class InitializationHandler:
             if not self.tts_model.is_style_cached(style_path):
                 self.tts_model.compute_style(style_path)
 
-        style_time = time.time() - style_start
-        print(f"Styles computation took {style_time:.2f}s")
-
-        return self.tts_model.get_cached_style("asset/ref_sound/neutral.wav")
+        self.results["style_computation"] = {"time": time.time() - style_start}
+        return self.tts_model.compute_style("asset/ref_sound/neutral.wav")
 
     def _init_emotion_classifier(self):
         """Initialize the emotion classifier"""
@@ -177,10 +210,23 @@ class InitializationHandler:
         print(f"├─ Group 1: {self.group1_time:.2f}s")
         print(f"│  ├─ Ollama warm-up")
         print(f"│  └─ StyleTTS2")
-        print(f"└─ Group 2: {self.group2_time:.2f}s")
-        print(f"   ├─ Whisper")
-        print(f"   ├─ Reference styles")
-        print(f"   └─ Emotion classifier")
+
+        if self.styles_were_cached:
+            # When styles were initially cached, show warm-up as part of Group 2
+            print(f"└─ Group 2: {self.group2_time:.2f}s")
+            print(f"   ├─ Whisper")
+            print(f"   ├─ Reference styles")
+            print(f"   ├─ Emotion classifier")
+            if "warmup" in self.results:
+                print(f"   └─ Inference warm-up")
+        else:
+            # When styles needed computation, show warm-up separately
+            print(f"├─ Group 2: {self.group2_time:.2f}s")
+            print(f"│  ├─ Whisper")
+            print(f"│  ├─ Reference styles")
+            print(f"│  └─ Emotion classifier")
+            if "warmup" in self.results:
+                print(f"└─ Inference warm-up: {self.results['warmup']['time']:.2f}s")
 
         return {
             "docker_handler": self.docker_handler,
