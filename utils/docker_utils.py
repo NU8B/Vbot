@@ -1,83 +1,67 @@
 import docker
 import requests
 import time
-from pathlib import Path
 
 
 class DockerHandler:
     def __init__(self):
-        setup_start = time.time()
         self.client = docker.from_env()
-        self.container = None
+        self.setup_time = self.ensure_ollama_container()
+        print(f"Docker setup took {self.setup_time:.2f}s")
 
+    def ensure_ollama_container(self):
+        """Ensure Ollama Docker container is running with GPU support"""
+        setup_start = time.time()
         try:
-            self._ensure_ollama_container()
-            self._ensure_model_exists()
-            self.setup_time = time.time() - setup_start
-            print(f"Docker setup took {self.setup_time:.2f}s")
-        except Exception as e:
-            print(f"Error during Docker setup: {str(e)}")
-            raise
+            # Check if container exists and is running
+            try:
+                container = self.client.containers.get("ollama")
+                if container.status != "running":
+                    print("Starting existing Ollama container...")
+                    container.start()
+            except docker.errors.NotFound:
+                print("Creating new Ollama container...")
+                # Create and start the container with GPU support
+                self.client.containers.run(
+                    "ollama/ollama",
+                    name="ollama",
+                    detach=True,
+                    runtime="nvidia",
+                    environment=["NVIDIA_VISIBLE_DEVICES=all"],
+                    volumes={"ollama": {"bind": "/root/.ollama", "mode": "rw"}},
+                    ports={"11434/tcp": 11434},
+                )
 
-    def _ensure_ollama_container(self):
-        """Ensure Ollama container is running"""
-        try:
-            # Try to get existing container
-            containers = self.client.containers.list(
-                filters={"name": "ollama", "status": "running"}
-            )
+            # Wait for Ollama API to be ready
+            self._wait_for_ollama()
 
-            if containers:
-                self.container = containers[0]
-                return
-
-            # Try to start existing but stopped container
-            containers = self.client.containers.list(
-                all=True, filters={"name": "ollama"}
-            )
-            if containers:
-                self.container = containers[0]
-                self.container.start()
-                return
-
-            # Create and start new container if none exists
-            self.container = self.client.containers.run(
-                "ollama/ollama",
-                name="ollama",
-                detach=True,
-                ports={"11434/tcp": 11434},
-                volumes={
-                    str(Path.home() / ".ollama"): {
-                        "bind": "/root/.ollama",
-                        "mode": "rw",
-                    }
-                },
-                device_requests=[
-                    docker.types.DeviceRequest(count=-1, capabilities=[["gpu"]])
-                ],
-            )
-
-        except Exception as e:
-            print(f"Error setting up Ollama container: {str(e)}")
-            raise
-
-    def _ensure_model_exists(self):
-        """Ensure Stheno model exists and pull if needed"""
-        try:
-            result = self.container.exec_run("ollama list")
+            # Check if Stheno model exists
+            container = self.client.containers.get("ollama")
+            result = container.exec_run("ollama list")
             if "stheno" not in result.output.decode():
-                # Pull and setup model
-                self.container.exec_run(
+                print("Stheno model not found. Setting up...")
+                # Pull the model from Hugging Face
+                print("Pulling model from Hugging Face...")
+                container.exec_run(
                     "ollama pull hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf"
                 )
-                self.container.exec_run(
+
+                # Copy to Stheno
+                print("Setting up as Stheno...")
+                container.exec_run(
                     "ollama cp hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf stheno"
                 )
-                self.container.exec_run(
+
+                # Clean up
+                container.exec_run(
                     'ollama rm "hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf"'
                 )
+                print("Stheno model setup complete")
+
+            return time.time() - setup_start
+
         except Exception as e:
-            print(f"Error ensuring model exists: {str(e)}")
+            print(f"Error setting up Docker container: {str(e)}")
             raise
 
     def _wait_for_ollama(self, timeout=60):
@@ -86,7 +70,6 @@ class DockerHandler:
         while time.time() - start_time < timeout:
             try:
                 requests.get("http://localhost:11434/api/health")
-                print("Ollama API is ready")
                 return
             except requests.exceptions.RequestException:
                 time.sleep(1)
@@ -95,7 +78,7 @@ class DockerHandler:
     def cleanup(self):
         """Cleanup method to stop the container"""
         try:
-            if self.container:
-                self.container.stop()
+            container = self.client.containers.get("ollama")
+            container.stop()
         except:
             pass

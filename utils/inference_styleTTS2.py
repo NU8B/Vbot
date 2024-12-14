@@ -49,7 +49,7 @@ def suppress_stdout():
 with suppress_stdout():
     nltk.download("punkt", quiet=True)
 
-from StyleTTS2.text_utils. import TextCleaner
+from StyleTTS2.text_utils import TextCleaner
 
 
 class StyleTTS2Inference:
@@ -106,32 +106,32 @@ class StyleTTS2Inference:
 
         # Import necessary modules
         from StyleTTS2.models import build_model, load_ASR_models, load_F0_models
-        from StyleTTS2.utils. import recursive_munch
+        from StyleTTS2.utils import recursive_munch
 
         # Create cache directories for utility models
         cache_dir = Path(self.cache_dir)
         for util_dir in ["ASR", "JDC", "PLBERT"]:
-            (cache_dir / "utils." / util_dir).mkdir(parents=True, exist_ok=True)
+            (cache_dir / "Utils" / util_dir).mkdir(parents=True, exist_ok=True)
 
         # Load ASR model with weights_only=True
-        asr_config = self._download_file("utils./ASR/config.yml")
-        asr_model = self._download_file("utils./ASR/epoch_00080.pth")
+        asr_config = self._download_file("Utils/ASR/config.yml")
+        asr_model = self._download_file("Utils/ASR/epoch_00080.pth")
         self.text_aligner = load_ASR_models(asr_model, asr_config)
 
         # Load F0 model
-        f0_model = self._download_file("utils./JDC/bst.t7")
+        f0_model = self._download_file("Utils/JDC/bst.t7")
         self.pitch_extractor = load_F0_models(f0_model)
 
         # Load PLBERT
-        from StyleTTS2.utils..PLBERT.util import load_plbert
+        from StyleTTS2.Utils.PLBERT.util import load_plbert
 
-        plbert_model = self._download_file("utils./PLBERT/step_1000000.t7")
-        plbert_config = self._download_file("utils./PLBERT/config.yml")
+        plbert_model = self._download_file("Utils/PLBERT/step_1000000.t7")
+        plbert_config = self._download_file("Utils/PLBERT/config.yml")
 
         # Create a temporary directory structure for PLBERT
-        plbert_dir = cache_dir / "utils." / "PLBERT"
-        shutils.copy(plbert_model, plbert_dir / "step_1000000.t7")
-        shutils.copy(plbert_config, plbert_dir / "config.yml")
+        plbert_dir = cache_dir / "Utils" / "PLBERT"
+        shutil.copy(plbert_model, plbert_dir / "step_1000000.t7")
+        shutil.copy(plbert_config, plbert_dir / "config.yml")
 
         self.plbert = load_plbert(str(plbert_dir))
 
