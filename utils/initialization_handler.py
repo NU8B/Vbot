@@ -1,12 +1,12 @@
 import time
 import threading
 from pathlib import Path
-from .audio_utils. import AudioProcessor
+from .audio_utils import AudioProcessor
 from .inference_styleTTS2 import StyleTTS2Inference
-from .docker_utils. import DockerHandler
-from .ollama_utils. import OllamaHandler
+from .docker_utils import DockerHandler
+from .ollama_utils import OllamaHandler
 from .emotion_handler import EmotionHandler, EMOTION_MAPPING
-from .StyleTTS_utils. import InferenceHandler
+from .StyleTTS_utils import InferenceHandler
 
 
 class InitializationHandler:
