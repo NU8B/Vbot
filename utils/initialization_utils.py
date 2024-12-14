@@ -110,9 +110,29 @@ class InitializationHandler:
 
         tasks = {
             "whisper": (AudioProcessor, [], {}),
-            "ref_style": (self._cache_all_styles, [], {}),
             "emotion": (self._init_emotion_classifier, [], {}),
         }
+
+        if self.styles_were_cached:
+            # When styles are cached, we can load and use them directly
+            cached_style = self.tts_model.get_cached_style(
+                "asset/ref_sound/neutral.wav"
+            )
+
+            def warmup_task():
+                return self.tts_model.inference(
+                    text="This is a warm-up inference.",
+                    ref_s=cached_style,
+                    alpha=0.3,
+                    beta=0.7,
+                    diffusion_steps=5,
+                    embedding_scale=1.0,
+                )
+
+            tasks["warmup"] = (warmup_task, [], {})
+            tasks["ref_style"] = (lambda: cached_style, [], {})
+        else:
+            tasks["ref_style"] = (self._cache_all_styles, [], {})
 
         self.results.update(self._run_parallel_tasks(tasks))
         self.audio_processor = self.results["whisper"]["result"]
@@ -129,20 +149,11 @@ class InitializationHandler:
                 f"Styles computation took {self.results['style_computation']['time']:.2f}s"
             )
 
-        # Warm up inference
-        if self.styles_were_cached:
-            warmup_start = time.time()
-            _ = self.tts_model.inference(
-                text="This is a warm-up inference.",
-                ref_s=ref_style,
-                alpha=0.3,
-                beta=0.7,
-                diffusion_steps=5,
-                embedding_scale=1.0,
-            )
-            self.results["warmup"] = {"time": time.time() - warmup_start}
-            print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
-        else:
+        # Calculate group2 time before warmup for non-cached case
+        self.group2_time = time.time() - group2_start
+
+        # Handle warmup for non-cached case
+        if not self.styles_were_cached:
             print("\nWarming up inference...")
             warmup_start = time.time()
             _ = self.tts_model.inference(
@@ -155,8 +166,8 @@ class InitializationHandler:
             )
             self.results["warmup"] = {"time": time.time() - warmup_start}
             print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
-
-        self.group2_time = time.time() - group2_start
+        else:
+            print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
 
     def _cache_all_styles(self):
         """Cache all unique style files"""
@@ -202,10 +213,8 @@ class InitializationHandler:
 
     def _get_initialization_results(self):
         """Return all initialized components and timing information"""
-        total_init_time = time.time() - self.init_start
-
         # Calculate actual group times including overlap
-        print(f"\nTotal initialization time: {total_init_time:.2f}s")
+        print(f"\nTotal initialization time: {time.time() - self.init_start:.2f}s")
         print(f"├─ Docker setup: {self.docker_time:.2f}s")
         print(f"├─ Group 1: {self.group1_time:.2f}s")
         print(f"│  ├─ Ollama warm-up")
