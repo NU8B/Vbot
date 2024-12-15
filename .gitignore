@@ -60,3 +60,6 @@ __pycache__/
 # NLTK data directory
 nltk_data/
 /asset/outputs
+/Data_prep/audio_preprocessor/temp
+/Data_prep/raw_data/full_audio
+/Data_prep/raw_data
