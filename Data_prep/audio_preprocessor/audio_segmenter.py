@@ -5,6 +5,7 @@ import torchaudio
 from tqdm import tqdm
 from pathlib import Path
 from scipy import signal
+import argparse
 
 
 def detect_speech(audio, sr, threshold_db=-35, min_silence_duration=0.3):
@@ -160,15 +161,17 @@ def group_short_segments(
                 # Extend last group
                 grouped_segments[-1] = (grouped_segments[-1][0], current_group[-1][1])
             else:
-                # Save as separate group even if it's shorter than minimum
+                # Only save if it meets minimum duration
+                if current_duration >= min_duration:
+                    group_start = current_group[0][0]
+                    group_end = current_group[-1][1]
+                    grouped_segments.append((group_start, group_end))
+        else:
+            # Only save if it meets minimum duration
+            if current_duration >= min_duration:
                 group_start = current_group[0][0]
                 group_end = current_group[-1][1]
                 grouped_segments.append((group_start, group_end))
-        else:
-            # Save as separate group
-            group_start = current_group[0][0]
-            group_end = current_group[-1][1]
-            grouped_segments.append((group_start, group_end))
 
     return grouped_segments
 
@@ -239,11 +242,26 @@ def segment_audio(
             # Split if too long
             if duration > max_segment_duration:
                 n_splits = int(np.ceil(duration / max_segment_duration))
-                split_size = int((end_sample - start_sample) / n_splits)
+                # Adjust split size to ensure minimum duration
+                split_size = max(
+                    int((end_sample - start_sample) / n_splits),
+                    int(min_segment_duration * target_sr),
+                )
+
+                # Recalculate number of splits based on minimum duration
+                n_splits = min(n_splits, int((end_sample - start_sample) / split_size))
 
                 for i in range(n_splits):
                     split_start = start_sample + i * split_size
                     split_end = min(split_start + split_size, end_sample)
+
+                    # Verify split duration
+                    split_duration = (split_end - split_start) / target_sr
+                    if split_duration < min_segment_duration:
+                        print(
+                            f"\nSkipping split segment: duration {split_duration:.2f}s < minimum {min_segment_duration}s"
+                        )
+                        continue
 
                     # Create segment and ensure it's 2D [channels, samples]
                     segment = torch.FloatTensor(audio[split_start:split_end])
@@ -254,6 +272,14 @@ def segment_audio(
                     segment_np = segment.numpy().squeeze()
                     padded_segment = add_padding(segment_np, target_sr, pad_duration)
                     segment = torch.FloatTensor(padded_segment).unsqueeze(0)
+
+                    # Verify final duration after padding
+                    final_duration = segment.size(1) / target_sr
+                    if final_duration < min_segment_duration:
+                        print(
+                            f"\nSkipping segment after padding: duration {final_duration:.2f}s < minimum {min_segment_duration}s"
+                        )
+                        continue
 
                     # Normalize audio to prevent clipping
                     if segment.numel() > 0:  # Check if segment is not empty
@@ -281,6 +307,14 @@ def segment_audio(
                 segment_np = segment.numpy().squeeze()
                 padded_segment = add_padding(segment_np, target_sr, pad_duration)
                 segment = torch.FloatTensor(padded_segment).unsqueeze(0)
+
+                # Verify final duration after padding
+                final_duration = segment.size(1) / target_sr
+                if final_duration < min_segment_duration:
+                    print(
+                        f"\nSkipping segment: duration {final_duration:.2f}s < minimum {min_segment_duration}s"
+                    )
+                    continue
 
                 # Normalize audio to prevent clipping
                 if segment.numel() > 0:  # Check if segment is not empty
@@ -314,18 +348,29 @@ def segment_audio(
 
 if __name__ == "__main__":
     try:
-        # Input should be the output from vocal_isolator.py
-        input_file = "Data_prep/raw_data/full_audio/amelia_stream_vocals.wav"
-        output_dir = "Data_prep/raw_data/2hour_amelia"
+        parser = argparse.ArgumentParser(description="Segment audio file into chunks")
+        parser.add_argument(
+            "--input", type=str, required=True, help="Input audio file path"
+        )
+        parser.add_argument(
+            "--output", type=str, required=True, help="Output directory path"
+        )
+        parser.add_argument(
+            "--threshold",
+            type=float,
+            default=-30,
+            help="Threshold in dB for speech detection",
+        )
+        args = parser.parse_args()
 
         segment_audio(
-            input_file,
-            output_dir,
+            args.input,
+            args.output,
             max_segment_duration=30,
             min_segment_duration=8,
             min_valid_duration=0.5,
             pad_duration=0.5,
-            threshold_db=-30,  # Adjust this if needed
+            threshold_db=args.threshold,
         )
     except KeyboardInterrupt:
         print("\nProcess interrupted by user")

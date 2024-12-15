@@ -4,6 +4,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import hashlib
+import argparse
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torchaudio
@@ -318,9 +319,26 @@ def prepare_data(data_dir, output_dir, sr, max_tokens):
 
 
 if __name__ == "__main__":
-    data_dir = "Data_prep/raw_data/2hour_amelia"
-    output_dir = "Data_prep/Data"
-    sr = 24000
-    max_tokens = 377
+    parser = argparse.ArgumentParser(description="Prepare data for StyleTTS2 training")
+    parser.add_argument(
+        "--input",
+        type=str,
+        required=True,
+        help="Input directory containing segmented audio files",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        required=True,
+        help="Output directory for prepared dataset",
+    )
+    parser.add_argument("--sr", type=int, default=24000, help="Target sample rate")
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=377,
+        help="Maximum number of tokens per sample",
+    )
+    args = parser.parse_args()
 
-    prepare_data(data_dir, output_dir, sr, max_tokens)
+    prepare_data(args.input, args.output, args.sr, args.max_tokens)

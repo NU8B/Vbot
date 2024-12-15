@@ -217,13 +217,20 @@ def isolate_vocals(
 
 if __name__ == "__main__":
     try:
-        # Can now use either MP3 or WAV input
-        input_file = "Data_prep/raw_data/full_audio/amelia_stream.mp3"
-        output_file = "Data_prep/raw_data/full_audio/amelia_stream_vocals.wav"
+        import argparse
+
+        parser = argparse.ArgumentParser(description="Isolate vocals from audio file")
+        parser.add_argument(
+            "--input", type=str, required=True, help="Input audio file path"
+        )
+        parser.add_argument(
+            "--output", type=str, required=True, help="Output audio file path"
+        )
+        args = parser.parse_args()
 
         isolate_vocals(
-            input_file,
-            output_file,
+            args.input,
+            args.output,
             target_sr=24000,
             max_workers=4,  # Adjust based on your CPU/GPU
         )
