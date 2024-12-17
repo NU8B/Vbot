@@ -12,6 +12,8 @@ from faster_whisper import WhisperModel
 from datetime import datetime
 import os
 import sys
+from pystoi import stoi
+from mir_eval.separation import bss_eval_sources
 
 # Add parent directory to Python path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -89,6 +91,35 @@ class VoiceBenchmark:
         common_words = original_words.intersection(generated_words)
         return len(common_words) / len(original_words)
 
+    def compute_stoi_score(self, reference_path, generated_path):
+        """Compute STOI score between reference and generated audio"""
+        ref_wav, sr = librosa.load(reference_path, sr=24000)
+        gen_wav, _ = librosa.load(generated_path, sr=24000)
+
+        # Resample to 16000Hz for STOI calculation
+        ref_wav = librosa.resample(ref_wav, orig_sr=24000, target_sr=16000)
+        gen_wav = librosa.resample(gen_wav, orig_sr=24000, target_sr=16000)
+
+        # Ensure both audio files have the same length
+        min_len = min(len(ref_wav), len(gen_wav))
+        ref_wav = ref_wav[:min_len]
+        gen_wav = gen_wav[:min_len]
+
+        return stoi(ref_wav, gen_wav, 16000)
+
+    def compute_sdr_score(self, reference_path, generated_path):
+        """Compute SDR score between reference and generated audio"""
+        ref_wav, sr = librosa.load(reference_path, sr=24000)
+        gen_wav, _ = librosa.load(generated_path, sr=24000)
+
+        # Ensure both audio files have the same length
+        min_len = min(len(ref_wav), len(gen_wav))
+        ref_wav = ref_wav[:min_len]
+        gen_wav = gen_wav[:min_len]
+
+        sdr, _, _, _ = bss_eval_sources(ref_wav, gen_wav)
+        return sdr[0]
+
     def benchmark_sample(self, reference_path, text, output_path="generated.wav"):
         """Benchmark a single sample"""
         # Generate speech
@@ -121,13 +152,56 @@ class VoiceBenchmark:
             original_transcription, generated_transcription
         )
 
+        # Compute STOI score
+        stoi_score = self.compute_stoi_score(reference_path, output_path)
+
+        # Compute SDR score
+        sdr_score = self.compute_sdr_score(reference_path, output_path)
+
         return {
             "speaker_similarity": float(speaker_similarity),
             "pesq_score": float(pesq_score) if pesq_score else None,
             "transcription_accuracy": float(transcription_accuracy),
+            "stoi_score": float(stoi_score),
+            "sdr_score": float(sdr_score),
             "original_transcription": original_transcription,
             "generated_transcription": generated_transcription,
         }
+
+    def explain_metrics(self):
+        """Provide detailed explanations for each metric used in the benchmark"""
+        explanations = {
+            "speaker_similarity": (
+                "Speaker Similarity: Measures how well the generated voice matches the "
+                "characteristics of the original voice. Calculated using cosine similarity "
+                "between speaker embeddings. Range: 0-1, Higher is better. A higher score "
+                "indicates that the generated voice closely resembles the original speaker's voice."
+            ),
+            "pesq_score": (
+                "PESQ Score: Industry standard measure of audio quality. Compares reference "
+                "and generated audio to evaluate naturalness and clarity. Range: -0.5 to 4.5, "
+                "Higher is better. A higher PESQ score suggests that the generated audio is "
+                "perceived as more natural and clear."
+            ),
+            "transcription_accuracy": (
+                "Transcription Accuracy: Measures how well the generated speech preserves "
+                "the original text content. Calculated as the ratio of common words between "
+                "original and generated transcriptions. Range: 0-1, Higher is better. This metric "
+                "is sensitive to transcription errors, including spelling mistakes and word order. "
+                "If a word is off by even one letter, it is considered different."
+            ),
+            "stoi_score": (
+                "STOI Score: Measures the intelligibility of the generated speech. Compares "
+                "short-time segments of reference and generated audio. Range: 0-1, Higher is better. "
+                "A higher STOI score means the generated speech is clearer and more understandable."
+            ),
+            "sdr_score": (
+                "SDR Score: Measures the distortion in the generated audio compared to the reference. "
+                "Calculated using the BSS Eval toolkit. Higher is better. A higher SDR score indicates "
+                "less distortion and better fidelity to the original audio."
+            ),
+        }
+        return explanations
 
     def benchmark_dataset(self, dataset_path, output_dir="results"):
         """
@@ -299,27 +373,15 @@ def main():
         output_dir="benchmark/results",
     )
 
-    # Print the results with explanations
+    # Print the results with detailed explanations
     if avg_metrics:
+        explanations = benchmark.explain_metrics()
         print("\nBenchmark Results:")
         print("------------------")
-        print(f"Speaker Similarity: {avg_metrics['speaker_similarity']:.4f}")
-        print("(Range: 0-1, Higher is better)")
-        print(
-            "Measures how well the generated voice matches the characteristics of the original voice"
-        )
-        print()
-
-        print(f"PESQ Score: {avg_metrics['pesq_score']:.4f}")
-        print("(Range: -0.5 to 4.5, Higher is better)")
-        print("Industry standard measure of audio quality:")
-        print()
-
-        print(f"Transcription Accuracy: {avg_metrics['transcription_accuracy']:.4f}")
-        print("(Range: 0-1, Higher is better)")
-        print(
-            "Measures how well the generated speech preserves the original text content"
-        )
+        for metric, value in avg_metrics.items():
+            print(f"{metric.capitalize()}: {value:.4f}")
+            print(explanations[metric])
+            print()
     else:
         print("\nBenchmark failed: No results to display")
 

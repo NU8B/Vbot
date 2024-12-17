@@ -64,36 +64,82 @@ def transcribe_audio(audio_path, device="cuda" if torch.cuda.is_available() else
         raise
 
 
-def combine_segments(segments, max_duration=18.0, min_duration=2.0):
+def combine_segments(segments, max_duration=18.0, min_duration=2.0, batch_size=500):
     """
     Combine segments while respecting duration constraints and aiming for a gaussian distribution
     between min_duration and max_duration.
     Uses word timestamps and silence detection for natural breaks.
+    Processes in batches to handle large files efficiently.
     """
     combined = []
-    target_mean = (min_duration + max_duration) / 2
-    target_std = (max_duration - min_duration) / 6
 
-    def get_target_duration():
-        """Generate a target duration following a gaussian distribution"""
-        while True:
-            duration = np.random.normal(target_mean, target_std)
-            if min_duration <= duration <= max_duration:
-                return duration
+    # Process segments in batches to avoid memory issues
+    def process_batch(batch_segments):
+        total_duration = 0
+        all_words = []
 
-    current_words = []
-    current_duration = 0
-    current_start = None
-    target_duration = get_target_duration()
+        # Calculate total duration for this batch
+        for segment in batch_segments:
+            if not hasattr(segment, "words") or not segment.words:
+                continue
+            for word in segment.words:
+                all_words.append(word)
+                total_duration += word.end - word.start
 
-    # Process each segment
-    for segment in segments:
-        # Skip segments without word timestamps
-        if not hasattr(segment, "words") or not segment.words:
-            continue
+        if not all_words:
+            return []
 
-        # Process each word in the segment
-        for word in segment.words:
+        # Generate target durations for this batch
+        mean = (min_duration + max_duration) / 2
+        std_dev = (max_duration - min_duration) / 6
+        target_durations = []
+        accumulated = 0
+
+        while accumulated < total_duration:
+            duration = np.random.normal(mean, std_dev)
+            duration = max(min(duration, max_duration), min_duration)
+
+            remaining = total_duration - accumulated
+
+            if remaining < min_duration:
+                if (
+                    target_durations
+                    and target_durations[-1] + remaining <= max_duration
+                ):
+                    target_durations[-1] += remaining
+                break
+
+            if accumulated + duration > total_duration:
+                remaining = total_duration - accumulated
+                if min_duration <= remaining <= max_duration:
+                    target_durations.append(remaining)
+                elif remaining > max_duration:
+                    while remaining > 0:
+                        if remaining > max_duration:
+                            target_durations.append(max_duration)
+                            remaining -= max_duration
+                        else:
+                            if remaining >= min_duration:
+                                target_durations.append(remaining)
+                            elif target_durations:
+                                target_durations[-1] += remaining
+                            break
+                break
+
+            target_durations.append(duration)
+            accumulated += duration
+
+        # Create segments for this batch
+        batch_combined = []
+        current_words = []
+        current_duration = 0
+        current_start = None
+        target_idx = 0
+
+        for word in all_words:
+            if target_idx >= len(target_durations):
+                break
+
             word_duration = word.end - word.start
 
             # Initialize start time if needed
@@ -101,10 +147,10 @@ def combine_segments(segments, max_duration=18.0, min_duration=2.0):
                 current_start = word.start
 
             # If adding this word would exceed target duration
-            if current_duration + word_duration > target_duration:
+            if current_duration + word_duration > target_durations[target_idx]:
                 # Save current group if it meets minimum duration
                 if current_duration >= min_duration:
-                    combined.append(
+                    batch_combined.append(
                         [
                             {
                                 "start": current_start,
@@ -117,37 +163,18 @@ def combine_segments(segments, max_duration=18.0, min_duration=2.0):
                     current_words = []
                     current_duration = 0
                     current_start = word.start
-                    target_duration = get_target_duration()
-
-                # Handle words that are too long themselves
-                if word_duration > max_duration:
-                    # Split long words at max_duration intervals
-                    start_time = word.start
-                    while start_time < word.end:
-                        split_duration = get_target_duration()
-                        end_time = min(start_time + split_duration, word.end)
-                        if end_time - start_time >= min_duration:
-                            combined.append(
-                                [
-                                    {
-                                        "start": start_time,
-                                        "end": end_time,
-                                        "text": word.word,
-                                    }
-                                ]
-                            )
-                        start_time = end_time
-                    continue
+                    target_idx += 1
 
             # Add word to current group
             current_words.append(word)
             current_duration += word_duration
 
             # Check for natural breaks (silence or punctuation)
-            if (word.word[-1] in ".!?" and current_duration >= min_duration) or (
-                current_duration >= target_duration * 0.8 and word.word[-1] in ",.;"
+            if (
+                word.word[-1] in ".!?"
+                and min_duration <= current_duration <= max_duration
             ):
-                combined.append(
+                batch_combined.append(
                     [
                         {
                             "start": current_start,
@@ -159,19 +186,31 @@ def combine_segments(segments, max_duration=18.0, min_duration=2.0):
                 current_words = []
                 current_duration = 0
                 current_start = None
-                target_duration = get_target_duration()
+                target_idx += 1
 
-    # Don't forget remaining words
-    if current_words and current_duration >= min_duration:
-        combined.append(
-            [
-                {
-                    "start": current_start,
-                    "end": current_words[-1].end,
-                    "text": " ".join(w.word for w in current_words),
-                }
-            ]
-        )
+        # Don't forget remaining words
+        if current_words and min_duration <= current_duration <= max_duration:
+            batch_combined.append(
+                [
+                    {
+                        "start": current_start,
+                        "end": current_words[-1].end,
+                        "text": " ".join(w.word for w in current_words),
+                    }
+                ]
+            )
+
+        return batch_combined
+
+    # Process segments in batches
+    for i in range(0, len(segments), batch_size):
+        batch = segments[i : i + batch_size]
+        batch_combined = process_batch(batch)
+        combined.extend(batch_combined)
+        # Clear memory
+        del batch_combined
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     return combined
 
