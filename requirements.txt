@@ -3,7 +3,7 @@
 # StyleTTS2 requirements.txt as well
 # espeak = https://www.youtube.com/watch?v=BBlivx6o0WM
 # view docker setup instuctions in asset\docker_setup_instructions.md
-numpy==2.0.2
+numpy>=1.26.0,<2.0.0
 scipy==1.14.1
 pandas==2.2.3
 accelerate==1.1.1

@@ -118,7 +118,7 @@ EMOTION_CONFIG = {
         "embedding_scale": 2.0,
     },
     "disgust": {"file": "angry.wav", "alpha": 0.5, "beta": 0.9, "embedding_scale": 2.0},
-    "anger": {"file": "angry.wav", "alpha": 0.5, "beta": 0.95, "embedding_scale": 2.0},
+    "anger": {"file": "angry.wav", "alpha": 0.5, "beta": 0.95, "embedding_scale": 5.0},
     "annoyance": {
         "file": "angry.wav",
         "alpha": 0.5,
@@ -154,10 +154,11 @@ class EmotionHandler:
             model=EMOTION_MODEL_NAME,
             top_k=1,
             truncation=True,
-            device=-1,  # CPU for emotion classification
+            device=-1,
+            framework="pt",  # Force PyTorch backend
             model_kwargs={
                 "low_cpu_mem_usage": True,
-                "torch_dtype": torch.float32,  # Use float32 for better accuracy
+                "torch_dtype": torch.float32,
             },
         )
 

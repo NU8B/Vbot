@@ -23,7 +23,7 @@ class AudioProcessor:
             device="cuda" if torch.cuda.is_available() else "cpu",
             compute_type="float16" if torch.cuda.is_available() else "int8",
             download_root=str(cache_dir / "whisper"),
-            num_workers=2,
+            num_workers=4,
         )
 
         # Voice input state

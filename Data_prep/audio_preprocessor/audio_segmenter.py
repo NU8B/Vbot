@@ -1,348 +1,309 @@
 import os
-import numpy as np
+import re
 import torch
-import torchaudio
+import faster_whisper
+import numpy as np
 from tqdm import tqdm
 from pathlib import Path
-from scipy import signal
+from pydub import AudioSegment
 import argparse
+import shutil
+
+# Get the root directory
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 
-def detect_speech(audio, sr, threshold_db=-35, min_silence_duration=0.3):
+def format_time(seconds):
+    """Convert seconds to SRT time format"""
+    milliseconds = int((seconds - int(seconds)) * 1000)
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    return f"{hours:02}:{minutes:02}:{secs:02},{milliseconds:03}"
+
+
+def transcribe_audio(audio_path, device="cuda" if torch.cuda.is_available() else "cpu"):
+    """Transcribe audio using faster_whisper and return segments"""
+    try:
+        # Clear GPU memory at start
+        if device == "cuda":
+            torch.cuda.empty_cache()
+
+        print("Loading faster_whisper model...")
+        model = faster_whisper.WhisperModel(
+            "medium",
+            device=device,
+            compute_type="float16" if device == "cuda" else "int8",
+            num_workers=4,
+        )
+
+        print("Transcribing audio...")
+        segments, _ = model.transcribe(
+            str(audio_path),
+            beam_size=5,
+            language="en",
+            condition_on_previous_text=False,
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=500),
+            word_timestamps=True,
+        )
+
+        # Convert generator to list to avoid memory issues
+        segments_list = list(segments)
+
+        # Clear GPU memory
+        if device == "cuda":
+            torch.cuda.empty_cache()
+
+        return segments_list
+
+    except Exception as e:
+        print(f"Error during transcription: {e}")
+        if device == "cuda":
+            torch.cuda.empty_cache()
+        raise
+
+
+def combine_segments(segments, max_duration=18.0, min_duration=2.0):
     """
-    Detect speech segments using bandpass filtering for speech frequencies
-    and energy detection
+    Combine segments while respecting duration constraints and aiming for a gaussian distribution
+    between min_duration and max_duration.
+    Uses word timestamps and silence detection for natural breaks.
     """
-    # Convert to mono if stereo
-    if len(audio.shape) > 1:
-        audio = np.mean(audio, axis=0)
+    combined = []
+    target_mean = (min_duration + max_duration) / 2
+    target_std = (max_duration - min_duration) / 6
 
-    # Apply bandpass filter to focus on speech frequencies (80-300 Hz for fundamental frequency)
-    nyquist = sr / 2
-    low = 80 / nyquist
-    high = 300 / nyquist
-    b, a = signal.butter(4, [low, high], btype="band")
-    filtered_audio = signal.filtfilt(b, a, audio)
+    def get_target_duration():
+        """Generate a target duration following a gaussian distribution"""
+        while True:
+            duration = np.random.normal(target_mean, target_std)
+            if min_duration <= duration <= max_duration:
+                return duration
 
-    # Calculate RMS energy in small windows
-    window_size = int(0.02 * sr)  # 20ms windows
-    hop_size = window_size // 2
-    n_windows = (len(filtered_audio) - window_size) // hop_size + 1
-
-    # Vectorized energy calculation
-    windows = np.lib.stride_tricks.sliding_window_view(filtered_audio, window_size)[
-        ::hop_size
-    ][:n_windows]
-    energy = np.sqrt(np.mean(windows**2, axis=1))
-
-    # Convert to dB
-    energy_db = 20 * np.log10(energy + 1e-10)
-
-    # Smooth the energy curve
-    window_length = int(0.1 * sr / hop_size)  # 100ms smoothing
-    if window_length % 2 == 0:
-        window_length += 1
-    energy_smooth = signal.savgol_filter(energy_db, window_length, 2)
-
-    # Find speech regions
-    is_speech = energy_smooth > threshold_db
-
-    # Convert windows to sample indices
-    boundaries = np.where(np.diff(is_speech.astype(int)))[0]
-    boundaries = boundaries * hop_size
-
-    if len(boundaries) == 0:
-        if is_speech[0]:
-            return [(0, len(audio))]
-        return []
-
-    segments = []
-    start_idx = 0 if is_speech[0] else boundaries[0]
-
-    for idx in boundaries[1:]:
-        if idx - start_idx >= min_silence_duration * sr:
-            segments.append((start_idx, idx))
-        start_idx = idx
-
-    if is_speech[-1]:
-        segments.append((start_idx, len(audio)))
-
-    return segments
-
-
-def add_padding(audio, sr, pad_duration=0.5):
-    """Add silence padding to audio"""
-    pad_length = int(pad_duration * sr)
-    return np.pad(audio, (pad_length, pad_length), mode="constant")
-
-
-def group_short_segments(
-    segments,
-    sr,
-    min_duration=8.0,
-    max_duration=30.0,
-    min_valid_duration=0.5,
-    pad_duration=0.5,
-):
-    """
-    Group short segments together until they reach minimum duration.
-    - min_duration: minimum duration for final segments (default 8 seconds)
-    - max_duration: maximum duration for final segments (default 30 seconds)
-    - min_valid_duration: minimum duration for a segment to be considered for grouping (default 0.5 seconds)
-    - pad_duration: duration of silence padding between combined segments (default 0.5 seconds)
-    """
-    grouped_segments = []
-    current_group = []
+    current_words = []
     current_duration = 0
-    pad_samples = int(pad_duration * sr)
+    current_start = None
+    target_duration = get_target_duration()
 
-    # First pass: filter out segments that are too short to be valid
-    valid_segments = []
-    for start, end in segments:
-        duration = (end - start) / sr
-        if duration >= min_valid_duration:
-            valid_segments.append((start, end, duration))
+    # Process each segment
+    for segment in segments:
+        # Skip segments without word timestamps
+        if not hasattr(segment, "words") or not segment.words:
+            continue
 
-    if not valid_segments:
-        return []
+        # Process each word in the segment
+        for word in segment.words:
+            word_duration = word.end - word.start
 
-    # Sort segments by duration, longer segments first
-    valid_segments.sort(key=lambda x: x[2], reverse=True)
+            # Initialize start time if needed
+            if current_start is None:
+                current_start = word.start
 
-    # First, add all segments that are already long enough
-    for start, end, duration in valid_segments:
-        if duration >= min_duration:
-            grouped_segments.append((start, end))
-
-    # Filter out segments that were already added
-    remaining_segments = [
-        (start, end, duration)
-        for start, end, duration in valid_segments
-        if duration < min_duration
-    ]
-
-    # Now process remaining segments
-    current_group = []
-    current_duration = 0
-
-    for start, end, duration in remaining_segments:
-        # Calculate total duration including padding
-        total_padding = pad_duration * (len(current_group))  # Padding between segments
-        potential_duration = current_duration + duration + total_padding
-
-        if potential_duration > max_duration and current_group:
-            # Save current group if it meets minimum duration
-            if current_duration >= min_duration:
-                group_start = current_group[0][0]
-                group_end = current_group[-1][1]
-                grouped_segments.append((group_start, group_end))
-            current_group = [(start, end)]
-            current_duration = duration
-        else:
-            current_group.append((start, end))
-            current_duration = potential_duration
-
-            # If we've reached minimum duration, save the group
-            if current_duration >= min_duration:
-                group_start = current_group[0][0]
-                group_end = current_group[-1][1]
-                grouped_segments.append((group_start, group_end))
-                current_group = []
-                current_duration = 0
-
-    # Handle remaining group
-    if current_group:
-        # Try to append to the last group if possible
-        if grouped_segments and current_duration < min_duration:
-            last_duration = (grouped_segments[-1][1] - grouped_segments[-1][0]) / sr
-            total_duration = last_duration + current_duration + pad_duration
-
-            if total_duration <= max_duration:
-                # Extend last group
-                grouped_segments[-1] = (grouped_segments[-1][0], current_group[-1][1])
-            else:
-                # Only save if it meets minimum duration
+            # If adding this word would exceed target duration
+            if current_duration + word_duration > target_duration:
+                # Save current group if it meets minimum duration
                 if current_duration >= min_duration:
-                    group_start = current_group[0][0]
-                    group_end = current_group[-1][1]
-                    grouped_segments.append((group_start, group_end))
-        else:
-            # Only save if it meets minimum duration
-            if current_duration >= min_duration:
-                group_start = current_group[0][0]
-                group_end = current_group[-1][1]
-                grouped_segments.append((group_start, group_end))
+                    combined.append(
+                        [
+                            {
+                                "start": current_start,
+                                "end": current_words[-1].end,
+                                "text": " ".join(w.word for w in current_words),
+                            }
+                        ]
+                    )
+                    # Reset for next group
+                    current_words = []
+                    current_duration = 0
+                    current_start = word.start
+                    target_duration = get_target_duration()
 
-    return grouped_segments
+                # Handle words that are too long themselves
+                if word_duration > max_duration:
+                    # Split long words at max_duration intervals
+                    start_time = word.start
+                    while start_time < word.end:
+                        split_duration = get_target_duration()
+                        end_time = min(start_time + split_duration, word.end)
+                        if end_time - start_time >= min_duration:
+                            combined.append(
+                                [
+                                    {
+                                        "start": start_time,
+                                        "end": end_time,
+                                        "text": word.word,
+                                    }
+                                ]
+                            )
+                        start_time = end_time
+                    continue
+
+            # Add word to current group
+            current_words.append(word)
+            current_duration += word_duration
+
+            # Check for natural breaks (silence or punctuation)
+            if (word.word[-1] in ".!?" and current_duration >= min_duration) or (
+                current_duration >= target_duration * 0.8 and word.word[-1] in ",.;"
+            ):
+                combined.append(
+                    [
+                        {
+                            "start": current_start,
+                            "end": word.end,
+                            "text": " ".join(w.word for w in current_words),
+                        }
+                    ]
+                )
+                current_words = []
+                current_duration = 0
+                current_start = None
+                target_duration = get_target_duration()
+
+    # Don't forget remaining words
+    if current_words and current_duration >= min_duration:
+        combined.append(
+            [
+                {
+                    "start": current_start,
+                    "end": current_words[-1].end,
+                    "text": " ".join(w.word for w in current_words),
+                }
+            ]
+        )
+
+    return combined
 
 
 def segment_audio(
     input_file,
     output_dir,
-    max_segment_duration=30,  # in seconds
-    min_segment_duration=8,  # in seconds
-    min_valid_duration=0.5,  # in seconds
+    max_segment_duration=18,  # Changed to match reference
+    min_segment_duration=2,  # Changed to match reference
     pad_duration=0.5,  # in seconds
     target_sr=24000,
-    threshold_db=-30,
 ):
     """
-    Segment an audio file into chunks based on speech detection:
-    1. Load audio file
-    2. Detect speech segments
-    3. Group short segments together with padding
-    4. Split long segments and save as WAV files
+    Segment audio file based on faster_whisper transcription:
+    1. Transcribe audio using faster_whisper to get word-level timestamps
+    2. Combine segments using word boundaries and natural breaks
+    3. Export segments with padding
     """
     try:
         # Convert paths to Path objects
         input_file = Path(input_file)
         output_dir = Path(output_dir)
+
+        # Check if input file exists
+        if not input_file.exists():
+            raise FileNotFoundError(f"Input file not found: {input_file}")
+
+        # Create output directory
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        # Load audio
         print("Loading audio file...")
-        wav, sr = torchaudio.load(str(input_file))
+        audio = AudioSegment.from_wav(str(input_file))
 
         # Convert to mono if stereo
-        if wav.size(0) > 1:
-            wav = torch.mean(wav, dim=0, keepdim=True)
+        if audio.channels > 1:
+            print("Converting to mono...")
+            audio = audio.set_channels(1)
 
-        # Resample if necessary
-        if sr != target_sr:
-            print(f"Resampling from {sr} to {target_sr}...")
-            resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
-            wav = resampler(wav)
+        # Convert to target sample rate
+        if audio.frame_rate != target_sr:
+            print(f"Resampling from {audio.frame_rate} to {target_sr}...")
+            audio = audio.set_frame_rate(target_sr)
 
-        # Convert to numpy for processing
-        audio = wav.squeeze().numpy()
+        # Get transcription segments with word timestamps
+        print("Transcribing audio with word timestamps...")
+        segments = transcribe_audio(input_file)
 
-        # Detect speech segments
-        print("Detecting speech segments...")
-        raw_segments = detect_speech(audio, target_sr, threshold_db=threshold_db)
+        if not segments:
+            raise ValueError("No segments were generated during transcription")
 
-        # Group short segments
-        print("Grouping segments...")
-        segments = group_short_segments(
-            raw_segments,
-            target_sr,
-            min_duration=min_segment_duration,
-            max_duration=max_segment_duration,
-            min_valid_duration=min_valid_duration,
-            pad_duration=pad_duration,
+        # Combine segments using word-level timestamps
+        print("Combining segments...")
+        combined_segments = combine_segments(
+            segments, max_segment_duration, min_segment_duration
         )
+
+        if not combined_segments:
+            raise ValueError("No segments were generated after combining")
 
         # Save segments
         print("Saving segments as WAV...")
         segments_saved = 0
         total_duration = 0
+        min_found_duration = float("inf")
+        max_found_duration = 0
+        durations = []  # Keep track of all durations for distribution analysis
 
-        for start_sample, end_sample in tqdm(segments, desc="Saving segments"):
-            duration = (end_sample - start_sample) / target_sr
-            total_duration += duration
+        for group in tqdm(combined_segments, desc="Saving segments"):
+            try:
+                segment_info = group[0]
+                duration = segment_info["end"] - segment_info["start"]
 
-            # Split if too long
-            if duration > max_segment_duration:
-                n_splits = int(np.ceil(duration / max_segment_duration))
-                # Adjust split size to ensure minimum duration
-                split_size = max(
-                    int((end_sample - start_sample) / n_splits),
-                    int(min_segment_duration * target_sr),
-                )
-
-                # Recalculate number of splits based on minimum duration
-                n_splits = min(n_splits, int((end_sample - start_sample) / split_size))
-
-                for i in range(n_splits):
-                    split_start = start_sample + i * split_size
-                    split_end = min(split_start + split_size, end_sample)
-
-                    # Verify split duration
-                    split_duration = (split_end - split_start) / target_sr
-                    if split_duration < min_segment_duration:
-                        print(
-                            f"\nSkipping split segment: duration {split_duration:.2f}s < minimum {min_segment_duration}s"
-                        )
-                        continue
-
-                    # Create segment and ensure it's 2D [channels, samples]
-                    segment = torch.FloatTensor(audio[split_start:split_end])
-                    if segment.dim() == 1:
-                        segment = segment.unsqueeze(0)  # Add channel dimension
-
-                    # Add padding
-                    segment_np = segment.numpy().squeeze()
-                    padded_segment = add_padding(segment_np, target_sr, pad_duration)
-                    segment = torch.FloatTensor(padded_segment).unsqueeze(0)
-
-                    # Verify final duration after padding
-                    final_duration = segment.size(1) / target_sr
-                    if final_duration < min_segment_duration:
-                        print(
-                            f"\nSkipping segment after padding: duration {final_duration:.2f}s < minimum {min_segment_duration}s"
-                        )
-                        continue
-
-                    # Normalize audio to prevent clipping
-                    if segment.numel() > 0:  # Check if segment is not empty
-                        max_val = torch.abs(segment).max()
-                        if max_val > 0:
-                            segment = segment / max_val * 0.9
-
-                    # Save segment as WAV
-                    output_path = output_dir / f"segment_{segments_saved:04d}.wav"
-                    torchaudio.save(
-                        str(output_path),
-                        segment,
-                        target_sr,
-                        encoding="PCM_S",
-                        bits_per_sample=16,
-                    )
-                    segments_saved += 1
-            else:
-                # Create segment and ensure it's 2D [channels, samples]
-                segment = torch.FloatTensor(audio[start_sample:end_sample])
-                if segment.dim() == 1:
-                    segment = segment.unsqueeze(0)  # Add channel dimension
-
-                # Add padding
-                segment_np = segment.numpy().squeeze()
-                padded_segment = add_padding(segment_np, target_sr, pad_duration)
-                segment = torch.FloatTensor(padded_segment).unsqueeze(0)
-
-                # Verify final duration after padding
-                final_duration = segment.size(1) / target_sr
-                if final_duration < min_segment_duration:
+                # Strict enforcement of duration limits
+                if duration < min_segment_duration or duration > max_segment_duration:
                     print(
-                        f"\nSkipping segment: duration {final_duration:.2f}s < minimum {min_segment_duration}s"
+                        f"\nSkipping segment: duration {duration:.2f}s outside range [{min_segment_duration}-{max_segment_duration}]s"
                     )
                     continue
 
-                # Normalize audio to prevent clipping
-                if segment.numel() > 0:  # Check if segment is not empty
-                    max_val = torch.abs(segment).max()
-                    if max_val > 0:
-                        segment = segment / max_val * 0.9
+                # Extract audio segment
+                start_ms = segment_info["start"] * 1000
+                end_ms = segment_info["end"] * 1000
+                segment = audio[start_ms:end_ms]
 
-                # Save segment as WAV
+                # Add padding
+                silence = AudioSegment.silent(duration=pad_duration * 1000)
+                padded_segment = silence + segment + silence
+
+                # Calculate final duration
+                final_duration = len(padded_segment) / 1000
+                total_duration += final_duration
+                min_found_duration = min(min_found_duration, final_duration)
+                max_found_duration = max(max_found_duration, final_duration)
+                durations.append(final_duration)
+
+                # Normalize audio
+                normalized_segment = padded_segment.normalize()
+
+                # Save segment
                 output_path = output_dir / f"segment_{segments_saved:04d}.wav"
-                torchaudio.save(
-                    str(output_path),
-                    segment,
-                    target_sr,
-                    encoding="PCM_S",
-                    bits_per_sample=16,
-                )
+                normalized_segment.export(str(output_path), format="wav")
                 segments_saved += 1
+
+            except Exception as e:
+                print(f"\nError processing segment {segments_saved}: {e}")
+                continue
+
+        if segments_saved == 0:
+            raise ValueError("No segments were successfully saved")
+
+        # Calculate distribution statistics
+        durations = np.array(durations)
+        mean_duration = np.mean(durations)
+        std_duration = np.std(durations)
 
         print("\nProcessing complete!")
         print(f"Total segments saved: {segments_saved}")
         print(f"Total audio duration: {total_duration:.2f} seconds")
-        print(f"Average segment duration: {total_duration/segments_saved:.2f} seconds")
+        print(f"Duration distribution:")
+        print(f"  Mean: {mean_duration:.2f} seconds")
+        print(f"  Std Dev: {std_duration:.2f} seconds")
+        print(f"  Min: {min_found_duration:.2f} seconds")
+        print(f"  Max: {max_found_duration:.2f} seconds")
         print(
-            f"Segment duration range: {min_segment_duration}-{max_segment_duration} seconds"
+            f"Target duration range: {min_segment_duration}-{max_segment_duration} seconds"
         )
 
     except Exception as e:
         print(f"\nError during processing: {e}")
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         raise
 
 
@@ -355,22 +316,14 @@ if __name__ == "__main__":
         parser.add_argument(
             "--output", type=str, required=True, help="Output directory path"
         )
-        parser.add_argument(
-            "--threshold",
-            type=float,
-            default=-30,
-            help="Threshold in dB for speech detection",
-        )
         args = parser.parse_args()
 
         segment_audio(
             args.input,
             args.output,
-            max_segment_duration=30,
-            min_segment_duration=8,
-            min_valid_duration=0.5,
+            max_segment_duration=18,
+            min_segment_duration=2,
             pad_duration=0.5,
-            threshold_db=args.threshold,
         )
     except KeyboardInterrupt:
         print("\nProcess interrupted by user")

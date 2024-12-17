@@ -49,7 +49,6 @@ Thumbs.db
 # Add these lines to your .gitignore
 *.pyc
 __pycache__/
-/Data_prep/Data
 
 
 *.zip
@@ -63,3 +62,6 @@ nltk_data/
 /Data_prep/audio_preprocessor/temp
 /Data_prep/raw_data/full_audio
 /Data_prep/raw_data
+/Data_prep/Data/wavs
+Data_prep/Data/train_list.txt
+Data_prep/Data/val_list.txt
