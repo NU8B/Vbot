@@ -29,7 +29,7 @@ class VoiceBenchmark:
         )
         self.voice_encoder = VoiceEncoder()
         self.whisper_model = WhisperModel(
-            "distil-large-v3",
+            "small",
             device="cuda" if torch.cuda.is_available() else "cpu",
             compute_type="float16" if torch.cuda.is_available() else "float32",
         )
@@ -244,6 +244,8 @@ class VoiceBenchmark:
             "speaker_similarity": 0,
             "pesq_score": 0,
             "transcription_accuracy": 0,
+            "stoi_score": 0,
+            "sdr_score": 0,
         }
         valid_pesq_scores = 0
         processed_files = 0
@@ -286,6 +288,8 @@ class VoiceBenchmark:
                 avg_metrics["transcription_accuracy"] += sample_results[
                     "transcription_accuracy"
                 ]
+                avg_metrics["stoi_score"] += sample_results["stoi_score"]
+                avg_metrics["sdr_score"] += sample_results["sdr_score"]
                 if sample_results["pesq_score"]:
                     avg_metrics["pesq_score"] += sample_results["pesq_score"]
                     valid_pesq_scores += 1
@@ -304,6 +308,8 @@ class VoiceBenchmark:
         # Calculate averages
         avg_metrics["speaker_similarity"] /= processed_files
         avg_metrics["transcription_accuracy"] /= processed_files
+        avg_metrics["stoi_score"] /= processed_files
+        avg_metrics["sdr_score"] /= processed_files
         if valid_pesq_scores > 0:
             avg_metrics["pesq_score"] /= valid_pesq_scores
 
@@ -327,10 +333,11 @@ class VoiceBenchmark:
             )
 
         # Save summary with explanations
+        explanations = self.explain_metrics()
         summary_file = output_dir / "summary.txt"
         with open(summary_file, "w") as f:
             f.write("StyleTTS2 Benchmark Summary\n")
-            f.write("=========================\n\n")
+            f.write("===========================\n\n")
             f.write(f"Timestamp: {timestamp}\n")
             f.write(f"Dataset: {dataset_path}\n")
             f.write(f"Total files: {len(wav_files)}\n")
@@ -338,23 +345,29 @@ class VoiceBenchmark:
             f.write(f"Valid PESQ scores: {valid_pesq_scores}\n\n")
 
             f.write("Average Metrics:\n")
-            f.write("--------------\n")
-            f.write(f"Speaker Similarity: {avg_metrics['speaker_similarity']:.4f}\n")
+            f.write("----------------\n")
             f.write(
-                "(Range: 0-1, Higher is better. Measures how well the voice characteristics match)\n\n"
+                f"Speaker Similarity: {avg_metrics['speaker_similarity']:.4f} (Range: 0-1, Higher is better)\n"
             )
-
-            f.write(f"PESQ Score: {avg_metrics['pesq_score']:.4f}\n")
-            f.write(
-                "(Range: -0.5 to 4.5, Higher is better. Industry standard for audio quality)\n\n"
-            )
+            f.write(explanations["speaker_similarity"] + "\n\n")
 
             f.write(
-                f"Transcription Accuracy: {avg_metrics['transcription_accuracy']:.4f}\n"
+                f"PESQ Score: {avg_metrics['pesq_score']:.4f} (Range: -0.5 to 4.5, Higher is better)\n"
             )
+            f.write(explanations["pesq_score"] + "\n\n")
+
             f.write(
-                "(Range: 0-1, Higher is better. Measures how well the content/words are preserved)\n"
+                f"Transcription Accuracy: {avg_metrics['transcription_accuracy']:.4f} (Range: 0-1, Higher is better)\n"
             )
+            f.write(explanations["transcription_accuracy"] + "\n\n")
+
+            f.write(
+                f"STOI Score: {avg_metrics['stoi_score']:.4f} (Range: 0-1, Higher is better)\n"
+            )
+            f.write(explanations["stoi_score"] + "\n\n")
+
+            f.write(f"SDR Score: {avg_metrics['sdr_score']:.4f} (Higher is better)\n")
+            f.write(explanations["sdr_score"] + "\n\n")
 
         print(
             f"\nSuccessfully processed {processed_files} out of {len(wav_files)} files"

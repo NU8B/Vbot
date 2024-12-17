@@ -1,0 +1,36 @@
+StyleTTS2 Benchmark Summary
+=========================
+
+Timestamp: 2024-12-18_05-06-32
+Dataset: Data_prep\raw_data\raw_audio2
+Total files: 67
+Processed files: 67
+Valid PESQ scores: 67
+
+Average Metrics:
+--------------
+Speaker Similarity: 0.8921 (Range: 0-1, Higher is better)
+- Measures how well the generated voice matches the characteristics of the original voice.
+- Calculated using COSINE similarity between speaker embeddings.
+- A higher score indicates that the generated voice closely resembles the original speaker's voice.
+
+PESQ Score: 1.1498 (Range: -0.5 to 4.5, Higher is better)
+- Industry standard measure of audio quality.
+- Compares reference and generated audio to evaluate naturalness and clarity.
+- A higher PESQ score suggests that the generated audio is perceived as more natural and clear.
+
+Transcription Accuracy: 0.8422 (Range: 0-1, Higher is better)
+- Measures how well the generated speech preserves the original text content.
+- Calculated as the ratio of common words between original and generated transcriptions.
+- This metric is sensitive to transcription errors, including spelling mistakes and word order.
+
+STOI Score: 0.1407 (Range: 0-1, Higher is better)
+- Measures the intelligibility of the generated speech.
+- Compares short-time segments of reference and generated audio.
+- A higher STOI score means the generated speech is clearer and more understandable.
+
+SDR Score: -23.0385 (Higher is better)
+- Measures the distortion in the generated audio compared to the reference.
+- Calculated using the BSS Eval toolkit.
+- A higher SDR score indicates less distortion and better fidelity to the original audio.
+
