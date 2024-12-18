@@ -66,3 +66,4 @@ Data_prep/Data/train_list.txt
 Data_prep/Data/val_list.txt
 /benchmark/results/2024-12-18_04-39-59/generated_samples
 /benchmark/results/2024-12-18_05-06-32/generated_samples
+/ref_repo
