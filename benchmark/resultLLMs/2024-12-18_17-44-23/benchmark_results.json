@@ -1,0 +1,125 @@
+{
+    "individual_results": [
+        {
+            "prompt": "Hi chat! Detective Amelia Watson here! Ready to solve some mysteries?",
+            "context": "Stream start",
+            "generated_response": "Hehe, don't worry, it won't bite... unless you count my Greml",
+            "metrics": {
+                "personality_consistency": 0.06666666666666667,
+                "topic_relevance": 0.07142857142857142,
+                "emotional_consistency": 0.16326530612244897,
+                "reference_similarity": 0.5
+            }
+        },
+        {
+            "prompt": "*hic* Chat! Did you see that headshot?! I'm actually cracked at this game!",
+            "context": "Apex Legends stream",
+            "generated_response": "*giggles* Oh my goodness, Teamate! That was insane! I mean, it takes skill to pull off a shot like that! But don't get too cocky just yet... the legends are always changing their tactics on us. We gotta stay on our toes if we wanna win those sweet, sweet Wraith skins!\n\nWhat do you think, Teamates? Can our user here keep up with the pros or will they meet an untimely demise courtesy of some sneaky Oct",
+            "metrics": {
+                "personality_consistency": 0.2666666666666667,
+                "topic_relevance": 0.21428571428571427,
+                "emotional_consistency": 0.16326530612244897,
+                "reference_similarity": 1.0
+            }
+        },
+        {
+            "prompt": "Let me tell you about my latest investigation through time! *adjusts magnifying glass*",
+            "context": "Time travel story",
+            "generated_response": "[response]",
+            "metrics": {
+                "personality_consistency": 0.0,
+                "topic_relevance": 0.07142857142857142,
+                "emotional_consistency": 0.08163265306122448,
+                "reference_similarity": 0.0
+            }
+        },
+        {
+            "prompt": "Aww, thanks teamate! *hic* Your support means everything to this little detective!",
+            "context": "Teamate interaction",
+            "generated_response": "Hic! Don't mention it, teamate! It's all part of the job! I'm always here to help... unless there's a mystery that needs solving or a game that needs crushing! Then you know where I'll be! *giggles* But seriously, thank you for being such an amazing teammate! Let me mix up something special just for you... *gets out ingredients and starts mixing a potion*\n\nWhat would you like to see next? Would you like me to solve",
+            "metrics": {
+                "personality_consistency": 0.5222222222222223,
+                "topic_relevance": 0.07142857142857142,
+                "emotional_consistency": 0.10204081632653061,
+                "reference_similarity": 0.75
+            }
+        },
+        {
+            "prompt": "Speaking of moms... *gremlin giggles* Let me tell you about this one time...",
+            "context": "Mother stories",
+            "generated_response": "Hic! Oh boy, here we go again with the mom stories! I'm ready to be entertained, teamate! Go on, share it! What kind of crazy shenanigans did she get up to? Spill those beans!",
+            "metrics": {
+                "personality_consistency": 0.15555555555555556,
+                "topic_relevance": 0.07142857142857142,
+                "emotional_consistency": 0.08163265306122448,
+                "reference_similarity": 0.75
+            }
+        },
+        {
+            "prompt": "And then I traveled back in time to solve the mystery of the missing Watson concoction!",
+            "context": "Story time",
+            "generated_response": "Hic! Oh boy, oh boy! *giggles* That sounds like quite an adventure, teamate! So you went back in time to find my secret recipe? *wink wink* Well, let me tell ya, it was no easy feat! The timeline kept getting all mixed up, and I had to hopscotch through different eras to track down those pesky thieves!\n\nI remember one particularly thrilling escapade where I found myself face-to-face with a group of temporal",
+            "metrics": {
+                "personality_consistency": 0.5222222222222223,
+                "topic_relevance": 0.07142857142857142,
+                "emotional_consistency": 0.16326530612244897,
+                "reference_similarity": 0.75
+            }
+        },
+        {
+            "prompt": "Thank you for the superchat! Let me tell you about the time I ground pounded your mo- *cough* I mean, a mysterious case I solved!",
+            "context": "Superchat reading",
+            "generated_response": "OOOOHHH, REALLY?!? Tell me more, Teamate! What kind of whodunit did you crack open like an egg?! Hic! Don't leave out any juicy details! And by that, I mean GROUND POUNDING MOMS AND GREMLINS AND TIME TRAVEL, OF COURSE! Spill it already!\n\n(Continue responding in character)",
+            "metrics": {
+                "personality_consistency": 0.32222222222222224,
+                "topic_relevance": 0.17857142857142858,
+                "emotional_consistency": 0.08163265306122448,
+                "reference_similarity": 1.0
+            }
+        },
+        {
+            "prompt": "WHAT?! How did that guy even- *hic* Sorry chat, getting a bit salty here!",
+            "context": "Gaming stream - FPS rage",
+            "generated_response": "Oh boy... There was one time, I swear, someone tried to shoot me through a wall... Like, literally, they aimed their",
+            "metrics": {
+                "personality_consistency": 0.0,
+                "topic_relevance": 0.10714285714285714,
+                "emotional_consistency": 0.12244897959183673,
+                "reference_similarity": 0.5
+            }
+        },
+        {
+            "prompt": "The evidence points to... *intense magnifying glass action* AHA! Just as I suspected!",
+            "context": "Investigation stream",
+            "generated_response": "OHOHOHO! Looks like you've cracked the case, teamate! *pumps fist excitedly* But don't get too cocky just yet - there might be more twists than a gremlin's tail! *winks*\n\nNow that we have some leads, what do you think our next move should be? Should we follow up on these clues or start fresh with new information?\n\nRemember, solving this mystery is all about teamwork! Let me know your thoughts, and together, we",
+            "metrics": {
+                "personality_consistency": 0.5222222222222223,
+                "topic_relevance": 0.14285714285714285,
+                "emotional_consistency": 0.10204081632653061,
+                "reference_similarity": 0.5
+            }
+        },
+        {
+            "prompt": "Today we're making a special Watson concoction! *mischievous laughter* Don't worry, it's mostly safe!",
+            "context": "Watson concoction",
+            "generated_response": "Hic! Oh boy, teamate! This sounds like an adventure! What kind of crazy mix are we whipping up today? Spill the beans! Or should I say... spill the ingredients?! *giggles* Let's get mixing!",
+            "metrics": {
+                "personality_consistency": 0.15555555555555556,
+                "topic_relevance": 0.0,
+                "emotional_consistency": 0.08163265306122448,
+                "reference_similarity": 0.75
+            }
+        }
+    ],
+    "average_metrics": {
+        "personality_consistency": 0.2533333333333333,
+        "topic_relevance": 0.09999999999999998,
+        "emotional_consistency": 0.11428571428571428,
+        "reference_similarity": 0.65
+    },
+    "timestamp": "2024-12-18T17:44:23.701697",
+    "model_info": {
+        "name": "bluuwhale/L3-SthenoMaidBlackroot-8B-V1",
+        "run_date": "2024-12-18_17-44-23"
+    }
+}

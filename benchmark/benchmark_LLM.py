@@ -14,6 +14,7 @@ from bert_score import score
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForCausalLM, BitsAndBytesConfig
 import random
+import shutil
 
 class VTuberLLMBenchmark:
     def __init__(self, model_path="bluuwhale/L3-SthenoMaidBlackroot-8B-V1"):
@@ -358,12 +359,42 @@ Keep responses natural, playful, and in character. Use Amelia's speech patterns 
         response = response.split("Amelia Watson:")[-1].strip()
         return response
 
+def save_benchmark_results(results: Dict):
+    """Save benchmark results to a JSON file in a dated directory."""
+    # Create resultLLMs directory if it doesn't exist
+    result_dir = Path("benchmark/resultLLMs")
+    result_dir.mkdir(exist_ok=True)
+    
+    # Create dated directory
+    current_time = datetime.now()
+    date_str = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+    dated_dir = result_dir / date_str
+    dated_dir.mkdir(exist_ok=True)
+    
+    # Save results
+    result_file = dated_dir / "benchmark_results.json"
+    
+    # Add timestamp to results
+    results["timestamp"] = current_time.isoformat()
+    results["model_info"] = {
+        "name": "bluuwhale/L3-SthenoMaidBlackroot-8B-V1",
+        "run_date": date_str
+    }
+    
+    with open(result_file, 'w', encoding='utf-8') as f:
+        json.dump(results, f, indent=4, ensure_ascii=False)
+    
+    print(f"\nResults saved to: {result_file}")
+
 def main():
     # Initialize benchmark
     benchmark = VTuberLLMBenchmark()
     
     # Run benchmark with all test cases
     results = benchmark.run_benchmark(num_samples=10)
+    
+    # Save results
+    save_benchmark_results(results)
     
     # Print results
     print("\nBenchmark Results:")
