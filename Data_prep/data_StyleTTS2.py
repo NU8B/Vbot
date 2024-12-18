@@ -3,7 +3,6 @@ import sys
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-import hashlib
 import argparse
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,42 +10,23 @@ import torchaudio
 import numpy as np
 import torch
 from tqdm import tqdm
-from faster_whisper import WhisperModel
 from StyleTTS2.text_utils import TextCleaner, symbols
 from phonemizer.backend import EspeakBackend
 from transformers import AlbertTokenizer
 import torchaudio.transforms as T
+
+# Default paths relative to script location
+SCRIPT_DIR = Path(__file__).parent
+DEFAULT_SEGMENTS_DIR = SCRIPT_DIR / "raw_data" / "segments"
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "Data"
+DEFAULT_SR = 24000
+DEFAULT_MAX_TOKENS = 377
 
 
 def clean_text(text):
     """Clean text to only include allowed characters"""
     allowed_chars = set(symbols)
     return "".join(c for c in text if c in allowed_chars)
-
-
-def get_file_hash(file_path):
-    """Get MD5 hash of file for caching"""
-    hasher = hashlib.md5()
-    with open(file_path, "rb") as f:
-        buf = f.read(65536)  # Read in 64kb chunks
-        while len(buf) > 0:
-            hasher.update(buf)
-            buf = f.read(65536)
-    return hasher.hexdigest()
-
-
-def load_cache(cache_file):
-    """Load transcription cache from file"""
-    if os.path.exists(cache_file):
-        with open(cache_file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-
-def save_cache(cache_file, cache):
-    """Save transcription cache to file"""
-    with open(cache_file, "w", encoding="utf-8") as f:
-        json.dump(cache, f, ensure_ascii=False, indent=2)
 
 
 def phonemize_text(text):
@@ -61,43 +41,6 @@ def phonemize_text(text):
     except Exception as e:
         print(f"Error phonemizing text: {e}")
         return None
-
-
-def process_single(model, audio_path):
-    """Process a single audio file with Whisper"""
-    try:
-        segments, _ = model.transcribe(
-            audio_path,
-            beam_size=5,
-            language="en",
-            condition_on_previous_text=False,
-        )
-        return " ".join(segment.text.strip() for segment in segments)
-    except Exception as e:
-        print(f"\nError transcribing {audio_path}: {e}")
-        return None
-
-
-def process_batch(model, audio_paths, max_workers=4):
-    """Process audio files in parallel"""
-    results = []
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Create a list to store futures
-        futures = []
-
-        # Submit all tasks
-        for audio_path in audio_paths:
-            future = executor.submit(process_single, model, audio_path)
-            futures.append(future)
-
-        # Process results as they complete
-        for future in tqdm(
-            as_completed(futures), total=len(futures), desc="Transcribing"
-        ):
-            result = future.result()
-            results.append(result)
-
-    return results
 
 
 def parallel_phonemize(texts, max_workers=4):
@@ -141,95 +84,84 @@ def parallel_audio_processing(data_dir, audio_files, target_sr, max_workers=8):
     return results
 
 
-def prepare_data(data_dir, output_dir, sr, max_tokens):
+def find_segments_dir():
+    """Find the segments directory by searching common locations"""
+    possible_paths = [
+        DEFAULT_SEGMENTS_DIR,
+        SCRIPT_DIR.parent / "raw_data" / "segments",
+        Path.cwd() / "raw_data" / "segments",
+        Path.cwd() / "Data_prep" / "raw_data" / "segments",
+    ]
+
+    for path in possible_paths:
+        if (path / "metadata.json").exists() and (path / "wavs").exists():
+            return path
+
+    raise FileNotFoundError(
+        "Could not find segments directory with metadata.json and wavs folder. "
+        "Please specify the input directory manually with --input"
+    )
+
+
+def prepare_data(
+    data_dir=None, output_dir=None, sr=DEFAULT_SR, max_tokens=DEFAULT_MAX_TOKENS
+):
     """Prepare data for StyleTTS2 training"""
+    print("\nInitializing StyleTTS2 data preparation...")
+
+    # Find input directory if not specified
+    if data_dir is None:
+        segments_dir = find_segments_dir()
+        data_dir = segments_dir / "wavs"
+        print(f"Found segments directory: {segments_dir}")
+    else:
+        data_dir = Path(data_dir)
+        segments_dir = data_dir.parent
+
+    # Use default output directory if not specified
+    if output_dir is None:
+        output_dir = DEFAULT_OUTPUT_DIR
+        print(f"Using default output directory: {output_dir}")
+    output_dir = Path(output_dir)
+
     # Initialize models
-    print("Loading Whisper model...")
-    model = WhisperModel("distil-large-v3", device="cuda", compute_type="float16")
     text_cleaner = TextCleaner()
     tokenizer = AlbertTokenizer.from_pretrained("albert-base-v2")
 
-    # Create all necessary directories
-    output_dir = Path(output_dir)
+    # Create output directories
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Create centralized cache directory in root
-    root_dir = Path(__file__).parent.parent  # Get root directory
-    cache_dir = root_dir / "cache"
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file = cache_dir / "whisper_transcriptions.json"
-
-    # Create wavs directory
     wavs_dir = output_dir / "wavs"
     wavs_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load cache
-    cache = load_cache(cache_file)
+    # Load metadata from segmentation
+    metadata_path = segments_dir / "metadata.json"
+    if not metadata_path.exists():
+        raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
+
+    with open(metadata_path, "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+
+    print(f"Loaded {len(metadata)} segments from metadata.json")
+
+    # Get all wav files and their corresponding texts
+    audio_files = [(item["filename"], item["text"]) for item in metadata]
+
+    # Prefetch audio files in parallel
+    print("\nPrefetching audio files...")
+    audio_data = parallel_audio_processing(data_dir, [f[0] for f in audio_files], sr)
+
+    # Parallel phonemization
+    print("\nPhonemizing texts in parallel...")
+    texts_to_phonemize = [text for _, text in audio_files]
+    phonemes_list = parallel_phonemize(texts_to_phonemize, max_workers=8)
 
     train_list = []
     val_list = []
     skipped_count = 0
     token_skipped = 0
 
-    # Get all wav files
-    data_dir = Path(data_dir)
-    if not data_dir.exists():
-        raise FileNotFoundError(f"Data directory not found: {data_dir}")
-
-    audio_files = [f for f in os.listdir(data_dir) if f.endswith(".wav")]
-    audio_files.sort()
-
-    # Prepare files for processing
-    files_to_process = []
-    cached_results = []
-
-    print("Checking cache and preparing files...")
-    for audio_file in tqdm(audio_files):
-        wav_path = os.path.join(data_dir, audio_file)
-        file_hash = get_file_hash(wav_path)
-
-        if file_hash in cache:
-            cached_results.append((audio_file, cache[file_hash]))
-        else:
-            files_to_process.append((audio_file, wav_path, file_hash))
-
-    # Prefetch audio files in parallel
-    print("\nPrefetching audio files...")
-    audio_data = parallel_audio_processing(
-        data_dir, [f[0] for f in files_to_process], sr
-    )
-
-    # Process uncached files in parallel
-    if files_to_process:
-        print(f"\nProcessing {len(files_to_process)} uncached files...")
-        batch_paths = [f[1] for f in files_to_process]
-
-        # Use more workers for transcription since it's GPU-bound
-        batch_results = process_batch(model, batch_paths, max_workers=8)
-
-        # Update cache with new results
-        for (audio_file, wav_path, file_hash), text in zip(
-            files_to_process, batch_results
-        ):
-            if text is not None:  # Only cache successful transcriptions
-                cache[file_hash] = text
-
-        # Save updated cache
-        save_cache(cache_file, cache)
-
-    # Combine cached and new results
-    all_results = cached_results + [
-        (f[0], cache[f[2]]) for f in files_to_process if f[2] in cache
-    ]
-
-    # Parallel phonemization
-    print("\nPhonemizing texts in parallel...")
-    texts_to_phonemize = [result[1] for result in all_results]
-    # Use more workers for phonemization since it's CPU-bound
-    phonemes_list = parallel_phonemize(texts_to_phonemize, max_workers=8)
-
     print("\nProcessing results...")
-    for i, ((audio_file, _), phonemes) in enumerate(zip(all_results, phonemes_list)):
+    for i, ((audio_file, _), phonemes) in enumerate(zip(audio_files, phonemes_list)):
         try:
             if not phonemes or not phonemes.strip():
                 print(f"Skipping {audio_file}: Empty or invalid phonemes")
@@ -307,7 +239,6 @@ def prepare_data(data_dir, output_dir, sr, max_tokens):
             len(tokenizer.encode(entry.split("|")[1], add_special_tokens=True))
             for entry in train_list
         ]
-
         print(f"Max direct token length: {max(direct_lengths)}")
         print(f"Average token length: {sum(direct_lengths)/len(direct_lengths):.2f}")
 
@@ -323,22 +254,31 @@ if __name__ == "__main__":
     parser.add_argument(
         "--input",
         type=str,
-        required=True,
-        help="Input directory containing segmented audio files",
+        help="Input directory containing segmented audio files (optional, will auto-detect if not specified)",
     )
     parser.add_argument(
         "--output",
         type=str,
-        required=True,
-        help="Output directory for prepared dataset",
+        help=f"Output directory for prepared dataset (default: {DEFAULT_OUTPUT_DIR})",
     )
-    parser.add_argument("--sr", type=int, default=24000, help="Target sample rate")
+    parser.add_argument(
+        "--sr",
+        type=int,
+        default=DEFAULT_SR,
+        help=f"Target sample rate (default: {DEFAULT_SR})",
+    )
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=377,
-        help="Maximum number of tokens per sample",
+        default=DEFAULT_MAX_TOKENS,
+        help=f"Maximum number of tokens per sample (default: {DEFAULT_MAX_TOKENS})",
     )
     args = parser.parse_args()
 
-    prepare_data(args.input, args.output, args.sr, args.max_tokens)
+    try:
+        prepare_data(args.input, args.output, args.sr, args.max_tokens)
+    except KeyboardInterrupt:
+        print("\nProcess interrupted by user")
+    except Exception as e:
+        print(f"\nError: {e}")
+        raise
