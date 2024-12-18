@@ -134,6 +134,7 @@ def adjust_segments(subs, durations):
     adjusted_segments = []
     i = 0
     num_subs = len(subs)
+    END_PADDING = 0.4  # 200ms padding for word completion
 
     if not subs:
         return []
@@ -149,25 +150,27 @@ def adjust_segments(subs, durations):
 
         current_segment = {"start": start_time, "text": "", "end": start_time}
 
+        # Keep accumulating text until we hit our target or would exceed max duration
         while i < num_subs:
+            # First add the text and update end time
             current_segment["text"] += " " + subs[i]["text"]
-            current_segment["end"] = subs[i]["end"]
+            # Add padding to ensure last word is complete
+            current_segment["end"] = subs[i]["end"] + END_PADDING
 
-            # Check if we would exceed max duration with next subtitle
-            if current_segment["end"] - current_segment["start"] >= 18:
-                break
-
-            # Check if we've reached target duration
-            if subs[i]["end"] >= target_end_time:
+            # Check if we've reached target duration or would exceed max with next subtitle
+            next_duration = current_segment["end"] - current_segment["start"]
+            if next_duration >= 18 or subs[i]["end"] >= target_end_time:
                 break
 
             i += 1
 
+        # Now we have a complete segment, check if it's valid
         segment_duration = current_segment["end"] - current_segment["start"]
         if 2 <= segment_duration <= 18:
             current_segment["text"] = current_segment["text"].strip()
             adjusted_segments.append(current_segment)
 
+        # Move to next segment
         i += 1
         if i < num_subs:
             start_time = subs[i]["start"]
