@@ -12,7 +12,7 @@ ROOT_DIR = Path(__file__).parent.parent
 DOWNLOADS_DIR = ROOT_DIR / "cache" / "downloads"
 RAW_AUDIO_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "full_audio"
 PROCESSED_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "processed_audio"
-SEGMENTS_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "2hour_amelia"
+SEGMENTS_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "segments"
 DATA_DIR = ROOT_DIR / "Data_prep" / "Data"
 
 # FFmpeg path configuration
@@ -34,7 +34,7 @@ def run_pipeline(youtube_url):
         cleanup_paths = [
             ROOT_DIR / "Data_prep" / "raw_data" / "full_audio" / "vocals.wav",
             ROOT_DIR / "Data_prep" / "raw_data" / "full_audio" / "input.mp3",
-            ROOT_DIR / "Data_prep" / "raw_data" / "2hour_amelia",
+            ROOT_DIR / "Data_prep" / "raw_data" / "segments",
             ROOT_DIR / "Data_prep" / "Data" / "wavs",
             ROOT_DIR / "Data_prep" / "Data" / "train_list.txt",
             ROOT_DIR / "Data_prep" / "Data" / "val_list.txt",
@@ -89,7 +89,7 @@ def run_pipeline(youtube_url):
                 sys.executable,
                 "Data_prep/data_StyleTTS2.py",
                 "--input",
-                str(SEGMENTS_DIR),
+                str(SEGMENTS_DIR / "wavs"),
                 "--output",
                 str(DATA_DIR),
                 "--sr",
@@ -231,7 +231,7 @@ def download_from_youtube(url):
 if __name__ == "__main__":
     # Example YouTube URL
     youtube_url = (
-        "https://www.youtube.com/watch?v=6Acc-zD1_3g"  # Replace with actual URL
+        "https://www.youtube.com/watch?v=RNhiT-SmR1Q"  # Replace with actual URL
     )
 
     try:

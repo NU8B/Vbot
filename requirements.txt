@@ -32,4 +32,5 @@ evaluate==0.4.3
 docker==7.1.0
 pystoi==0.4.1
 mir_eval==0.7
-g2p
+pysrt
+openai-whisper
