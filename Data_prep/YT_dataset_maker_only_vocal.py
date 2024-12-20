@@ -17,7 +17,7 @@ DATA_DIR = ROOT_DIR / "Data_prep" / "Data"
 
 # FFmpeg path configuration
 FFMPEG_PATHS = [
-    r"D:\ffmpeg-2024-12-11-git-a518b5540d-full_build\bin",  # Your FFmpeg path
+    r"C:\ffmpeg\bin",  # Your FFmpeg path
     os.environ.get("FFMPEG_PATH", ""),  # Environment variable if set
     "",  # System PATH
 ]
