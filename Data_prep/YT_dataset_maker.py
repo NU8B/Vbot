@@ -16,7 +16,7 @@ DATA_DIR = ROOT_DIR / "Data_prep" / "Data"
 
 # FFmpeg path configuration
 FFMPEG_PATHS = [
-    r"D:\ffmpeg-2024-12-11-git-a518b5540d-full_build\bin",  # Your FFmpeg path
+    r"C:\ffmpeg-7.1-full_build\bin",  # Your FFmpeg path
     os.environ.get("FFMPEG_PATH", ""),  # Environment variable if set
     "",  # System PATH
 ]
@@ -58,6 +58,9 @@ def run_pipeline(youtube_url):
         # Step 2: Isolate vocals
         print("\nStep 2: Isolating vocals...")
         vocals_file = RAW_AUDIO_DIR / "vocals.wav"
+        print(f"Input file: {input_file}")
+        print(f"Output file: {vocals_file}")
+        
         subprocess.run(
             [
                 sys.executable,
@@ -69,40 +72,41 @@ def run_pipeline(youtube_url):
             ],
             check=True,
         )
+        print("Vocal isolation completed successfully.")
 
-        # Step 3: Segment audio
-        print("\nStep 3: Segmenting audio...")
-        subprocess.run(
-            [
-                sys.executable,
-                "Data_prep/audio_preprocessor/audio_segmenter.py",
-                "--input",
-                str(vocals_file),
-                "--output",
-                str(SEGMENTS_DIR),
-            ],
-            check=True,
-        )
+        # # Step 3: Segment audio
+        # print("\nStep 3: Segmenting audio...")
+        # subprocess.run(
+        #     [
+        #         sys.executable,
+        #         "Data_prep/audio_preprocessor/audio_segmenter.py",
+        #         "--input",
+        #         str(vocals_file),
+        #         "--output",
+        #         str(SEGMENTS_DIR),
+        #     ],
+        #     check=True,
+        # )
 
-        # Step 4: Prepare dataset
-        print("\nStep 4: Preparing dataset...")
-        subprocess.run(
-            [
-                sys.executable,
-                "Data_prep/data_StyleTTS2.py",
-                "--input",
-                str(SEGMENTS_DIR / "wavs"),
-                "--output",
-                str(DATA_DIR),
-                "--sr",
-                "24000",
-                "--max-tokens",
-                "377",
-            ],
-            check=True,
-        )
+        # # Step 4: Prepare dataset
+        # print("\nStep 4: Preparing dataset...")
+        # subprocess.run(
+        #     [
+        #         sys.executable,
+        #         "Data_prep/data_StyleTTS2.py",
+        #         "--input",
+        #         str(SEGMENTS_DIR / "wavs"),
+        #         "--output",
+        #         str(DATA_DIR),
+        #         "--sr",
+        #         "24000",
+        #         "--max-tokens",
+        #         "377",
+        #     ],
+        #     check=True,
+        # )
 
-        print("\nPipeline completed successfully!")
+        # print("\nPipeline completed successfully!")
 
     except Exception as e:
         print(f"\nError in pipeline: {e}")
@@ -233,7 +237,7 @@ def download_from_youtube(url):
 if __name__ == "__main__":
     # Example YouTube URL
     youtube_url = (
-        "https://www.youtube.com/watch?v=x9oWb4bROcQ"  # Replace with actual URL
+        "https://www.youtube.com/watch?v=uPlX6qOfc-M"  # Replace with actual URL
     )
 
     try:

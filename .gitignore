@@ -67,3 +67,12 @@ Data_prep/Data/val_list.txt
 /benchmark/results/2024-12-18_04-39-59/generated_samples
 /benchmark/results/2024-12-18_05-06-32/generated_samples
 /ref_repo
+
+
+# pipeline files because we often change them for our own use
+Data_prep/YT_dataset_maker.py
+Data_prep/audio_preprocessor/vocal_isolator.py
+Data_prep/audio_preprocessor/audio_preprocessor.py
+
+# LLM results
+benchmark/resultLLMs/
