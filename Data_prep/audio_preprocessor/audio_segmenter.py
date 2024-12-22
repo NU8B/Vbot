@@ -292,10 +292,16 @@ def segment_audio(input_file, output_dir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Segment audio file into chunks")
     parser.add_argument(
-        "--input", type=str, required=True, help="Input audio file path"
+        "--input",
+        type=str,
+        default="Data_prep/raw_data/full_audio/vocals.wav",
+        help="Input audio file path",
     )
     parser.add_argument(
-        "--output", type=str, required=True, help="Output directory path"
+        "--output",
+        type=str,
+        default="Data_prep/raw_data/segments",
+        help="Output directory path",
     )
     args = parser.parse_args()
 

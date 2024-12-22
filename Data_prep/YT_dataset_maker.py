@@ -11,7 +11,6 @@ START_TIME = time.time()
 ROOT_DIR = Path(__file__).parent.parent
 DOWNLOADS_DIR = ROOT_DIR / "cache" / "downloads"
 RAW_AUDIO_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "full_audio"
-PROCESSED_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "processed_audio"
 SEGMENTS_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "segments"
 DATA_DIR = ROOT_DIR / "Data_prep" / "Data"
 
@@ -28,7 +27,7 @@ def run_pipeline(youtube_url):
     try:
         # Install dependencies first
         install_dependencies()
-        
+
         # Setup
         print("Setting up environment...")
         setup_directories()
@@ -127,7 +126,7 @@ def find_ffmpeg():
 
 def setup_directories():
     """Create necessary directories"""
-    directories = [DOWNLOADS_DIR, RAW_AUDIO_DIR, PROCESSED_DIR, SEGMENTS_DIR, DATA_DIR]
+    directories = [DOWNLOADS_DIR, RAW_AUDIO_DIR, SEGMENTS_DIR, DATA_DIR]
     for dir_path in directories:
         dir_path.mkdir(parents=True, exist_ok=True)
 
@@ -234,7 +233,7 @@ def download_from_youtube(url):
 if __name__ == "__main__":
     # Example YouTube URL
     youtube_url = (
-        "https://www.youtube.com/watch?v=y3QpnBzetJ4"  # Replace with actual URL
+        "https://www.youtube.com/watch?v=x9oWb4bROcQ"  # Replace with actual URL
     )
 
     try:
