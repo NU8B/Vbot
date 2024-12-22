@@ -237,7 +237,7 @@ def download_from_youtube(url):
 if __name__ == "__main__":
     # Example YouTube URL
     youtube_url = (
-        "https://www.youtube.com/watch?v=uPlX6qOfc-M"  # Replace with actual URL
+        "https://www.youtube.com/watch?v=p67zRZJ3Ib4"  # Replace with actual URL
     )
 
     try:
