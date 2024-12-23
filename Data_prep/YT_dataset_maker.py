@@ -55,61 +55,100 @@ def run_pipeline(youtube_urls):
         if isinstance(youtube_urls, str):
             youtube_urls = [youtube_urls]
 
-        for youtube_url in youtube_urls:
+        downloaded_files = []
+        for idx, youtube_url in enumerate(youtube_urls, 1):
+            print(f"\nProcessing video {idx} of {len(youtube_urls)}")
+
             # Step 1: Download from YouTube
             print(f"\nStep 1: Downloading from YouTube: {youtube_url}...")
-            input_file = download_from_youtube(youtube_url)
+            downloaded_file = download_from_youtube(youtube_url, idx)
+            downloaded_files.append(downloaded_file)
 
-            # Step 2: Isolate vocals
-            print("\nStep 2: Isolating vocals...")
-            vocals_file = RAW_AUDIO_DIR / "vocals.wav"
-            print(f"Input file: {input_file}")
-            print(f"Output file: {vocals_file}")
+        # Combine all downloaded files into a single input.mp3
+        print("\nCombining all downloaded files...")
+        final_input = RAW_AUDIO_DIR / "input.mp3"
+        if len(downloaded_files) == 1:
+            shutil.move(str(downloaded_files[0]), str(final_input))
+        else:
+            # Create a file list for ffmpeg
+            file_list = RAW_AUDIO_DIR / "files.txt"
+            with open(file_list, "w", encoding="utf-8") as f:
+                for file in downloaded_files:
+                    f.write(f"file '{file}'\n")
 
+            # Concatenate files using ffmpeg
+            ffmpeg_path = find_ffmpeg()
             subprocess.run(
                 [
-                    sys.executable,
-                    "Data_prep/audio_preprocessor/vocal_isolator.py",
-                    "--input",
-                    str(input_file),
-                    "--output",
-                    str(vocals_file),
+                    os.path.join(ffmpeg_path, "ffmpeg"),
+                    "-f",
+                    "concat",
+                    "-safe",
+                    "0",
+                    "-i",
+                    str(file_list),
+                    "-c",
+                    "copy",
+                    str(final_input),
                 ],
                 check=True,
             )
-            print("Vocal isolation completed successfully.")
 
-            # Step 3: Segment audio
-            print("\nStep 3: Segmenting audio...")
-            subprocess.run(
-                [
-                    sys.executable,
-                    "Data_prep/audio_preprocessor/audio_segmenter.py",
-                    "--input",
-                    str(vocals_file),
-                    "--output",
-                    str(SEGMENTS_DIR),
-                ],
-                check=True,
-            )
+            # Clean up individual files and the list file
+            for file in downloaded_files:
+                file.unlink()
+            file_list.unlink()
 
-            # Step 4: Prepare dataset
-            print("\nStep 4: Preparing dataset...")
-            subprocess.run(
-                [
-                    sys.executable,
-                    "Data_prep/data_StyleTTS2.py",
-                    "--input",
-                    str(SEGMENTS_DIR / "wavs"),
-                    "--output",
-                    str(DATA_DIR),
-                    "--sr",
-                    "24000",
-                    "--max-tokens",
-                    "377",
-                ],
-                check=True,
-            )
+        # Step 2: Isolate vocals
+        print("\nStep 2: Isolating vocals...")
+        vocals_file = RAW_AUDIO_DIR / "vocals.wav"
+        print(f"Input file: {final_input}")
+        print(f"Output file: {vocals_file}")
+
+        subprocess.run(
+            [
+                sys.executable,
+                "Data_prep/audio_preprocessor/vocal_isolator.py",
+                "--input",
+                str(final_input),
+                "--output",
+                str(vocals_file),
+            ],
+            check=True,
+        )
+        print("Vocal isolation completed successfully.")
+
+        # Step 3: Segment audio
+        print("\nStep 3: Segmenting audio...")
+        subprocess.run(
+            [
+                sys.executable,
+                "Data_prep/audio_preprocessor/audio_segmenter.py",
+                "--input",
+                str(vocals_file),
+                "--output",
+                str(SEGMENTS_DIR),
+            ],
+            check=True,
+        )
+
+        # Step 4: Prepare dataset
+        print("\nStep 4: Preparing dataset...")
+        subprocess.run(
+            [
+                sys.executable,
+                "Data_prep/data_StyleTTS2.py",
+                "--input",
+                str(SEGMENTS_DIR / "wavs"),
+                "--output",
+                str(DATA_DIR),
+                "--sr",
+                "24000",
+                "--max-tokens",
+                "377",
+            ],
+            check=True,
+        )
 
         print("\nPipeline completed successfully!")
 
@@ -177,13 +216,13 @@ def install_dependencies():
         raise
 
 
-def download_from_youtube(url):
+def download_from_youtube(url, idx):
     """Download audio from YouTube with best quality"""
     ffmpeg_path = find_ffmpeg()
     if not ffmpeg_path:
         raise RuntimeError("FFmpeg not found. Please install FFmpeg and add it to PATH")
 
-    output_template = str(DOWNLOADS_DIR / "%(title)s.%(ext)s")
+    output_template = str(DOWNLOADS_DIR / f"%(title)s_{idx}.%(ext)s")
     ydl_opts = {
         "format": "bestaudio/best",
         "postprocessors": [
@@ -223,13 +262,13 @@ def download_from_youtube(url):
             ydl.download([url])
 
             # Find the downloaded file
-            downloaded_files = list(DOWNLOADS_DIR.glob("*.mp3"))
+            downloaded_files = list(DOWNLOADS_DIR.glob(f"*_{idx}.mp3"))
             if not downloaded_files:
                 raise FileNotFoundError("Download completed but no MP3 file found")
 
             # Move the file to raw_audio directory
             downloaded_file = downloaded_files[0]
-            target_file = RAW_AUDIO_DIR / "input.mp3"
+            target_file = RAW_AUDIO_DIR / f"temp_{idx}.mp3"
             shutil.move(str(downloaded_file), str(target_file))
 
             return target_file
@@ -242,7 +281,9 @@ def download_from_youtube(url):
 if __name__ == "__main__":
     # Example YouTube URLs
     youtube_urls = [
-        "https://www.youtube.com/watch?v=nl4SKhfQAB0",  # Replace with actual URLs
+        "https://www.youtube.com/watch?v=A6A1Jlb2jZs",  # Replace with actual URLs
+        "https://www.youtube.com/watch?v=vLSfo0tdIgU",
+        "https://www.youtube.com/watch?v=Pqox9-28ZD0",
         # Add more URLs as needed
     ]
 

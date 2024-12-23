@@ -1,61 +1,13 @@
 import os
-
 import torch
 import torchaudio
 import subprocess
 import sys
-import shutil
 from pathlib import Path
 
-
-# Get the directory where this script is located
-SCRIPT_DIR = Path(__file__).parent.absolute()
-TEMP_DIR = SCRIPT_DIR / "temp"
-CACHE_DIR = SCRIPT_DIR / "cache"
-DEMUCS_INSTALLED_FLAG = CACHE_DIR / ".demucs_installed"
-
-
-def is_demucs_installed():
-    """Check if demucs is already installed"""
-    try:
-        import demucs
-
-        return DEMUCS_INSTALLED_FLAG.exists()
-    except ImportError:
-        return False
-
-
-def setup_demucs():
-    """Setup demucs with pretrained models"""
-    if not is_demucs_installed():
-        print("First-time setup: Installing demucs...")
-        # Install demucs and its dependencies
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                "demucs",  # Main package
-                "--upgrade",  # Ensure we have the latest version
-                "pydub",  # For MP3 handling
-            ],
-            check=True,
-        )
-        # Create flag file to indicate installation
-        DEMUCS_INSTALLED_FLAG.parent.mkdir(parents=True, exist_ok=True)
-        DEMUCS_INSTALLED_FLAG.touch()
-
-    # Clean up any existing temporary directories
-    if TEMP_DIR.exists():
-        shutil.rmtree(TEMP_DIR)
-
-    # Create fresh directories
-    TEMP_DIR.mkdir(exist_ok=True)
-    CACHE_DIR.mkdir(exist_ok=True)
-
-    # Set environment variables to control where demucs creates files
-    os.environ["XDG_CACHE_HOME"] = str(CACHE_DIR)
+# Get the root directory (same as in YT_dataset_maker.py)
+ROOT_DIR = Path(__file__).parent.parent.parent
+RAW_AUDIO_DIR = ROOT_DIR / "Data_prep" / "raw_data" / "full_audio"
 
 
 def isolate_vocals(input_file, output_file, target_sr=24000):
@@ -66,10 +18,6 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
     3. Save the isolated vocals
     """
     try:
-        # Setup demucs
-        print("Setting up demucs...")
-        setup_demucs()
-
         # Convert paths to Path objects
         input_file = Path(input_file)
         output_file = Path(output_file)
@@ -82,13 +30,13 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
         if wav.size(0) > 1:
             wav = torch.mean(wav, dim=0, keepdim=True)
 
-        # Save as temporary file for demucs
-        temp_input = TEMP_DIR / "input.mp3"
-        torchaudio.save(str(temp_input), wav, sr_orig, format="mp3")
+        # Create temp directory for processing
+        temp_dir = Path("temp")
+        temp_dir.mkdir(exist_ok=True)
 
-        # Create output directory for demucs
-        temp_output_dir = TEMP_DIR / "demucs_output"
-        temp_output_dir.mkdir(exist_ok=True, parents=True)
+        # Save as temporary file for demucs
+        temp_input = temp_dir / "input.mp3"
+        torchaudio.save(str(temp_input), wav, sr_orig, format="mp3")
 
         print("Separating vocals...")
         # Run demucs inference
@@ -101,15 +49,13 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
                 "--mp3",  # Output as MP3 to save space
                 "-d",
                 "cuda" if torch.cuda.is_available() else "cpu",
-                "--out",
-                str(temp_output_dir),
                 str(temp_input),
             ],
             check=True,
         )
 
         # Load separated vocals
-        vocals_path = temp_output_dir / "htdemucs_ft" / temp_input.stem / "vocals.mp3"
+        vocals_path = Path("separated") / "htdemucs_ft" / temp_input.stem / "vocals.mp3"
         if not vocals_path.exists():
             raise RuntimeError("Demucs failed to generate vocals output")
 
@@ -142,40 +88,20 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
         print("\nProcessing complete!")
         print(f"Isolated vocals saved to: {output_file}")
 
-    finally:
-        # Clean up temp directory
-        if TEMP_DIR.exists():
-            try:
-                shutil.rmtree(TEMP_DIR)
-                TEMP_DIR.mkdir(exist_ok=True)  # Recreate empty temp dir
-            except Exception as e:
-                print(f"Warning: Could not clean up temp directory: {e}")
+    except Exception as e:
+        print(f"\nError during processing: {e}")
+        raise
 
 
 if __name__ == "__main__":
-    try:
-        import argparse
+    # Use the same default paths as in YT_dataset_maker.py
+    input_file = RAW_AUDIO_DIR / "input.mp3"
+    output_file = RAW_AUDIO_DIR / "vocals.wav"
 
-        parser = argparse.ArgumentParser(description="Isolate vocals from audio file")
-        parser.add_argument(
-            "--input", type=str, required=True, help="Input audio file path"
-        )
-        parser.add_argument(
-            "--output", type=str, required=True, help="Output audio file path"
-        )
-        args = parser.parse_args()
+    print(f"Input file: {input_file}")
+    print(f"Output file: {output_file}")
 
-        isolate_vocals(args.input, args.output, target_sr=24000)
-    except KeyboardInterrupt:
-        print("\nProcess interrupted by user")
-        # Clean up on interrupt
-        if TEMP_DIR.exists():
-            shutil.rmtree(TEMP_DIR)
-            TEMP_DIR.mkdir(exist_ok=True)
-    except Exception as e:
-        print(f"\nError during processing: {e}")
-        # Clean up on error
-        if TEMP_DIR.exists():
-            shutil.rmtree(TEMP_DIR)
-            TEMP_DIR.mkdir(exist_ok=True)
-        raise
+    # Create output directory if it doesn't exist
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
+    isolate_vocals(input_file, output_file, target_sr=24000)

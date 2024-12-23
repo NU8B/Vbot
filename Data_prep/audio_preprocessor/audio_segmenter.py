@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import torch
-import whisper
+import gc
 import pysrt
 import logging
 import numpy as np
@@ -11,6 +11,7 @@ from pathlib import Path
 import soundfile as sf
 from pydub import AudioSegment
 import argparse
+import ctypes
 
 # Configure logging
 logging.basicConfig(
@@ -26,9 +27,66 @@ def format_time(seconds):
     return time_str
 
 
-def transcribe_with_whisper(audio_file_path, output_dir, num_gpus=None):
+def verify_cuda_setup():
+    """Verify CUDA and cuDNN are properly set up"""
+    import os
+    import torch
+    import ctypes
+    from pathlib import Path
+
+    if not torch.cuda.is_available():
+        logger.error("CUDA is not available. Please check your PyTorch installation.")
+        return False
+
+    # Enable TF32 for better performance
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+
+    # Check CUDA version
+    cuda_version = torch.version.cuda
+    logger.info(f"CUDA version: {cuda_version}")
+
+    # Try to find cudnn64_8.dll in CUDA 12.1 path
+    cuda_path = os.environ.get(
+        "CUDA_PATH", r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1"
+    )
+    cudnn_paths = [
+        Path(cuda_path) / "bin" / "cudnn64_8.dll",
+        Path(cuda_path) / "bin" / "cudnn_ops_infer64_8.dll",
+        Path(cuda_path) / "bin" / "cudnn_cnn_infer64_8.dll",
+    ]
+
+    missing_dlls = []
+    for dll_path in cudnn_paths:
+        if not dll_path.exists():
+            missing_dlls.append(dll_path.name)
+
+    if missing_dlls:
+        logger.error(
+            f"The following cuDNN files are missing: {', '.join(missing_dlls)}"
+        )
+        logger.error(
+            f"Please install cuDNN for CUDA 12.1 from: https://developer.nvidia.com/cudnn"
+        )
+        logger.error(
+            f"And copy all files from the cuDNN zip's cuda/bin folder to: {Path(cuda_path) / 'bin'}"
+        )
+        return False
+
+    try:
+        # Try to load cuDNN files
+        for dll_path in cudnn_paths:
+            ctypes.CDLL(str(dll_path))
+        logger.info("All cuDNN files loaded successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to load cuDNN: {e}")
+        return False
+
+
+def transcribe_with_whisperx(audio_file_path, output_dir):
     """
-    Transcribe audio using local Whisper model.
+    Transcribe audio using WhisperX CLI for more accurate word-level timestamps.
     Skip if SRT file already exists.
     """
     # Check if SRT file already exists
@@ -42,34 +100,49 @@ def transcribe_with_whisper(audio_file_path, output_dir, num_gpus=None):
         return True
 
     try:
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        model = whisper.load_model("turbo").to(device)
-        if device == "cuda":
-            torch.cuda.empty_cache()
-            torch.backends.cudnn.benchmark = True
-        result = model.transcribe(
-            audio_file_path,
-            language="en",
-            word_timestamps=True,
-            verbose=True,
-            fp16=(device == "cuda"),
-        )
-        srt_content = ""
-        for i, segment in enumerate(result["segments"], 1):
-            start_time = format_time(segment["start"])
-            end_time = format_time(segment["end"])
-            text = segment["text"].strip()
-            srt_content += f"{i}\n{start_time} --> {end_time}\n{text}\n\n"
+        import subprocess
+        import sys
 
-        with open(srt_file_path, "w", encoding="utf-8") as f:
-            f.write(srt_content)
+        # Verify CUDA setup first
+        if not verify_cuda_setup():
+            logger.error("CUDA setup verification failed")
+            return False
+
+        # Get the path to whisperx executable in the current Python environment
+        python_dir = os.path.dirname(sys.executable)
+        whisperx_path = os.path.join(python_dir, "Scripts", "whisperx.exe")
+
+        if not os.path.exists(whisperx_path):
+            logger.error(
+                f"WhisperX not found at {whisperx_path}. Please install it using: pip install git+https://github.com/m-bain/whisperx.git"
+            )
+            return False
+
+        # Construct the whisperx command
+        cmd = [
+            whisperx_path,
+            str(audio_file_path),
+            "--model",
+            "large-v2",
+            "--align_model",
+            "WAV2VEC2_ASR_LARGE_LV60K_960H",
+            "--output_dir",
+            str(output_dir),
+            "--compute_type",
+            "float16",  # Add compute type for better compatibility
+        ]
+
+        # Run the command
+        logger.info(f"Running command: {' '.join(cmd)}")
+        result = subprocess.run(cmd, capture_output=True, text=True)
+
+        if result.returncode != 0:
+            logger.error(f"WhisperX failed with error: {result.stderr}")
+            return False
 
         logger.info(f"Transcription saved to {srt_file_path}")
-
-        if device == "cuda":
-            torch.cuda.empty_cache()
-
         return True
+
     except Exception as e:
         logger.error(f"Error transcribing {audio_file_path}: {e}")
         return False
@@ -87,93 +160,69 @@ def parse_srt(srt_file_path):
     return subs
 
 
-def generate_gaussian_durations(total_duration, min_length=2, max_length=18):
-    """Generate segment durations following a truncated Gaussian distribution."""
-    mean = (min_length + max_length) / 2
-    std_dev = (max_length - min_length) / 6
-    durations = []
-    accumulated = 0
-
-    while accumulated < total_duration:
-        duration = np.random.normal(mean, std_dev)
-        duration = max(min(duration, max_length), min_length)
-
-        remaining = total_duration - accumulated
-
-        if remaining < min_length:
-            if durations:
-                if durations[-1] + remaining <= max_length:
-                    durations[-1] += remaining
-            break
-
-        if accumulated + duration > total_duration:
-            remaining = total_duration - accumulated
-            if min_length <= remaining <= max_length:
-                durations.append(remaining)
-            elif remaining > max_length:
-                while remaining > 0:
-                    if remaining > max_length:
-                        durations.append(max_length)
-                        remaining -= max_length
-                    else:
-                        if remaining >= min_length:
-                            durations.append(remaining)
-                        elif durations:
-                            durations[-1] += remaining
-                        break
-            break
-
-        durations.append(duration)
-        accumulated += duration
-
-    return durations
-
-
 def adjust_segments(subs, durations):
-    """Adjust the segments to match the desired durations."""
+    """Combine subtitles into segments up to max duration."""
+    MAX_DURATION = 8  # Maximum segment duration in seconds
+    MIN_DURATION = 2  # Minimum segment duration in seconds
     adjusted_segments = []
-    i = 0
-    num_subs = len(subs)
-    END_PADDING = 0.4  # 200ms padding for word completion
 
     if not subs:
         return []
 
-    start_time = subs[0]["start"]
+    current_segment = {
+        "start": subs[0]["start"],
+        "text": subs[0]["text"],
+        "end": subs[0]["end"],
+    }
 
-    while i < num_subs:
-        if not durations:
-            break
+    i = 1
+    while i < len(subs):
+        # Calculate current segment duration
+        current_duration = current_segment["end"] - current_segment["start"]
 
-        segment_duration = durations.pop(0)
-        target_end_time = start_time + segment_duration
+        # Calculate what duration would be if we add next segment
+        potential_duration = subs[i]["end"] - current_segment["start"]
 
-        current_segment = {"start": start_time, "text": "", "end": start_time}
+        # Decide whether to combine segments
+        should_combine = (
+            # Always combine if current segment is too short
+            current_duration < MIN_DURATION
+            or
+            # Or if adding next segment won't exceed max duration
+            potential_duration <= MAX_DURATION
+        )
 
-        # Keep accumulating text until we hit our target or would exceed max duration
-        while i < num_subs:
-            # First add the text and update end time
+        if should_combine:
+            # Add to current segment
             current_segment["text"] += " " + subs[i]["text"]
-            # Add padding to ensure last word is complete
-            current_segment["end"] = subs[i]["end"] + END_PADDING
-
-            # Check if we've reached target duration or would exceed max with next subtitle
-            next_duration = current_segment["end"] - current_segment["start"]
-            if next_duration >= 18 or subs[i]["end"] >= target_end_time:
-                break
-
+            current_segment["end"] = subs[i]["end"]
+            i += 1
+        else:
+            # Save current segment if it's long enough
+            if current_duration >= MIN_DURATION:
+                adjusted_segments.append(current_segment)
+            # Start new segment
+            current_segment = {
+                "start": subs[i]["start"],
+                "text": subs[i]["text"],
+                "end": subs[i]["end"],
+            }
             i += 1
 
-        # Now we have a complete segment, check if it's valid
-        segment_duration = current_segment["end"] - current_segment["start"]
-        if 2 <= segment_duration <= 18:
-            current_segment["text"] = current_segment["text"].strip()
+    # Handle the last segment
+    last_duration = current_segment["end"] - current_segment["start"]
+    if last_duration >= MIN_DURATION:
+        adjusted_segments.append(current_segment)
+    elif adjusted_segments:
+        # If last segment is too short, try to combine it with the previous segment
+        prev_segment = adjusted_segments[-1]
+        total_duration = current_segment["end"] - prev_segment["start"]
+        if total_duration <= MAX_DURATION:
+            prev_segment["text"] += " " + current_segment["text"]
+            prev_segment["end"] = current_segment["end"]
+        # If we can't combine it with previous segment and it's not too short, keep it
+        elif last_duration >= MIN_DURATION:
             adjusted_segments.append(current_segment)
-
-        # Move to next segment
-        i += 1
-        if i < num_subs:
-            start_time = subs[i]["start"]
 
     return adjusted_segments
 
@@ -181,31 +230,29 @@ def adjust_segments(subs, durations):
 def segment_audio(input_file, output_dir):
     """
     Main function to segment audio file using transcription-based segmentation.
-    Follows the exact logic from adm_main.py.
     """
     try:
         # Convert paths to Path objects
         input_file = Path(input_file)
         output_dir = Path(output_dir)
-        wavs_dir = output_dir / "wavs"
-        srt_dir = output_dir / "srts"  # Add SRT directory
 
-        # Create output directories
+        # Create all necessary directories
+        wavs_dir = output_dir / "wavs"
+        srt_dir = output_dir / "srts"
         wavs_dir.mkdir(parents=True, exist_ok=True)
-        srt_dir.mkdir(parents=True, exist_ok=True)  # Create SRT directory
+        srt_dir.mkdir(parents=True, exist_ok=True)
 
         # Check if input file exists
         if not input_file.exists():
             raise FileNotFoundError(f"Input file not found: {input_file}")
 
         # First generate transcription if SRT doesn't exist
-        srt_path = input_file.with_suffix(".srt")
+        srt_path = srt_dir / f"{input_file.stem}.srt"
         if not srt_path.exists():
             logger.info("No SRT file found. Generating transcription...")
-            transcribe_success = transcribe_with_whisper(str(input_file), str(srt_dir))
+            transcribe_success = transcribe_with_whisperx(str(input_file), str(srt_dir))
             if not transcribe_success:
                 raise RuntimeError("Failed to generate transcription")
-            srt_path = srt_dir / f"{input_file.stem}.srt"
 
         # Parse SRT content
         logger.info("Parsing SRT content...")
@@ -220,10 +267,12 @@ def segment_audio(input_file, output_dir):
         total_duration = len(audio) / 1000.0  # Convert to seconds
         logger.info(f"Input audio duration: {total_duration:.2f} seconds")
 
-        # Generate durations and adjust segments
-        logger.info("Generating segment durations...")
-        durations = generate_gaussian_durations(total_duration)
-        adjusted_segments = adjust_segments(subs, durations)
+        # Create 100ms of silence with same properties as input audio
+        silence = AudioSegment.silent(duration=100, frame_rate=audio.frame_rate)
+
+        # Adjust segments
+        logger.info("Adjusting segments...")
+        adjusted_segments = adjust_segments(subs, None)
 
         if not adjusted_segments:
             raise ValueError("No segments were generated after combining")
@@ -236,12 +285,25 @@ def segment_audio(input_file, output_dir):
             start_ms = segment["start"] * 1000
             end_ms = segment["end"] * 1000
             duration = (end_ms - start_ms) / 1000
+
+            # Skip segments that are too long
+            if duration > 8:
+                logger.warning(
+                    f"Skipping segment {idx} with duration {duration:.2f}s (too long)"
+                )
+                continue
+
+            # Extract audio segment with 20ms extra at the end and add 100ms silence at the start
+            audio_segment = silence + audio[start_ms : end_ms + 20]
+
+            # Update duration to include silence and extra audio
+            duration += 0.12  # Add 100ms silence + 20ms extra
             segment_durations.append(duration)
-            audio_segment = audio[start_ms:end_ms]
 
             output_filename = f"{input_file.stem}_{idx+1}.wav"
             output_path = wavs_dir / output_filename
 
+            # Export the audio segment
             audio_segment.export(str(output_path), format="wav")
 
             metadata.append(
@@ -249,11 +311,16 @@ def segment_audio(input_file, output_dir):
                     "segment_id": idx,
                     "filename": output_filename,
                     "text": segment["text"],
-                    "duration": duration,
+                    "duration": duration,  # Updated duration including silence and extra audio
                     "start_time": segment["start"],
-                    "end_time": segment["end"],
+                    "end_time": segment["end"] + 0.02,  # Add 20ms to end time
+                    "has_leading_silence": True,  # Add flag to indicate silence was added
+                    "has_trailing_audio": True,  # Add flag to indicate extra audio at end
                 }
             )
+
+        if not metadata:
+            raise ValueError("No valid segments were generated")
 
         # Calculate statistics
         segment_durations = np.array(segment_durations)
@@ -272,12 +339,12 @@ def segment_audio(input_file, output_dir):
         logger.info(f"Total segments saved: {len(metadata)}")
         logger.info(f"Total input duration: {total_duration:.2f} seconds")
         logger.info(f"Total segmented duration: {total_segmented_duration:.2f} seconds")
-        logger.info(f"Duration distribution:")
+        logger.info(f"Duration distribution (including 100ms silence + 20ms extra):")
         logger.info(f"  Mean: {mean_duration:.2f} seconds")
         logger.info(f"  Std Dev: {std_duration:.2f} seconds")
         logger.info(f"  Min: {min_duration:.2f} seconds")
         logger.info(f"  Max: {max_duration:.2f} seconds")
-        logger.info(f"Target duration range: 2-18 seconds")
+        logger.info(f"Target duration range: 2-8 seconds")
         logger.info(f"\nOutputs saved to:")
         logger.info(f"  WAV segments: {wavs_dir}")
         logger.info(f"  Metadata: {metadata_path}")
