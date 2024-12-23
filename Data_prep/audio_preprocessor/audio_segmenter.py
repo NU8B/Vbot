@@ -102,6 +102,7 @@ def transcribe_with_whisperx(audio_file_path, output_dir):
     try:
         import subprocess
         import sys
+        import gc  # For manual garbage collection
 
         # Verify CUDA setup first
         if not verify_cuda_setup():
@@ -118,33 +119,82 @@ def transcribe_with_whisperx(audio_file_path, output_dir):
             )
             return False
 
-        # Construct the whisperx command
+        # Clear any existing GPU memory
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            gc.collect()
+
+        # Construct the whisperx command with optimized settings
         cmd = [
             whisperx_path,
             str(audio_file_path),
             "--model",
-            "large-v2",
+            "large-v3",
+            "--language",
+            "en",
             "--align_model",
             "WAV2VEC2_ASR_LARGE_LV60K_960H",
             "--output_dir",
             str(output_dir),
             "--compute_type",
-            "float16",  # Add compute type for better compatibility
+            "float16",  # Use float16 for better memory efficiency
+            "--batch_size",
+            "8",  # Middle ground between memory usage and speed
+            "--device",
+            "cuda" if torch.cuda.is_available() else "cpu",
+            "--verbose",
+            "True",  # Fixed the verbose flag
         ]
 
-        # Run the command
-        logger.info(f"Running command: {' '.join(cmd)}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        print("\nStarting WhisperX transcription...")
+        print("This may take several minutes. Progress will be shown below:")
+        print("(Note: Progress indicators will appear as transcription proceeds)\n")
 
-        if result.returncode != 0:
-            logger.error(f"WhisperX failed with error: {result.stderr}")
+        # Run the command and capture output in real-time
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            bufsize=1,
+        )
+
+        # Track progress through output
+        for line in process.stdout:
+            line = line.strip()
+            if "Detecting language" in line:
+                print("Detecting audio language...")
+            elif "Transcribing" in line:
+                print("Transcribing audio...")
+            elif "Aligning" in line:
+                print("Aligning timestamps...")
+            elif "Writing" in line and ".srt" in line:
+                print("Saving transcription to SRT file...")
+            elif any(x in line.lower() for x in ["error", "warning", "cuda"]):
+                print(f"System message: {line}")
+
+        # Wait for the process to complete
+        process.wait()
+
+        if process.returncode != 0:
+            print("\nWhisperX transcription failed!")
             return False
 
-        logger.info(f"Transcription saved to {srt_file_path}")
+        print("\nTranscription completed successfully!")
+
+        # Clear GPU memory again after processing
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            gc.collect()
+
         return True
 
     except Exception as e:
-        logger.error(f"Error transcribing {audio_file_path}: {e}")
+        print(f"\nError during transcription: {e}")
+        # Ensure GPU memory is cleared even if there's an error
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            gc.collect()
         return False
 
 
@@ -236,6 +286,10 @@ def segment_audio(input_file, output_dir):
         input_file = Path(input_file)
         output_dir = Path(output_dir)
 
+        print("\n=== Starting Audio Segmentation Process ===")
+        print(f"Input file: {input_file}")
+        print(f"Output directory: {output_dir}\n")
+
         # Create all necessary directories
         wavs_dir = output_dir / "wavs"
         srt_dir = output_dir / "srts"
@@ -249,30 +303,36 @@ def segment_audio(input_file, output_dir):
         # First generate transcription if SRT doesn't exist
         srt_path = srt_dir / f"{input_file.stem}.srt"
         if not srt_path.exists():
-            logger.info("No SRT file found. Generating transcription...")
+            print("\n=== Generating Transcription ===")
+            print("This may take a few minutes depending on the audio length...")
             transcribe_success = transcribe_with_whisperx(str(input_file), str(srt_dir))
             if not transcribe_success:
                 raise RuntimeError("Failed to generate transcription")
+        else:
+            print("\n=== Using Existing Transcription ===")
 
         # Parse SRT content
-        logger.info("Parsing SRT content...")
+        print("\n=== Parsing Transcription ===")
         subs = parse_srt(srt_path)
+        print(f"Found {len(subs)} initial segments in transcription")
 
         if not subs:
             raise ValueError("No segments were generated from SRT")
 
         # Load audio file
-        logger.info("Loading audio file...")
+        print("\n=== Loading Audio File ===")
         audio = AudioSegment.from_wav(str(input_file))
         total_duration = len(audio) / 1000.0  # Convert to seconds
-        logger.info(f"Input audio duration: {total_duration:.2f} seconds")
+        print(f"Input audio duration: {total_duration:.2f} seconds")
 
         # Create 100ms of silence with same properties as input audio
         silence = AudioSegment.silent(duration=100, frame_rate=audio.frame_rate)
 
         # Adjust segments
-        logger.info("Adjusting segments...")
+        print("\n=== Adjusting Segments ===")
+        print("Combining short segments and splitting long ones...")
         adjusted_segments = adjust_segments(subs, None)
+        print(f"Adjusted to {len(adjusted_segments)} segments")
 
         if not adjusted_segments:
             raise ValueError("No segments were generated after combining")
@@ -280,27 +340,31 @@ def segment_audio(input_file, output_dir):
         # Process segments
         metadata = []
         segment_durations = []
-        logger.info("Processing segments...")
-        for idx, segment in enumerate(tqdm(adjusted_segments)):
+        skipped_too_long = 0
+        print("\n=== Processing Audio Segments ===")
+        print(f"Processing {len(adjusted_segments)} segments...")
+
+        for idx, segment in enumerate(adjusted_segments, 1):
             start_ms = segment["start"] * 1000
             end_ms = segment["end"] * 1000
             duration = (end_ms - start_ms) / 1000
 
             # Skip segments that are too long
             if duration > 8:
-                logger.warning(
-                    f"Skipping segment {idx} with duration {duration:.2f}s (too long)"
-                )
+                skipped_too_long += 1
                 continue
 
-            # Extract audio segment with 20ms extra at the end and add 100ms silence at the start
-            audio_segment = silence + audio[start_ms : end_ms + 20]
+            # Extract audio segment with 20ms extra at the end
+            audio_segment = audio[start_ms : end_ms + 20]
+
+            # Add 100ms silence at both start and end
+            audio_segment = silence + audio_segment + silence
 
             # Update duration to include silence and extra audio
-            duration += 0.12  # Add 100ms silence + 20ms extra
+            duration += 0.22  # Add 200ms silence (100ms at each end) + 20ms extra audio
             segment_durations.append(duration)
 
-            output_filename = f"{input_file.stem}_{idx+1}.wav"
+            output_filename = f"{input_file.stem}_{idx}.wav"
             output_path = wavs_dir / output_filename
 
             # Export the audio segment
@@ -308,19 +372,25 @@ def segment_audio(input_file, output_dir):
 
             metadata.append(
                 {
-                    "segment_id": idx,
+                    "segment_id": idx - 1,
                     "filename": output_filename,
                     "text": segment["text"],
-                    "duration": duration,  # Updated duration including silence and extra audio
+                    "duration": duration,  # Updated duration including silences and extra audio
                     "start_time": segment["start"],
                     "end_time": segment["end"] + 0.02,  # Add 20ms to end time
                     "has_leading_silence": True,  # Add flag to indicate silence was added
+                    "has_trailing_silence": True,  # Add flag to indicate silence was added
                     "has_trailing_audio": True,  # Add flag to indicate extra audio at end
                 }
             )
 
         if not metadata:
             raise ValueError("No valid segments were generated")
+
+        print(f"\nSegments processed:")
+        print(f"  Total segments: {len(adjusted_segments)}")
+        print(f"  Successfully processed: {len(metadata)}")
+        print(f"  Skipped (too long): {skipped_too_long}")
 
         # Calculate statistics
         segment_durations = np.array(segment_durations)
@@ -335,22 +405,22 @@ def segment_audio(input_file, output_dir):
         with open(metadata_path, "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
 
-        logger.info(f"\nProcessing complete!")
-        logger.info(f"Total segments saved: {len(metadata)}")
-        logger.info(f"Total input duration: {total_duration:.2f} seconds")
-        logger.info(f"Total segmented duration: {total_segmented_duration:.2f} seconds")
-        logger.info(f"Duration distribution (including 100ms silence + 20ms extra):")
-        logger.info(f"  Mean: {mean_duration:.2f} seconds")
-        logger.info(f"  Std Dev: {std_duration:.2f} seconds")
-        logger.info(f"  Min: {min_duration:.2f} seconds")
-        logger.info(f"  Max: {max_duration:.2f} seconds")
-        logger.info(f"Target duration range: 2-8 seconds")
-        logger.info(f"\nOutputs saved to:")
-        logger.info(f"  WAV segments: {wavs_dir}")
-        logger.info(f"  Metadata: {metadata_path}")
+        print("\n=== Processing Summary ===")
+        print(f"Total segments saved: {len(metadata)}")
+        print(f"Total input duration: {total_duration:.2f} seconds")
+        print(f"Total segmented duration: {total_segmented_duration:.2f} seconds")
+        print(f"\nDuration distribution (including 100ms silence + 20ms extra):")
+        print(f"  Mean: {mean_duration:.2f} seconds")
+        print(f"  Std Dev: {std_duration:.2f} seconds")
+        print(f"  Min: {min_duration:.2f} seconds")
+        print(f"  Max: {max_duration:.2f} seconds")
+        print(f"\nTarget duration range: 2-8 seconds")
+        print(f"\nOutputs saved to:")
+        print(f"  WAV segments: {wavs_dir}")
+        print(f"  Metadata: {metadata_path}")
 
     except Exception as e:
-        logger.error(f"Error during processing: {e}")
+        print(f"\nError during processing: {e}")
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         raise

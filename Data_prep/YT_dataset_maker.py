@@ -106,14 +106,7 @@ def run_pipeline(youtube_urls):
         print(f"Output file: {vocals_file}")
 
         subprocess.run(
-            [
-                sys.executable,
-                "Data_prep/audio_preprocessor/vocal_isolator.py",
-                "--input",
-                str(final_input),
-                "--output",
-                str(vocals_file),
-            ],
+            [sys.executable, "Data_prep/audio_preprocessor/vocal_isolator.py"],
             check=True,
         )
         print("Vocal isolation completed successfully.")
@@ -281,7 +274,6 @@ def download_from_youtube(url, idx):
 if __name__ == "__main__":
     # Example YouTube URLs
     youtube_urls = [
-        "https://www.youtube.com/watch?v=A6A1Jlb2jZs",  # Replace with actual URLs
         "https://www.youtube.com/watch?v=vLSfo0tdIgU",
         "https://www.youtube.com/watch?v=Pqox9-28ZD0",
         # Add more URLs as needed
