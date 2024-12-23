@@ -16,14 +16,14 @@ DATA_DIR = ROOT_DIR / "Data_prep" / "Data"
 
 # FFmpeg path configuration
 FFMPEG_PATHS = [
-    r"C:\ffmpeg-7.1-full_build\bin",  # Your FFmpeg path
+    r"D:\ffmpeg-2024-12-11-git-a518b5540d-full_build\bin",  # Your FFmpeg path
     os.environ.get("FFMPEG_PATH", ""),  # Environment variable if set
     "",  # System PATH
 ]
 
 
-def run_pipeline(youtube_url):
-    """Run the complete pipeline from YouTube to dataset"""
+def run_pipeline(youtube_urls):
+    """Run the complete pipeline from YouTube to dataset for one or more URLs"""
     try:
         # Install dependencies first
         install_dependencies()
@@ -51,62 +51,67 @@ def run_pipeline(youtube_url):
                 shutil.rmtree(path, ignore_errors=True)
                 path.mkdir(parents=True, exist_ok=True)
 
-        # Step 1: Download from YouTube
-        print("\nStep 1: Downloading from YouTube...")
-        input_file = download_from_youtube(youtube_url)
+        # Ensure youtube_urls is a list
+        if isinstance(youtube_urls, str):
+            youtube_urls = [youtube_urls]
 
-        # Step 2: Isolate vocals
-        print("\nStep 2: Isolating vocals...")
-        vocals_file = RAW_AUDIO_DIR / "vocals.wav"
-        print(f"Input file: {input_file}")
-        print(f"Output file: {vocals_file}")
-        
-        subprocess.run(
-            [
-                sys.executable,
-                "Data_prep/audio_preprocessor/vocal_isolator.py",
-                "--input",
-                str(input_file),
-                "--output",
-                str(vocals_file),
-            ],
-            check=True,
-        )
-        print("Vocal isolation completed successfully.")
+        for youtube_url in youtube_urls:
+            # Step 1: Download from YouTube
+            print(f"\nStep 1: Downloading from YouTube: {youtube_url}...")
+            input_file = download_from_youtube(youtube_url)
 
-        # # Step 3: Segment audio
-        # print("\nStep 3: Segmenting audio...")
-        # subprocess.run(
-        #     [
-        #         sys.executable,
-        #         "Data_prep/audio_preprocessor/audio_segmenter.py",
-        #         "--input",
-        #         str(vocals_file),
-        #         "--output",
-        #         str(SEGMENTS_DIR),
-        #     ],
-        #     check=True,
-        # )
+            # Step 2: Isolate vocals
+            print("\nStep 2: Isolating vocals...")
+            vocals_file = RAW_AUDIO_DIR / "vocals.wav"
+            print(f"Input file: {input_file}")
+            print(f"Output file: {vocals_file}")
 
-        # # Step 4: Prepare dataset
-        # print("\nStep 4: Preparing dataset...")
-        # subprocess.run(
-        #     [
-        #         sys.executable,
-        #         "Data_prep/data_StyleTTS2.py",
-        #         "--input",
-        #         str(SEGMENTS_DIR / "wavs"),
-        #         "--output",
-        #         str(DATA_DIR),
-        #         "--sr",
-        #         "24000",
-        #         "--max-tokens",
-        #         "377",
-        #     ],
-        #     check=True,
-        # )
+            subprocess.run(
+                [
+                    sys.executable,
+                    "Data_prep/audio_preprocessor/vocal_isolator.py",
+                    "--input",
+                    str(input_file),
+                    "--output",
+                    str(vocals_file),
+                ],
+                check=True,
+            )
+            print("Vocal isolation completed successfully.")
 
-        # print("\nPipeline completed successfully!")
+            # Step 3: Segment audio
+            print("\nStep 3: Segmenting audio...")
+            subprocess.run(
+                [
+                    sys.executable,
+                    "Data_prep/audio_preprocessor/audio_segmenter.py",
+                    "--input",
+                    str(vocals_file),
+                    "--output",
+                    str(SEGMENTS_DIR),
+                ],
+                check=True,
+            )
+
+            # Step 4: Prepare dataset
+            print("\nStep 4: Preparing dataset...")
+            subprocess.run(
+                [
+                    sys.executable,
+                    "Data_prep/data_StyleTTS2.py",
+                    "--input",
+                    str(SEGMENTS_DIR / "wavs"),
+                    "--output",
+                    str(DATA_DIR),
+                    "--sr",
+                    "24000",
+                    "--max-tokens",
+                    "377",
+                ],
+                check=True,
+            )
+
+        print("\nPipeline completed successfully!")
 
     except Exception as e:
         print(f"\nError in pipeline: {e}")
@@ -235,13 +240,14 @@ def download_from_youtube(url):
 
 
 if __name__ == "__main__":
-    # Example YouTube URL
-    youtube_url = (
-        "https://www.youtube.com/watch?v=p67zRZJ3Ib4"  # Replace with actual URL
-    )
+    # Example YouTube URLs
+    youtube_urls = [
+        "https://www.youtube.com/watch?v=nl4SKhfQAB0",  # Replace with actual URLs
+        # Add more URLs as needed
+    ]
 
     try:
-        run_pipeline(youtube_url)
+        run_pipeline(youtube_urls)
     except KeyboardInterrupt:
         print("\nProcess interrupted by user")
     except Exception as e:
