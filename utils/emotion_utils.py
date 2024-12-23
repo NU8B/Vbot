@@ -118,7 +118,7 @@ EMOTION_CONFIG = {
         "embedding_scale": 2.0,
     },
     "disgust": {"file": "angry.wav", "alpha": 0.5, "beta": 0.9, "embedding_scale": 2.0},
-    "anger": {"file": "angry.wav", "alpha": 0.5, "beta": 0.95, "embedding_scale": 5.0},
+    "anger": {"file": "angry.wav", "alpha": 0.5, "beta": 0.95, "embedding_scale": 2.0},
     "annoyance": {
         "file": "angry.wav",
         "alpha": 0.5,

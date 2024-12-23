@@ -53,7 +53,7 @@ from StyleTTS2.text_utils import TextCleaner
 
 
 class StyleTTS2Inference:
-    def __init__(self, repo_id="nonoJDWAOIDAWKDA/new_ft_StyleTTS2", device=None):
+    def __init__(self, repo_id="nonoJDWAOIDAWKDA/newSINGLE_ft_StyleTTS2", device=None):
         init_start = time.time()
 
         self.repo_id = repo_id
