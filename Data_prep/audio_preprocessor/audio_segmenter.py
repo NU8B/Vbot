@@ -212,7 +212,7 @@ def parse_srt(srt_file_path):
 
 def adjust_segments(subs, durations):
     """Combine subtitles into segments up to max duration."""
-    MAX_DURATION = 8  # Maximum segment duration in seconds
+    MAX_DURATION = 7.8  # Maximum segment duration in seconds
     MIN_DURATION = 2  # Minimum segment duration in seconds
     adjusted_segments = []
 
@@ -350,7 +350,7 @@ def segment_audio(input_file, output_dir):
             duration = (end_ms - start_ms) / 1000
 
             # Skip segments that are too long
-            if duration > 8:
+            if duration > 7.8:
                 skipped_too_long += 1
                 continue
 
