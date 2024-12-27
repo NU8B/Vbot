@@ -5,7 +5,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import soundfile as sf
 import warnings
 from utils.inference_styleTTS2 import StyleTTS2Inference
-from utils.emotion_utils import EmotionHandler, EMOTION_CONFIG, DIFFUSION_STEPS
+from utils.emotion_utils import (
+    EmotionHandler,
+    EMOTION_CONFIG,
+    DIFFUSION_STEPS,
+    ALPHA,
+    BETA,
+    EMBEDDING_SCALE,
+)
 import time
 from pathlib import Path
 
@@ -32,10 +39,10 @@ warmup_start = time.time()
 _ = tts.inference(
     text=warmup_text,
     ref_s=default_style,
-    alpha=0.3,
-    beta=0.7,
-    diffusion_steps=5,
-    embedding_scale=1.0,
+    alpha=ALPHA,
+    beta=BETA,
+    diffusion_steps=DIFFUSION_STEPS,
+    embedding_scale=EMBEDDING_SCALE,
 )
 print(f"Warm-up took {time.time() - warmup_start:.2f}s")
 

@@ -1,7 +1,6 @@
 import torch
 import random
 import yaml
-import time
 import numpy as np
 import torchaudio
 import librosa
@@ -54,14 +53,15 @@ from StyleTTS2.text_utils import TextCleaner
 
 class StyleTTS2Inference:
     def __init__(self, repo_id="nonoJDWAOIDAWKDA/new_ft_StyleTTS2", device=None):
-        init_start = time.time()
 
         self.repo_id = repo_id
         self.device = (
             device if device else ("cuda" if torch.cuda.is_available() else "cpu")
         )
-        self.cache_dir = Path("cache/style_tts2_ft")
-        self.cache_dir.mkdir(exist_ok=True)
+        # Extract model name from repo_id for cache directory
+        model_name = repo_id.split("/")[-1]
+        self.cache_dir = Path("cache/style") / model_name
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Add style cache
         self._style_cache = {}

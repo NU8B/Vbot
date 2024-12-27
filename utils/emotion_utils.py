@@ -1,6 +1,12 @@
 from transformers import pipeline
 import torch
 
+# Emotion model settings
+EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
+
+DIFFUSION_STEPS = 5  # Adjust this to trade off quality vs speed
+
+
 ALPHA = 0.3
 BETA = 0.7
 EMBEDDING_SCALE = 1.0
@@ -20,12 +26,6 @@ SAD_EMBEDDING_SCALE = 1.0
 SURPRISE_ALPHA = 0.3
 SURPRISE_BETA = 0.7
 SURPRISE_EMBEDDING_SCALE = 1.0
-
-# Emotion model settings
-EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
-
-# Global inference settings
-DIFFUSION_STEPS = 10  # Adjust this to trade off quality vs speed
 
 # Emotion to voice style mapping with inference parameters
 EMOTION_CONFIG = {
