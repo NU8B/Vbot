@@ -132,7 +132,7 @@ def run_pipeline(youtube_urls):
                 sys.executable,
                 "Data_prep/data_StyleTTS2.py",
                 "--input",
-                str(SEGMENTS_DIR / "wavs"),
+                str(SEGMENTS_DIR),
                 "--output",
                 str(DATA_DIR),
                 "--sr",
@@ -274,8 +274,10 @@ def download_from_youtube(url, idx):
 if __name__ == "__main__":
     # Example YouTube URLs
     youtube_urls = [
-        "https://www.youtube.com/watch?v=vLSfo0tdIgU",
-        "https://www.youtube.com/watch?v=Pqox9-28ZD0",
+        "https://www.youtube.com/watch?v=MPb3HMp5clg",
+        "https://www.youtube.com/watch?v=eNlGkPYN_ww",
+        "https://www.youtube.com/watch?v=UujeFlNpDr4",
+        "https://www.youtube.com/watch?v=4NFnYmf4ar0",
         # Add more URLs as needed
     ]
 

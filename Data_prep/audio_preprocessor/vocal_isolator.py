@@ -45,7 +45,7 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
                 "demucs",
                 "--two-stems=vocals",  # Only separate vocals
                 "-n",
-                "htdemucs_ft",  # Use the hybrid transformer model
+                "htdemucs",  # Use the hybrid transformer model
                 "--mp3",  # Output as MP3 to save space
                 "-d",
                 "cuda" if torch.cuda.is_available() else "cpu",
@@ -55,7 +55,7 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
         )
 
         # Load separated vocals
-        vocals_path = Path("separated") / "htdemucs_ft" / temp_input.stem / "vocals.mp3"
+        vocals_path = Path("separated") / "htdemucs" / temp_input.stem / "vocals.mp3"
         if not vocals_path.exists():
             raise RuntimeError("Demucs failed to generate vocals output")
 

@@ -1,142 +1,207 @@
 from transformers import pipeline
 import torch
 
+ALPHA = 0.3
+BETA = 0.7
+EMBEDDING_SCALE = 1.0
+
+ANGRY_ALPHA = 0.3
+ANGRY_BETA = 0.7
+ANGRY_EMBEDDING_SCALE = 1.0
+
+HAPPY_ALPHA = 0.3
+HAPPY_BETA = 0.7
+HAPPY_EMBEDDING_SCALE = 1.0
+
+SAD_ALPHA = 0.3
+SAD_BETA = 0.7
+SAD_EMBEDDING_SCALE = 1.0
+
+SURPRISE_ALPHA = 0.3
+SURPRISE_BETA = 0.7
+SURPRISE_EMBEDDING_SCALE = 1.0
+
 # Emotion model settings
 EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
 
 # Global inference settings
-DIFFUSION_STEPS = 5  # Adjust this to trade off quality vs speed
+DIFFUSION_STEPS = 10  # Adjust this to trade off quality vs speed
 
 # Emotion to voice style mapping with inference parameters
 EMOTION_CONFIG = {
     # Format: "emotion": {"file": "style_file.wav", "alpha": float, "beta": float, "embedding_scale": float}
-    # Neutral emotions - minimal style modification
+    # Neutral emotions - using neutral.wav
     "neutral": {
         "file": "neutral.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.0,
+        "alpha": ALPHA,
+        "beta": BETA,
+        "embedding_scale": EMBEDDING_SCALE,
     },
     "confusion": {
         "file": "neutral.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.0,
+        "alpha": ALPHA,
+        "beta": BETA,
+        "embedding_scale": EMBEDDING_SCALE,
     },
     "caring": {
         "file": "neutral.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.0,
+        "alpha": ALPHA,
+        "beta": BETA,
+        "embedding_scale": EMBEDDING_SCALE,
     },
     "curiosity": {
         "file": "neutral.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.0,
+        "alpha": ALPHA,
+        "beta": BETA,
+        "embedding_scale": EMBEDDING_SCALE,
     },
     "desire": {
         "file": "neutral.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.0,
+        "alpha": ALPHA,
+        "beta": BETA,
+        "embedding_scale": EMBEDDING_SCALE,
     },
     "relief": {
         "file": "neutral.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.0,
+        "alpha": ALPHA,
+        "beta": BETA,
+        "embedding_scale": EMBEDDING_SCALE,
     },
-    # Happy emotions - more expressive, higher embedding scale
+    # Happy emotions - using happy.wav
     "admiration": {
         "file": "happy.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.5,
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
     },
     "amusement": {
         "file": "happy.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.5,
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
     },
     "approval": {
         "file": "happy.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.5,
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
     },
     "excitement": {
         "file": "happy.wav",
-        "alpha": 0.5,
-        "beta": 0.9,
-        "embedding_scale": 2.0,
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
     },
     "gratitude": {
         "file": "happy.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.5,
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
     },
-    "joy": {"file": "happy.wav", "alpha": 0.5, "beta": 0.9, "embedding_scale": 2.0},
-    "love": {"file": "happy.wav", "alpha": 0.5, "beta": 0.9, "embedding_scale": 2.0},
+    "joy": {
+        "file": "happy.wav",
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
+    },
+    "love": {
+        "file": "happy.wav",
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
+    },
     "optimism": {
         "file": "happy.wav",
-        "alpha": 0.3,
-        "beta": 0.7,
-        "embedding_scale": 1.5,
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
     },
-    "pride": {"file": "happy.wav", "alpha": 0.5, "beta": 0.9, "embedding_scale": 2.0},
-    # Sad emotions - lower beta for more reference emotion
+    "pride": {
+        "file": "happy.wav",
+        "alpha": HAPPY_ALPHA,
+        "beta": HAPPY_BETA,
+        "embedding_scale": HAPPY_EMBEDDING_SCALE,
+    },
+    # Sad emotions - using sad.wav
     "disappointment": {
         "file": "sad.wav",
-        "alpha": 0.3,
-        "beta": 0.5,
-        "embedding_scale": 1.5,
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
     },
     "embarrassment": {
         "file": "sad.wav",
-        "alpha": 0.3,
-        "beta": 0.5,
-        "embedding_scale": 1.5,
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
     },
-    "fear": {"file": "sad.wav", "alpha": 0.5, "beta": 0.7, "embedding_scale": 2.0},
-    "grief": {"file": "sad.wav", "alpha": 0.5, "beta": 0.7, "embedding_scale": 2.0},
+    "fear": {
+        "file": "sad.wav",
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
+    },
+    "grief": {
+        "file": "sad.wav",
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
+    },
     "nervousness": {
         "file": "sad.wav",
-        "alpha": 0.3,
-        "beta": 0.5,
-        "embedding_scale": 1.5,
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
     },
-    "remorse": {"file": "sad.wav", "alpha": 0.5, "beta": 0.7, "embedding_scale": 2.0},
-    "sadness": {"file": "sad.wav", "alpha": 0.5, "beta": 0.7, "embedding_scale": 2.0},
-    # Angry emotions - high beta and embedding scale for strong emotion
+    "remorse": {
+        "file": "sad.wav",
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
+    },
+    "sadness": {
+        "file": "sad.wav",
+        "alpha": SAD_ALPHA,
+        "beta": SAD_BETA,
+        "embedding_scale": SAD_EMBEDDING_SCALE,
+    },
+    # Angry emotions - using angry.wav
     "disapproval": {
         "file": "angry.wav",
-        "alpha": 0.5,
-        "beta": 0.9,
-        "embedding_scale": 2.0,
+        "alpha": ANGRY_ALPHA,
+        "beta": ANGRY_BETA,
+        "embedding_scale": ANGRY_EMBEDDING_SCALE,
     },
-    "disgust": {"file": "angry.wav", "alpha": 0.5, "beta": 0.9, "embedding_scale": 2.0},
-    "anger": {"file": "angry.wav", "alpha": 0.5, "beta": 0.95, "embedding_scale": 2.0},
+    "disgust": {
+        "file": "angry.wav",
+        "alpha": ANGRY_ALPHA,
+        "beta": ANGRY_BETA,
+        "embedding_scale": ANGRY_EMBEDDING_SCALE,
+    },
+    "anger": {
+        "file": "angry.wav",
+        "alpha": ANGRY_ALPHA,
+        "beta": ANGRY_BETA,
+        "embedding_scale": ANGRY_EMBEDDING_SCALE,
+    },
     "annoyance": {
         "file": "angry.wav",
-        "alpha": 0.5,
-        "beta": 0.9,
-        "embedding_scale": 2.0,
+        "alpha": ANGRY_ALPHA,
+        "beta": ANGRY_BETA,
+        "embedding_scale": ANGRY_EMBEDDING_SCALE,
     },
-    # Surprised emotions - high embedding scale for expressiveness
+    # Surprised emotions - using surprised.wav
     "realization": {
         "file": "surprised.wav",
-        "alpha": 0.5,
-        "beta": 0.9,
-        "embedding_scale": 2.0,
+        "alpha": SURPRISE_ALPHA,
+        "beta": SURPRISE_BETA,
+        "embedding_scale": SURPRISE_EMBEDDING_SCALE,
     },
     "surprise": {
         "file": "surprised.wav",
-        "alpha": 0.5,
-        "beta": 0.9,
-        "embedding_scale": 2.0,
+        "alpha": SURPRISE_ALPHA,
+        "beta": SURPRISE_BETA,
+        "embedding_scale": SURPRISE_EMBEDDING_SCALE,
     },
 }
 
