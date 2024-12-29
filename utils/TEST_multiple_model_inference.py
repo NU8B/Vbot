@@ -23,9 +23,7 @@ warnings.filterwarnings("ignore")
 # List of models to test (repo IDs)
 MODELS_TO_TEST = [
     "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
-    "nonoJDWAOIDAWKDA/newSingle_ft_StyleTTS2",
-    "nonoJDWAOIDAWKDA/new2_ft_StyleTTS2",
-    "nonoJDWAOIDAWKDA/Amelia3_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia6_ft_StyleTTS2",
     # Add more model repo IDs here
 ]
 

@@ -77,3 +77,4 @@ Data_prep/audio_preprocessor/audio_preprocessor.py
 # LLM results
 benchmark/resultLLMs/
 /temp
+/models

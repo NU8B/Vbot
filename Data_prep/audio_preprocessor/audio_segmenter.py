@@ -23,13 +23,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Global duration settings
+MIN_DURATION = 3.0  # Minimum segment duration in seconds
+MAX_DURATION = 6.0  # Maximum segment duration in seconds
+COMBINE_SILENCE_GAP = 1  # Silence duration between combined segments in seconds
+
 # Audio segmentation settings
 SEGMENT_SETTINGS = {
-    "max_duration": 7.0,  # Maximum segment duration in seconds
-    "min_duration": 2.0,  # Minimum segment duration in seconds
     "discard_threshold": 0.75,  # Discard segments shorter than this duration
-    "word_boundary_buffer": 0.015,  # 150ms buffer around word boundaries
-    "silence_padding": 0.05,  # 100ms silence padding at start/end
+    "word_boundary_buffer": 0.075,  # 40ms buffer at word boundaries
+    "silence_padding": 0.1,  # 100ms silence padding at start/end
     "fade_duration": 0.015,  # 15ms fade in/out
     "max_gap": 5,  # Maximum allowed gap between segments
 }
@@ -678,15 +681,17 @@ def adjust_segments(subs, durations):
         return []
 
     current_segment = {
-        "start": max(0, subs[0]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"]),
+        "start": subs[0]["start"],  # Exact SRT start time
         "text": subs[0]["text"],
-        "end": subs[0]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"],
+        "end": subs[0]["end"]
+        + SEGMENT_SETTINGS["word_boundary_buffer"],  # Add buffer only to end
         "original_timings": [
             (
-                max(0, subs[0]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"]),
-                subs[0]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"],
+                subs[0]["start"],  # Exact SRT start time
+                subs[0]["end"]
+                + SEGMENT_SETTINGS["word_boundary_buffer"],  # Add buffer only to end
             )
-        ],  # Track original timings with buffers
+        ],
     }
 
     adjusted_segments = []
@@ -695,93 +700,67 @@ def adjust_segments(subs, durations):
         # Calculate current segment duration
         current_duration = current_segment["end"] - current_segment["start"]
 
-        # Calculate gap to next segment, considering word boundary buffers
-        next_start_with_buffer = max(
-            0, subs[i]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"]
-        )
-        gap_to_next = next_start_with_buffer - current_segment["end"]
+        # Calculate gap to next segment
+        next_start = subs[i]["start"]  # Exact SRT start time
+        gap_to_next = next_start - (
+            current_segment["end"] - SEGMENT_SETTINGS["word_boundary_buffer"]
+        )  # Remove buffer for gap calculation
 
         # If current duration is less than discard_threshold, try to combine regardless
         # If between discard_threshold and min_duration, only combine if conditions are good
         must_combine = current_duration < SEGMENT_SETTINGS["discard_threshold"]
         should_combine = (
-            (must_combine or current_duration < SEGMENT_SETTINGS["min_duration"])
+            (must_combine or current_duration < MIN_DURATION)
             and gap_to_next <= SEGMENT_SETTINGS["max_gap"]
             and (
                 subs[i]["end"]
                 + SEGMENT_SETTINGS["word_boundary_buffer"]
                 - current_segment["start"]
             )
-            <= SEGMENT_SETTINGS["max_duration"]
+            <= MAX_DURATION
         )
 
         if should_combine:
-            # When combining segments with a gap, adjust the timing
-            if gap_to_next > 0.2:  # If gap is larger than 200ms
-                # Store original timing of the next segment with buffers
-                current_segment["original_timings"].append(
-                    (
-                        max(
-                            0,
-                            subs[i]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"],
-                        ),
-                        subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"],
-                    )
+            # Store original timing of the next segment
+            current_segment["original_timings"].append(
+                (
+                    subs[i]["start"],  # Exact SRT start time
+                    subs[i]["end"]
+                    + SEGMENT_SETTINGS[
+                        "word_boundary_buffer"
+                    ],  # Add buffer only to end
                 )
+            )
 
-                # Adjust the start time of the next segment to be 200ms after the end of current segment
-                adjusted_start = current_segment["end"] + 0.2  # 200ms gap
-                duration_of_next = (
-                    subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"]
-                ) - (subs[i]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"])
-
-                # Add to current segment with adjusted timing
-                current_segment["text"] += " " + subs[i]["text"]
-                current_segment["end"] = adjusted_start + duration_of_next
-            else:
-                # If gap is small enough, just combine normally, keeping word boundary buffers
-                current_segment["text"] += " " + subs[i]["text"]
-                current_segment["end"] = (
-                    subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"]
-                )
-                current_segment["original_timings"].append(
-                    (
-                        max(
-                            0,
-                            subs[i]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"],
-                        ),
-                        subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"],
-                    )
-                )
+            # Update text and end time
+            current_segment["text"] += " " + subs[i]["text"]
+            current_segment["end"] = (
+                subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"]
+            )  # Add buffer only to end
             i += 1
         else:
-            # If segment is shorter than discard_threshold, discard it
-            # If it's between discard_threshold and min_duration, try to combine with next
-            # If it's longer than min_duration, save it
             if current_duration < SEGMENT_SETTINGS["discard_threshold"]:
                 logger.info(f"Discarding segment (duration: {current_duration:.2f}s)")
-            elif current_duration >= SEGMENT_SETTINGS["min_duration"]:
+            elif current_duration >= MIN_DURATION:
                 adjusted_segments.append(current_segment)
             else:
-                # If we can't combine and it's too short, discard it
                 logger.info(
                     f"Discarding segment that couldn't reach min duration (duration: {current_duration:.2f}s)"
                 )
 
-            # Start new segment with buffer
+            # Start new segment
             current_segment = {
-                "start": max(
-                    0, subs[i]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"]
-                ),
+                "start": subs[i]["start"],  # Exact SRT start time
                 "text": subs[i]["text"],
-                "end": subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"],
+                "end": subs[i]["end"]
+                + SEGMENT_SETTINGS["word_boundary_buffer"],  # Add buffer only to end
                 "original_timings": [
                     (
-                        max(
-                            0,
-                            subs[i]["start"] - SEGMENT_SETTINGS["word_boundary_buffer"],
-                        ),
-                        subs[i]["end"] + SEGMENT_SETTINGS["word_boundary_buffer"],
+                        subs[i]["start"],  # Exact SRT start time
+                        subs[i]["end"]
+                        + SEGMENT_SETTINGS[
+                            "word_boundary_buffer"
+                        ],  # Add buffer only to end
                     )
                 ],
             }
@@ -789,65 +768,25 @@ def adjust_segments(subs, durations):
 
     # Handle the last segment
     last_duration = current_segment["end"] - current_segment["start"]
-    if last_duration >= SEGMENT_SETTINGS["min_duration"]:
+    if last_duration >= MIN_DURATION:
         adjusted_segments.append(current_segment)
     elif last_duration >= SEGMENT_SETTINGS["discard_threshold"]:
         # Try to combine with the previous segment if possible
         if adjusted_segments:
             prev_segment = adjusted_segments[-1]
-            gap_to_prev = current_segment["start"] - prev_segment["end"]
+            gap_to_prev = current_segment["start"] - (
+                prev_segment["end"] - SEGMENT_SETTINGS["word_boundary_buffer"]
+            )  # Remove buffer for gap calculation
 
-            if gap_to_prev > 0.2:  # If gap is larger than 200ms
-                # Adjust the timing to have 200ms gap
-                adjusted_start = prev_segment["end"] + 0.2
-                duration_of_current = current_segment["end"] - current_segment["start"]
-                total_duration = (
-                    adjusted_start + duration_of_current - prev_segment["start"]
+            # Store original timing and combine
+            prev_segment["original_timings"].append(
+                (
+                    current_segment["start"],  # Exact SRT start time
+                    current_segment["end"],  # Add buffer only to end
                 )
-
-                if total_duration <= SEGMENT_SETTINGS["max_duration"]:
-                    prev_segment["text"] += " " + current_segment["text"]
-                    prev_segment["end"] = adjusted_start + duration_of_current
-                    prev_segment["original_timings"].append(
-                        (
-                            max(
-                                0,
-                                current_segment["start"]
-                                - SEGMENT_SETTINGS["word_boundary_buffer"],
-                            ),
-                            current_segment["end"]
-                            + SEGMENT_SETTINGS["word_boundary_buffer"],
-                        )
-                    )
-                else:
-                    logger.info(
-                        f"Discarding last segment that couldn't reach min duration (duration: {last_duration:.2f}s)"
-                    )
-            else:
-                # If gap is small, combine normally
-                total_duration = current_segment["end"] - prev_segment["start"]
-                if total_duration <= SEGMENT_SETTINGS["max_duration"]:
-                    prev_segment["text"] += " " + current_segment["text"]
-                    prev_segment["end"] = current_segment["end"]
-                    prev_segment["original_timings"].append(
-                        (
-                            max(
-                                0,
-                                current_segment["start"]
-                                - SEGMENT_SETTINGS["word_boundary_buffer"],
-                            ),
-                            current_segment["end"]
-                            + SEGMENT_SETTINGS["word_boundary_buffer"],
-                        )
-                    )
-                else:
-                    logger.info(
-                        f"Discarding last segment that couldn't reach min duration (duration: {last_duration:.2f}s)"
-                    )
-        else:
-            logger.info(
-                f"Discarding last segment that couldn't reach min duration (duration: {last_duration:.2f}s)"
             )
+            prev_segment["text"] += " " + current_segment["text"]
+            prev_segment["end"] = current_segment["end"]  # Keep the buffered end time
     else:
         logger.info(f"Discarding last segment (duration: {last_duration:.2f}s)")
 
@@ -975,26 +914,24 @@ def process_audio_segment(args):
     """Process a single audio segment in parallel"""
     audio_segment, segment, idx, input_file, output_dir, wavs_dir, full_audio = args
     try:
-        # Calculate the actual start and end times with consideration for word boundaries
-        start_ms = max(
-            0, int((segment["start"] - SEGMENT_SETTINGS["word_boundary_buffer"]) * 1000)
-        )
-        end_ms = int((segment["end"] + SEGMENT_SETTINGS["word_boundary_buffer"]) * 1000)
+        processed_segments = []
 
         # Process each subsegment according to original timings
-        processed_segments = []
         for i, (orig_start, orig_end) in enumerate(segment["original_timings"]):
-            # Extract the subsegment with original timing
-            subseg_start_ms = int(orig_start * 1000)
-            subseg_end_ms = int(orig_end * 1000)
+            # Extract the subsegment with exact timing plus word boundary buffer at end
+            subseg_start_ms = int(orig_start * 1000)  # Exact SRT start time
+            subseg_end_ms = int(
+                (orig_end) * 1000
+            )  # End time with buffer already included
             subsegment = full_audio[subseg_start_ms:subseg_end_ms]
 
-            # If not the first segment, add 200ms gap before it
+            # If not the first segment, add the silence gap before this segment
             if i > 0:
-                gap = AudioSegment.silent(
-                    duration=200, frame_rate=full_audio.frame_rate
+                silence_ms = int(COMBINE_SILENCE_GAP * 1000)
+                silence = AudioSegment.silent(
+                    duration=silence_ms, frame_rate=full_audio.frame_rate
                 )
-                processed_segments.append(gap)
+                processed_segments.append(silence)
 
             processed_segments.append(subsegment)
 
@@ -1002,25 +939,26 @@ def process_audio_segment(args):
         if processed_segments:
             audio_segment = sum(processed_segments)
         else:
+            # Fallback to original segment if no processed segments
+            start_ms = int(segment["start"] * 1000)  # Exact SRT start time
+            end_ms = int(segment["end"] * 1000)  # End time with buffer already included
             audio_segment = full_audio[start_ms:end_ms]
 
-        # Create silence with same properties as the segment
-        silence_duration = int(
-            SEGMENT_SETTINGS["silence_padding"] * 1000
-        )  # Convert to ms
+        # Create silence for padding
+        silence_duration = int(SEGMENT_SETTINGS["silence_padding"] * 1000)
         silence = AudioSegment.silent(
             duration=silence_duration, frame_rate=audio_segment.frame_rate
         )
 
-        # Add silence before and after the segment
+        # Add silence padding
         audio_segment = silence + audio_segment + silence
 
-        # Apply a gentler fade in/out to prevent abrupt transitions
-        fade_ms = int(SEGMENT_SETTINGS["fade_duration"] * 1000)  # Convert to ms
+        # Apply fade in/out
+        fade_ms = int(SEGMENT_SETTINGS["fade_duration"] * 1000)
         audio_segment = audio_segment.fade_in(fade_ms).fade_out(fade_ms)
 
         # Normalize to EBU R128 standard
-        target_dBFS = -23.0  # EBU R128 standard
+        target_dBFS = -23.0
         change_in_dBFS = target_dBFS - audio_segment.dBFS
         audio_segment = audio_segment.apply_gain(change_in_dBFS)
 
@@ -1038,10 +976,10 @@ def process_audio_segment(args):
         if audio_segment.channels == 2:
             samples = samples.reshape((-1, 2)).mean(axis=1)
 
-        # Normalize the audio properly
-        if samples.dtype.kind in "iu":  # if integer type
+        # Normalize samples
+        if samples.dtype.kind in "iu":
             samples = samples.astype(np.float32) / np.iinfo(samples.dtype).max
-        else:  # if already float
+        else:
             samples = samples.astype(np.float32)
             if np.abs(samples).max() > 1.0:
                 samples /= np.abs(samples).max()
@@ -1088,7 +1026,7 @@ def process_audio_segment(args):
         metadata = {
             "segment_id": idx - 1,
             "filename": output_filename,
-            "text": segment["text"] + " $",  # Add stop token
+            "text": segment["text"],
             "duration": float(duration),
             "start_time": float(segment["start"]),
             "end_time": float(segment["end"]),
@@ -1214,7 +1152,7 @@ def segment_audio(input_file, output_dir):
             duration = (end_ms - start_ms) / 1000
 
             # Skip segments that are too long
-            if duration > 7:
+            if duration > MAX_DURATION:
                 skipped_too_long += 1
                 continue
 
@@ -1349,7 +1287,7 @@ def segment_audio(input_file, output_dir):
         print(f"  Std Dev: {std_duration:.2f} seconds")
         print(f"  Min: {min_duration:.2f} seconds")
         print(f"  Max: {max_duration:.2f} seconds")
-        print(f"\nTarget duration range: 2-8 seconds")
+        print(f"\nTarget duration range: {MIN_DURATION}-{MAX_DURATION} seconds")
         print(f"\nOutputs saved to:")
         print(f"  WAV segments: {wavs_dir}")
         print(f"  Metadata: {metadata_path}")

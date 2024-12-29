@@ -94,11 +94,12 @@ def find_segments_dir():
     ]
 
     for path in possible_paths:
-        if (path / "metadata.json").exists() and (path / "wavs").exists():
+        if (path / "metadata.json").exists() and (path / "passed_segments").exists():
+            # Only return the parent directory that contains metadata.json
             return path
 
     raise FileNotFoundError(
-        "Could not find segments directory with metadata.json and wavs folder. "
+        "Could not find segments directory with metadata.json and passed_segments folder. "
         "Please specify the input directory manually with --input"
     )
 
@@ -112,7 +113,7 @@ def prepare_data(
     # Find input directory if not specified
     if data_dir is None:
         segments_dir = find_segments_dir()
-        data_dir = segments_dir / "wavs"
+        data_dir = segments_dir / "passed_segments"  # This is the input directory
         print(f"Found segments directory: {segments_dir}")
     else:
         data_dir = Path(data_dir)
@@ -128,9 +129,9 @@ def prepare_data(
     text_cleaner = TextCleaner()
     tokenizer = AlbertTokenizer.from_pretrained("albert-base-v2")
 
-    # Create output directories
+    # Create only the necessary output directories
     output_dir.mkdir(parents=True, exist_ok=True)
-    wavs_dir = output_dir / "wavs"
+    wavs_dir = output_dir / "wavs"  # This is where we'll store the final wav files
     wavs_dir.mkdir(parents=True, exist_ok=True)
 
     # Load metadata from segmentation
@@ -139,12 +140,12 @@ def prepare_data(
         raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
 
     with open(metadata_path, "r", encoding="utf-8") as f:
-        metadata = json.load(f)
+        metadata_list = json.load(f)
 
-    print(f"Loaded {len(metadata)} segments from metadata.json")
+    print(f"Loaded metadata with {len(metadata_list)} segments")
 
     # Get all wav files and their corresponding texts
-    audio_files = [(item["filename"], item["text"]) for item in metadata]
+    audio_files = [(item["filename"], item["text"]) for item in metadata_list]
 
     # Prefetch audio files in parallel
     print("\nPrefetching audio files...")
