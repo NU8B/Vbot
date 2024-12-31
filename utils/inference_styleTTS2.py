@@ -52,7 +52,7 @@ from StyleTTS2.text_utils import TextCleaner
 
 
 class StyleTTS2Inference:
-    def __init__(self, repo_id="nonoJDWAOIDAWKDA/new_ft_StyleTTS2", device=None):
+    def __init__(self, repo_id="nonoJDWAOIDAWKDA/Amelia7_ft_StyleTTS2", device=None):
 
         self.repo_id = repo_id
         self.device = (
@@ -281,9 +281,14 @@ class StyleTTS2Inference:
 
         # Phonemize text - let it handle most of the normalization
         ps = self.global_phonemizer.phonemize([text])
+        ps = ps[0]  # Get first element since phonemize returns a list
+
+        # Add $ token only at the end after phonemization but before tokenization
+        if not ps.endswith("$"):
+            ps = ps + " $"
 
         # Tokenize the phonemized text
-        ps = word_tokenize(ps[0])
+        ps = word_tokenize(ps)
         ps = " ".join(ps)
 
         # Convert to tokens using the simple TextCleaner
@@ -360,4 +365,6 @@ class StyleTTS2Inference:
 
             out = self.model.decoder(asr, F0_pred, N_pred, ref.squeeze().unsqueeze(0))
 
-        return out.squeeze().cpu().numpy()[..., :-50]
+        # Trim only the end samples where artifact occurs
+        audio = out.squeeze().cpu().numpy()
+        return audio[..., :-5000]

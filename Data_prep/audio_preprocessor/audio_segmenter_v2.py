@@ -52,6 +52,116 @@ SPEECH_THRESHOLDS = {
     "mfcc_var": None,  # We'll only use upper bound for MFCC variance
 }
 
+
+# Initialize Silero VAD model (done once)
+def init_silero_vad():
+    """Initialize the Silero VAD model"""
+    try:
+        if not hasattr(init_silero_vad, "model"):
+            # Download and load the model
+            model, utils = torch.hub.load(
+                repo_or_dir="snakers4/silero-vad",
+                model="silero_vad",
+                force_reload=False,
+                onnx=False,
+            )
+
+            # Store model and get_speech_timestamps function
+            init_silero_vad.model = model
+            init_silero_vad.get_speech_timestamps = utils[0]
+
+            # Move model to GPU if available
+            if torch.cuda.is_available():
+                init_silero_vad.model = init_silero_vad.model.cuda()
+
+            # Set model to evaluation mode
+            init_silero_vad.model.eval()
+
+            logger.info("Initialized Silero VAD model successfully")
+            return True
+    except Exception as e:
+        logger.error(f"Failed to initialize Silero VAD: {e}")
+        return False
+
+
+def detect_speech_silero(waveform, sample_rate=16000, threshold=0.3):
+    """
+    Detect speech segments using Silero VAD with confidence scoring
+
+    Args:
+        waveform (numpy.ndarray): Audio waveform
+        sample_rate (int): Sample rate of the audio
+        threshold (float): VAD threshold (0 to 1)
+
+    Returns:
+        tuple: (has_speech, speech_timestamps, confidences)
+    """
+    try:
+        # Initialize model if not done yet
+        if not hasattr(init_silero_vad, "model"):
+            if not init_silero_vad():
+                return False, [], []
+
+        # Ensure correct sample rate (Silero VAD expects 16kHz)
+        if sample_rate != 16000:
+            waveform = librosa.resample(waveform, orig_sr=sample_rate, target_sr=16000)
+
+        # Convert to torch tensor
+        wav_tensor = torch.FloatTensor(waveform)
+
+        # Move to GPU if available
+        if torch.cuda.is_available():
+            wav_tensor = wav_tensor.cuda()
+
+        # Get speech timestamps with confidence scores
+        speech_timestamps = init_silero_vad.get_speech_timestamps(
+            wav_tensor,
+            init_silero_vad.model,
+            threshold=threshold,
+            sampling_rate=16000,
+            min_speech_duration_ms=250,
+            min_silence_duration_ms=500,
+            window_size_samples=512,  # Must be 512 for 16kHz audio
+            speech_pad_ms=30,
+            return_seconds=True,
+        )
+
+        has_speech = len(speech_timestamps) > 0
+        if not has_speech:
+            return False, [], []
+
+        # Get confidence scores for each segment
+        confidences = []
+        for ts in speech_timestamps:
+            start_frame = int(ts["start"] * 16000)
+            end_frame = int(ts["end"] * 16000)
+            segment = wav_tensor[start_frame:end_frame]
+
+            # Get confidence score using sliding windows
+            window_size = 512  # Must match Silero VAD requirements
+            hop_length = 256  # Half window size for 50% overlap
+            scores = []
+
+            for i in range(0, len(segment) - window_size, hop_length):
+                window = segment[i : i + window_size]
+                if len(window) == window_size:  # Only process full windows
+                    with torch.no_grad():
+                        score = init_silero_vad.model(window, 16000).item()
+                        scores.append(score)
+
+            # Use average confidence score for the segment
+            avg_confidence = sum(scores) / len(scores) if scores else 0
+            confidences.append(avg_confidence)
+
+        return True, speech_timestamps, confidences
+
+    except Exception as e:
+        logger.error(f"Error in Silero VAD detection: {e}")
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        return False, [], []
+
+
 # Upper bounds for speech metrics
 SPEECH_UPPER_BOUNDS = {
     "zcr": 0.25,  # Stricter to catch high-frequency noise
@@ -878,103 +988,211 @@ def is_audio_quality_acceptable(metrics, metric_failures):
     return True, []
 
 
+def detect_non_speech_sounds(samples, sample_rate):
+    """
+    Detect non-speech sounds (clicks, pops, background noise, etc.)
+    Returns: (bool, dict) - has_non_speech and details
+    """
+    try:
+        # Calculate spectral features
+        spec = np.abs(librosa.stft(samples))
+
+        # Spectral centroid (helps identify mechanical/electronic sounds)
+        cent = librosa.feature.spectral_centroid(S=spec)[0]
+
+        # Spectral bandwidth (helps identify noise)
+        bandw = librosa.feature.spectral_bandwidth(S=spec)[0]
+
+        # Spectral rolloff (helps identify high-frequency noise)
+        rolloff = librosa.feature.spectral_rolloff(S=spec)[0]
+
+        # Zero crossing rate (helps identify clicks/pops)
+        zcr = librosa.feature.zero_crossing_rate(samples)[0]
+
+        # RMS energy
+        rms = librosa.feature.rms(S=spec)[0]
+
+        # Calculate statistics
+        stats = {
+            "centroid_mean": np.mean(cent),
+            "centroid_std": np.std(cent),
+            "bandwidth_mean": np.mean(bandw),
+            "bandwidth_std": np.std(bandw),
+            "rolloff_mean": np.mean(rolloff),
+            "zcr_mean": np.mean(zcr),
+            "zcr_std": np.std(zcr),
+            "rms_mean": np.mean(rms),
+            "rms_std": np.std(rms),
+        }
+
+        # Define thresholds for non-speech sounds
+        has_non_speech = (
+            # High frequency mechanical noise
+            (stats["centroid_mean"] > 4000 and stats["centroid_std"] < 500)
+            or
+            # Clicks and pops (sudden ZCR changes)
+            (stats["zcr_std"] > 0.3 and stats["zcr_mean"] > 0.2)
+            or
+            # Wide bandwidth noise
+            (stats["bandwidth_mean"] > 3000 and stats["bandwidth_std"] < 400)
+            or
+            # Sudden amplitude changes (clicks/pops)
+            (stats["rms_std"] / (stats["rms_mean"] + 1e-6) > 2.0)
+        )
+
+        return has_non_speech, stats
+
+    except Exception as e:
+        logger.warning(f"Error in non-speech sound detection: {e}")
+        return False, {}
+
+
 def detect_untranscribed_sounds(samples, sample_rate, text=None):
-    """Detect if there are speech sounds that aren't in the transcription"""
+    """Detect if there are speech sounds that aren't in the transcription using Silero VAD"""
     try:
         # If no text provided, we can't check for untranscribed sounds
         if text is None:
             return False, {}
+
+        # First check for non-speech sounds
+        has_non_speech, non_speech_stats = detect_non_speech_sounds(
+            samples, sample_rate
+        )
 
         # Convert text to lowercase and remove punctuation for comparison
         text = text.lower()
         for char in ".,!?":
             text = text.replace(char, "")
 
-        # Get speech activity using VAD-like approach
-        frame_length = int(0.025 * sample_rate)  # 25ms frames
-        hop_length = int(0.010 * sample_rate)  # 10ms hop
-
-        # Calculate energy in frames
-        frames = librosa.util.frame(
-            samples, frame_length=frame_length, hop_length=hop_length
-        )
-        energy = np.sum(frames**2, axis=0)
-
-        # Normalize energy
-        energy = (energy - np.min(energy)) / (np.max(energy) - np.min(energy))
-
-        # Find silent gaps (potential locations of untranscribed sounds)
-        silence_threshold = 0.15  # Increased from 0.11 to be more sensitive
-        is_silence = energy < silence_threshold
-
-        # Count speech segments (continuous non-silent regions)
-        speech_segments = 1 + sum(
-            1
-            for i in range(1, len(is_silence))
-            if not is_silence[i] and is_silence[i - 1]
+        # Use Silero VAD to detect speech segments with confidence scores
+        has_speech, speech_timestamps, confidences = detect_speech_silero(
+            samples,
+            sample_rate=sample_rate,
+            threshold=0.3,
         )
 
-        # Count words in transcription (rough estimate)
-        word_count = len(text.split())
+        if not has_speech:
+            return has_non_speech, {
+                "has_non_speech": has_non_speech,
+                "non_speech_stats": non_speech_stats,
+            }
 
-        # Stricter rules for allowed extra segments
-        if word_count <= 3:
-            allowed_extra_segments = 0
-        elif word_count <= 8:
-            allowed_extra_segments = word_count // 6
-        else:
-            allowed_extra_segments = word_count // 8
+        # Count words in transcription
+        words = text.split()
+        word_count = len(words)
 
-        # Check for significant energy variations within words
-        word_boundaries = text.count(" ") + 1
-        avg_frames_per_word = len(energy) / word_boundaries
-        energy_variations = np.diff(energy)
+        # Calculate speech duration statistics
+        speech_durations = [ts["end"] - ts["start"] for ts in speech_timestamps]
+        total_speech_duration = sum(speech_durations)
 
-        # Make variation detection more sensitive for longer segments
-        variation_threshold = 0.25 if word_count <= 3 else 0.2
-        significant_variations = np.sum(np.abs(energy_variations) > variation_threshold)
+        # Filter out low-confidence segments
+        reliable_segments = []
+        reliable_durations = []
+        for i, (ts, conf) in enumerate(zip(speech_timestamps, confidences)):
+            if conf >= 0.5:  # Only keep segments with high confidence
+                reliable_segments.append(ts)
+                reliable_durations.append(speech_durations[i])
 
-        # Adjust expected variations based on word count
-        if word_count <= 3:
-            expected_variations = word_boundaries * 2  # expect 2 variations per word
-        else:
-            expected_variations = (
-                word_boundaries * 1.5
-            )  # expect fewer variations for longer text
+        # Calculate speech rate only for reliable segments
+        total_reliable_duration = sum(reliable_durations)
+        words_per_second = (
+            word_count / total_reliable_duration if total_reliable_duration > 0 else 0
+        )
 
-        # Add duration-based check
-        duration = len(samples) / sample_rate
-        words_per_second = word_count / duration if duration > 0 else 0
+        # Check for reasonable speech rate (120-180 words per minute is typical)
+        too_fast = words_per_second > 4.0  # More than 240 wpm
+        too_slow = words_per_second < 1.0  # Less than 60 wpm
 
-        # Flag if words per second is too low
-        words_per_second_too_low = words_per_second < 1.5 and duration > 2.0
+        # Analyze gaps between reliable segments
+        gaps = []
+        for i in range(1, len(reliable_segments)):
+            gap = reliable_segments[i]["start"] - reliable_segments[i - 1]["end"]
+            if gap > 0.1:  # Only consider gaps longer than 100ms
+                # Check for non-speech sounds in the gap
+                gap_start = int(reliable_segments[i - 1]["end"] * sample_rate)
+                gap_end = int(reliable_segments[i]["start"] * sample_rate)
+                gap_audio = samples[gap_start:gap_end]
+                if len(gap_audio) > 0:
+                    has_gap_noise, _ = detect_non_speech_sounds(gap_audio, sample_rate)
+                    if has_gap_noise:
+                        gaps.append(gap)
 
-        has_unexpected_variations = significant_variations > (expected_variations * 1.3)
+        # Calculate gap statistics
+        max_gap = max(gaps) if gaps else 0
+        avg_gap = sum(gaps) / len(gaps) if gaps else 0
 
-        # Return detection result and details
+        # Define gap thresholds based on text content
+        base_gap_threshold = 1.2  # More lenient base threshold
+        if any(word in ["pause", "wait", "um", "uh", "well", "..."] for word in words):
+            base_gap_threshold = (
+                1.5  # Even more lenient for texts with pause indicators
+            )
+        elif "?" in text or "!" in text:
+            base_gap_threshold = 1.3  # More lenient for questions/exclamations
+
+        # Check for suspicious gaps with non-speech sounds
+        has_suspicious_gaps = (
+            len(gaps) > 0
+            and max_gap > base_gap_threshold
+            and avg_gap > base_gap_threshold * 0.7
+            and not any(w in ["pause", "wait", "um", "uh", "well"] for w in words)
+        )
+
+        # Calculate average confidence
+        avg_confidence = sum(confidences) / len(confidences) if confidences else 0
+
+        # Determine if there are untranscribed sounds - including non-speech detection
         has_untranscribed = (
-            (speech_segments > word_count + allowed_extra_segments)
-            or has_unexpected_variations
-            or words_per_second_too_low
+            has_non_speech  # Non-speech sounds detected
+            or (too_slow and avg_confidence > 0.7)
+            or (too_fast and avg_confidence > 0.7)
+            or (has_suspicious_gaps and avg_confidence > 0.8)
         )
 
         details = {
-            "speech_segments": speech_segments,
+            "has_non_speech": has_non_speech,
+            "non_speech_stats": non_speech_stats,
+            "total_segments": len(speech_timestamps),
+            "reliable_segments": len(reliable_segments),
             "word_count": word_count,
-            "allowed_extra": allowed_extra_segments,
-            "energy_variations": significant_variations,
-            "expected_variations": expected_variations,
-            "has_unexpected_variations": has_unexpected_variations,
+            "total_duration": total_speech_duration,
+            "reliable_duration": total_reliable_duration,
             "words_per_second": words_per_second,
-            "words_per_second_too_low": words_per_second_too_low,
+            "speech_rate_too_slow": too_slow,
+            "speech_rate_too_fast": too_fast,
+            "max_gap": max_gap,
+            "avg_gap": avg_gap,
+            "gap_threshold": base_gap_threshold,
+            "has_suspicious_gaps": has_suspicious_gaps,
+            "avg_confidence": avg_confidence,
+            "speech_timestamps": speech_timestamps,
+            "confidences": confidences,
         }
 
         if has_untranscribed:
+            reason = []
+            if has_non_speech:
+                reason.append(
+                    f"Non-speech sounds detected (centroid: {non_speech_stats['centroid_mean']:.0f}Hz, "
+                    f"zcr: {non_speech_stats['zcr_mean']:.3f})"
+                )
+            if too_slow and avg_confidence > 0.7:
+                reason.append(
+                    f"Speech rate too slow ({words_per_second:.1f} wps, conf: {avg_confidence:.2f})"
+                )
+            if too_fast and avg_confidence > 0.7:
+                reason.append(
+                    f"Speech rate too fast ({words_per_second:.1f} wps, conf: {avg_confidence:.2f})"
+                )
+            if has_suspicious_gaps and avg_confidence > 0.8:
+                reason.append(
+                    f"Suspicious gaps with noise (max: {max_gap:.2f}s, avg: {avg_gap:.2f}s, conf: {avg_confidence:.2f})"
+                )
+
             logger.info(
-                f"Detected potential untranscribed sounds: {speech_segments} segments vs {word_count} words "
-                f"(allowed extra: {allowed_extra_segments}). "
-                f"Energy variations: {significant_variations} vs expected {expected_variations}. "
-                f"Words per second: {words_per_second:.2f}"
+                f"Detected potential issues: {', '.join(reason)}. "
+                f"Reliable speech duration: {total_reliable_duration:.2f}s, "
+                f"Words: {word_count}"
             )
 
         return has_untranscribed, details

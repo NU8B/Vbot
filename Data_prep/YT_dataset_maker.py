@@ -23,7 +23,7 @@ FFMPEG_PATHS = [
 
 
 def run_pipeline(youtube_urls):
-    """Run the complete pipeline from YouTube to dataset for one or more URLs"""
+    """Run the pipeline to download from YouTube and isolate vocals"""
     try:
         # Install dependencies first
         install_dependencies()
@@ -36,10 +36,6 @@ def run_pipeline(youtube_urls):
         cleanup_paths = [
             ROOT_DIR / "Data_prep" / "raw_data" / "full_audio" / "vocals.wav",
             ROOT_DIR / "Data_prep" / "raw_data" / "full_audio" / "input.mp3",
-            ROOT_DIR / "Data_prep" / "raw_data" / "segments",
-            ROOT_DIR / "Data_prep" / "Data" / "wavs",
-            ROOT_DIR / "Data_prep" / "Data" / "train_list.txt",
-            ROOT_DIR / "Data_prep" / "Data" / "val_list.txt",
             DOWNLOADS_DIR,
         ]
 
@@ -55,25 +51,43 @@ def run_pipeline(youtube_urls):
         if isinstance(youtube_urls, str):
             youtube_urls = [youtube_urls]
 
-        downloaded_files = []
+        processed_vocals = []
         for idx, youtube_url in enumerate(youtube_urls, 1):
             print(f"\nProcessing video {idx} of {len(youtube_urls)}")
 
             # Step 1: Download from YouTube
             print(f"\nStep 1: Downloading from YouTube: {youtube_url}...")
             downloaded_file = download_from_youtube(youtube_url, idx)
-            downloaded_files.append(downloaded_file)
 
-        # Combine all downloaded files into a single input.mp3
-        print("\nCombining all downloaded files...")
-        final_input = RAW_AUDIO_DIR / "input.mp3"
-        if len(downloaded_files) == 1:
-            shutil.move(str(downloaded_files[0]), str(final_input))
+            # Step 2: Isolate vocals for this video
+            print(f"\nStep 2: Isolating vocals for video {idx}...")
+            vocals_file = RAW_AUDIO_DIR / f"vocals_{idx}.wav"
+            subprocess.run(
+                [
+                    sys.executable,
+                    "Data_prep/audio_preprocessor/vocal_isolator.py",
+                    "--input",
+                    str(downloaded_file),
+                    "--output",
+                    str(vocals_file),
+                ],
+                check=True,
+            )
+            processed_vocals.append(vocals_file)
+
+            # Clean up the downloaded file
+            downloaded_file.unlink()
+
+        # Step 3: Combine all processed vocals
+        print("\nStep 3: Combining all processed vocals...")
+        final_vocals = RAW_AUDIO_DIR / "vocals.wav"
+        if len(processed_vocals) == 1:
+            shutil.move(str(processed_vocals[0]), str(final_vocals))
         else:
             # Create a file list for ffmpeg
-            file_list = RAW_AUDIO_DIR / "files.txt"
+            file_list = RAW_AUDIO_DIR / "vocals_files.txt"
             with open(file_list, "w", encoding="utf-8") as f:
-                for file in downloaded_files:
+                for file in processed_vocals:
                     f.write(f"file '{file}'\n")
 
             # Concatenate files using ffmpeg
@@ -89,59 +103,15 @@ def run_pipeline(youtube_urls):
                     str(file_list),
                     "-c",
                     "copy",
-                    str(final_input),
+                    str(final_vocals),
                 ],
                 check=True,
             )
 
             # Clean up individual files and the list file
-            for file in downloaded_files:
+            for file in processed_vocals:
                 file.unlink()
             file_list.unlink()
-
-        # Step 2: Isolate vocals
-        print("\nStep 2: Isolating vocals...")
-        vocals_file = RAW_AUDIO_DIR / "vocals.wav"
-        print(f"Input file: {final_input}")
-        print(f"Output file: {vocals_file}")
-
-        subprocess.run(
-            [sys.executable, "Data_prep/audio_preprocessor/vocal_isolator.py"],
-            check=True,
-        )
-        print("Vocal isolation completed successfully.")
-
-        # Step 3: Segment audio
-        print("\nStep 3: Segmenting audio...")
-        subprocess.run(
-            [
-                sys.executable,
-                "Data_prep/audio_preprocessor/audio_segmenter.py",
-                "--input",
-                str(vocals_file),
-                "--output",
-                str(SEGMENTS_DIR),
-            ],
-            check=True,
-        )
-
-        # Step 4: Prepare dataset
-        print("\nStep 4: Preparing dataset...")
-        subprocess.run(
-            [
-                sys.executable,
-                "Data_prep/data_StyleTTS2.py",
-                "--input",
-                str(SEGMENTS_DIR),
-                "--output",
-                str(DATA_DIR),
-                "--sr",
-                "24000",
-                "--max-tokens",
-                "377",
-            ],
-            check=True,
-        )
 
         print("\nPipeline completed successfully!")
 
@@ -242,12 +212,6 @@ def download_from_youtube(url, idx):
             video_title = info.get("title", "video")
             duration = info.get("duration", 0)
 
-            # Check duration (limit to 3 hours to prevent massive downloads)
-            if duration > 10800:  # 3 hours in seconds
-                raise ValueError(
-                    f"Video too long: {duration/3600:.1f} hours. Maximum allowed is 3 hours."
-                )
-
             print(f"\nDownloading: {video_title}")
             print(f"Duration: {duration/60:.1f} minutes")
 
@@ -275,9 +239,10 @@ if __name__ == "__main__":
     # Example YouTube URLs
     youtube_urls = [
         "https://www.youtube.com/watch?v=MPb3HMp5clg",
-        "https://www.youtube.com/watch?v=eNlGkPYN_ww",
-        "https://www.youtube.com/watch?v=UujeFlNpDr4",
-        "https://www.youtube.com/watch?v=4NFnYmf4ar0",
+        "https://www.youtube.com/watch?v=1KYRDR9rnTw",
+        "https://www.youtube.com/watch?v=aS5MtVQnLGw",
+        "https://www.youtube.com/watch?v=BvjagRepqxU",
+        "https://www.youtube.com/watch?v=piAlPCZxRNc",
         # Add more URLs as needed
     ]
 
