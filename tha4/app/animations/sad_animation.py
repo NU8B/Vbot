@@ -8,16 +8,22 @@ class SadAnimation(BaseAnimation):
         self.base_cycle = 0.0
         self.cycle_speed = 0.4  # Slower movements
         
-        # Head movement - downward tilt
+        # Head movement - more downward tilt
         self.head_droop_cycle = 0.0
         self.head_droop_speed = 0.2
         self.head_droop_amount = 0.4
-        self.constant_down_tilt = 0.3    # Reduced to avoid extreme tilt
+        self.constant_down_tilt = -0.5    # Changed to negative for downward tilt
         
-        # Eyes - looking down
-        self.eye_look_down = 0.3         # Changed to positive for looking down
+        # Eyes - looking down and unimpressed
+        self.eye_look_down = 0.3
         self.eye_squint = 0.5
         self.eye_base_openness = 0.6
+        self.eye_unimpressed_left = 0.2
+        self.eye_unimpressed_right = 0.2
+        
+        # Eyebrows - troubled expression
+        self.eyebrow_troubled_left = 1.0
+        self.eyebrow_troubled_right = 1.0
         
         # Blinking - slower, longer blinks
         self.blink_cycle = 0.0
@@ -30,6 +36,13 @@ class SadAnimation(BaseAnimation):
         self.mouth_cycle = 0.0
         self.mouth_variation_speed = 0.3
         self.mouth_variation_amount = 0.1
+        
+        # Add new mouth shape parameters
+        self.mouth_aaa_value = 0.2      # Slightly open mouth
+        self.mouth_ooo_value = 0.4      # Rounded sad shape
+        self.mouth_delta = -0.3         # Downward delta for sad expression
+        self.mouth_corner_droop_left = 0.8  # Drooping corners
+        self.mouth_corner_droop_right = 0.8
         
         # Body movement - subtle, drooping
         self.body_droop_cycle = 0.0
@@ -71,8 +84,8 @@ class SadAnimation(BaseAnimation):
         blink_value = math.sin(self.blink_cycle * math.pi) if self.blink_cycle < 1.0 else 0.0
         eye_openness = (self.eye_base_openness - blink_value - self.eye_squint) * 0.8  # Overall more closed
         
-        # Mouth variation
-        mouth_value = self.mouth_sad_value + math.sin(self.mouth_cycle) * self.mouth_variation_amount
+        # Calculate mouth variation
+        mouth_cycle_value = math.sin(self.mouth_cycle) * self.mouth_variation_amount
         
         # Enhanced sad face
         return {
@@ -85,7 +98,19 @@ class SadAnimation(BaseAnimation):
             'eye_openness': eye_openness,
             'mouth_sad': 0.9,
             'mouth_form': 0.3,
+            'mouth_aaa': self.mouth_aaa_value + mouth_cycle_value,
+            'mouth_ooo': self.mouth_ooo_value,
+            'mouth_iii': 0.0,
+            'mouth_uuu': 0.0,
+            'mouth_eee': 0.0,
+            'mouth_delta': self.mouth_delta,
+            'mouth_lowered_corner_left': self.mouth_corner_droop_left,
+            'mouth_lowered_corner_right': self.mouth_corner_droop_right,
             'eye_squint': 0.5,
+            'eyebrow_troubled_left': self.eyebrow_troubled_left,
+            'eyebrow_troubled_right': self.eyebrow_troubled_right,
+            'eye_unimpressed_left': self.eye_unimpressed_left,
+            'eye_unimpressed_right': self.eye_unimpressed_right,
             'eyebrow_frown': 0.8,
             'eyebrow_angle': -0.5,
             'nose_wrinkle': 0.2,

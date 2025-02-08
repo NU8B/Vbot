@@ -478,10 +478,41 @@ class AutonomousAnimationFrame(wx.Frame):
                 pose[mouth_smile_index] = animation_values.get('mouth_happy', 1.0)
         elif self.animation_presets['sad'].is_active:
             animation_values = self.sad_animation.update(delta_time)
-            # Apply sad-specific parameters
-            mouth_sad_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_sad")
-            if mouth_sad_index >= 0:
-                pose[mouth_sad_index] = animation_values.get('mouth_sad', 0.8)
+            
+            # Handle mouth parameters
+            mouth_aaa_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_aaa")
+            mouth_ooo_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_ooo")
+            mouth_delta_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_delta")
+            mouth_lowered_left_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_left")
+            mouth_lowered_right_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_right")
+            
+            if mouth_aaa_index >= 0:
+                pose[mouth_aaa_index] = animation_values.get('mouth_aaa', 0.2)
+            if mouth_ooo_index >= 0:
+                pose[mouth_ooo_index] = animation_values.get('mouth_ooo', 0.4)
+            if mouth_delta_index >= 0:
+                pose[mouth_delta_index] = animation_values.get('mouth_delta', -0.3)
+            if mouth_lowered_left_index >= 0:
+                pose[mouth_lowered_left_index] = animation_values.get('mouth_lowered_corner_left', 0.8)
+            if mouth_lowered_right_index >= 0:
+                pose[mouth_lowered_right_index] = animation_values.get('mouth_lowered_corner_right', 0.8)
+            
+            # Handle troubled eyebrows
+            troubled_left_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_troubled")
+            if troubled_left_index >= 0:
+                pose[troubled_left_index] = animation_values.get('eyebrow_troubled_left', 1.0)
+                pose[troubled_left_index + 1] = animation_values.get('eyebrow_troubled_right', 1.0)
+            
+            # Handle unimpressed eyes
+            unimpressed_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_unimpressed")
+            if unimpressed_index >= 0:
+                pose[unimpressed_index] = animation_values.get('eye_unimpressed_left', 0.2)
+                pose[unimpressed_index + 1] = animation_values.get('eye_unimpressed_right', 0.2)
+            
+            # Handle head rotation
+            head_x_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x")
+            if head_x_index >= 0:
+                pose[head_x_index] = animation_values.get('head_x', -0.5)  # Ensure negative value for down tilt
         elif self.animation_presets['angry'].is_active:
             animation_values = self.angry_animation.update(delta_time)
             # Apply angry-specific parameters
