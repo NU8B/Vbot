@@ -531,6 +531,13 @@ class AutonomousAnimationFrame(wx.Frame):
                 pose[iris_x_index] = animation_values['iris_x']
             if iris_y_index >= 0:
                 pose[iris_y_index] = animation_values['iris_y']
+            
+            # Map mouth shape parameters
+            mouth_shapes = ['mouth_aaa', 'mouth_iii', 'mouth_uuu', 'mouth_eee', 'mouth_ooo']
+            for shape in mouth_shapes:
+                shape_index = self.get_parameter_index(PoseParameterCategory.MOUTH, shape)
+                if shape_index >= 0:
+                    pose[shape_index] = animation_values.get(shape, 0.0)
         
         # Update image
         self.update_image(pose)
