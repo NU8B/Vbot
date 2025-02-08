@@ -34,3 +34,4 @@ pystoi==0.4.1
 mir_eval==0.7
 pysrt
 git+https://github.com/m-bain/whisperx.git
+wxPython==4.2.2
