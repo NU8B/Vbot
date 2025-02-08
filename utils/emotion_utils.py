@@ -4,7 +4,7 @@ import torch
 # Emotion model settings
 EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
 
-DIFFUSION_STEPS = 5  # Adjust this to trade off quality vs speed
+DIFFUSION_STEPS = 10  # Adjust this to trade off quality vs speed
 
 
 ALPHA = 0.3

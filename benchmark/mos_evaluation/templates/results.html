@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Model Evaluation Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .results-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .chart-container {
+            margin: 20px 0;
+            height: 400px;
+        }
+        .model-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        .metric-group {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .metric-title {
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .overall-score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #0d6efd;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .score-label {
+            font-size: 1.2em;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">TTS Model Evaluation Results</h1>
+        
+        <!-- Overall Model Comparison -->
+        <div class="results-section">
+            <h2 class="mb-4">Overall Model Comparison</h2>
+            <div class="row">
+                {% for model in ['new_ft_StyleTTS2', 'Amelia10_ft_StyleTTS2'] %}
+                <div class="col-md-6">
+                    <div class="metric-group">
+                        <h3 class="text-center mb-3">{{ model }}</h3>
+                        <div id="{{ model }}_overall_score" class="overall-score">-</div>
+                        <div class="score-label">Average Rating</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="chart-container">
+                <canvas id="models_comparison_chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Detailed Model Performance -->
+        <div class="results-section">
+            <h2 class="mb-4">Detailed Model Performance</h2>
+            
+            {% for model in ['new_ft_StyleTTS2', 'Amelia10_ft_StyleTTS2'] %}
+            <div class="model-section">
+                <h3 class="mb-3">{{ model }}</h3>
+                
+                <!-- Voice Similarity -->
+                <div class="metric-group">
+                    <h4 class="metric-title">Voice Similarity</h4>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="{{ model }}_similarity_chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Specific Emotions -->
+                <div class="metric-group">
+                    <h4 class="metric-title">Specific Text Emotions</h4>
+                    <div class="chart-container">
+                        <canvas id="{{ model }}_specific_emotions_chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Generic Emotions -->
+                <div class="metric-group">
+                    <h4 class="metric-title">Generic Text Emotions</h4>
+                    <div class="chart-container">
+                        <canvas id="{{ model }}_generic_emotions_chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="results-section">
+            <h2>Recent Comments</h2>
+            <div class="list-group">
+                {% for result in results[-5:]|reverse %}
+                {% if result.comments %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <small class="text-muted">{{ result.timestamp.split('T')[0] }}</small>
+                    </div>
+                    <p class="mb-1">{{ result.comments }}</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <a href="/" class="btn btn-primary mb-5">Back to Evaluation Form</a>
+    </div>
+
+    <script>
+        function calculateAverages(results) {
+            const averages = {};
+            
+            results.forEach(result => {
+                Object.entries(result).forEach(([key, value]) => {
+                    if (key !== 'timestamp' && key !== 'comments' && key !== 'remote_ip') {
+                        if (!averages[key]) {
+                            averages[key] = {
+                                sum: 0,
+                                count: 0
+                            };
+                        }
+                        averages[key].sum += parseFloat(value);
+                        averages[key].count += 1;
+                    }
+                });
+            });
+            
+            Object.keys(averages).forEach(key => {
+                averages[key] = averages[key].sum / averages[key].count;
+            });
+            
+            return averages;
+        }
+
+        function calculateOverallAverage(averages, modelName) {
+            let sum = 0;
+            let count = 0;
+            
+            Object.entries(averages).forEach(([key, value]) => {
+                if (key.startsWith(modelName)) {
+                    sum += value;
+                    count += 1;
+                }
+            });
+            
+            return count > 0 ? (sum / count).toFixed(2) : 0;
+        }
+
+        const resultData = {{ results|tojson|safe }};
+        const averages = calculateAverages(resultData);
+        
+        // Calculate and display overall scores
+        ['new_ft_StyleTTS2', 'Amelia10_ft_StyleTTS2'].forEach(model => {
+            const overallScore = calculateOverallAverage(averages, model);
+            document.getElementById(`${model}_overall_score`).textContent = overallScore;
+        });
+
+        // Overall comparison chart
+        const comparisonCtx = document.getElementById('models_comparison_chart').getContext('2d');
+        new Chart(comparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['new_ft_StyleTTS2', 'Amelia10_ft_StyleTTS2'],
+                datasets: [{
+                    label: 'Overall Average Rating',
+                    data: [
+                        calculateOverallAverage(averages, 'new_ft_StyleTTS2'),
+                        calculateOverallAverage(averages, 'Amelia10_ft_StyleTTS2')
+                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10
+                    }
+                }
+            }
+        });
+        
+        // Create detailed charts for each model
+        ['new_ft_StyleTTS2', 'Amelia10_ft_StyleTTS2'].forEach(model => {
+            // Voice Similarity Chart
+            const similarityCtx = document.getElementById(`${model}_similarity_chart`).getContext('2d');
+            new Chart(similarityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Voice Similarity'],
+                    datasets: [{
+                        label: 'Rating',
+                        data: [averages[`${model}_voice_similarity`] || 0],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Specific Emotions Chart
+            const specificCtx = document.getElementById(`${model}_specific_emotions_chart`).getContext('2d');
+            new Chart(specificCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Joy', 'Sadness', 'Anger', 'Surprise', 'Neutral'],
+                    datasets: [{
+                        label: 'Specific Text Emotions',
+                        data: [
+                            averages[`${model}_specific_joy_rating`] || 0,
+                            averages[`${model}_specific_sadness_rating`] || 0,
+                            averages[`${model}_specific_anger_rating`] || 0,
+                            averages[`${model}_specific_surprise_rating`] || 0,
+                            averages[`${model}_specific_neutral_rating`] || 0
+                        ],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+
+            // Generic Emotions Chart
+            const genericCtx = document.getElementById(`${model}_generic_emotions_chart`).getContext('2d');
+            new Chart(genericCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Joy', 'Sadness', 'Anger', 'Surprise', 'Neutral'],
+                    datasets: [{
+                        label: 'Generic Text Emotions',
+                        data: [
+                            averages[`${model}_generic_joy_rating`] || 0,
+                            averages[`${model}_generic_sadness_rating`] || 0,
+                            averages[`${model}_generic_anger_rating`] || 0,
+                            averages[`${model}_generic_surprise_rating`] || 0,
+                            averages[`${model}_generic_neutral_rating`] || 0
+                        ],
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

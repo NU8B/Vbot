@@ -22,10 +22,8 @@ warnings.filterwarnings("ignore")
 
 # List of models to test (repo IDs)
 MODELS_TO_TEST = [
-    "nonoJDWAOIDAWKDA/Amelia7_ft_StyleTTS2",
-    "nonoJDWAOIDAWKDA/Amelia8_ft_StyleTTS2",
-    "nonoJDWAOIDAWKDA/Amelia9_ft_StyleTTS2",
     "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
 ]
 
 # Base output directory
@@ -57,18 +55,18 @@ def ensure_output_directory(path):
 
 # Test prompts optimized for each emotion
 EMOTION_SPECIFIC_PROMPTS = {
-    "joy": "I just got promoted at work! This is the happiest day of my life!",
-    "sadness": "I had to say goodbye to my best friend today, and my heart feels so heavy.",
-    "anger": "They completely destroyed the project I spent months working on!",
-    "surprise": "I can't believe I just won the lottery! This is unbelievable!",
-    "neutral": "The meeting is scheduled for three o'clock in the conference room.",
+    "joy": "I am absolutely thrilled to announce that I just got promoted to senior manager at work! After five years of dedication and hard work, this is truly the happiest moment of my career. I can't stop smiling!",
+    "sadness": "Today, I had to say goodbye to my best friend who is moving across the country. We've been inseparable for fifteen years, and now everything feels empty and quiet. I miss them already, and my heart feels so heavy.",
+    "anger": "I cannot believe they completely destroyed the project I spent six months working on without even consulting me! All those late nights and weekends wasted because of their incompetence. This is absolutely unacceptable!",
+    "surprise": "Oh my goodness, I can't believe what just happened! I actually won the grand prize in the national lottery - fifty million dollars! I had to check the numbers ten times because I couldn't believe my eyes!",
+    "neutral": "The quarterly business meeting is scheduled for three o'clock in the main conference room on the third floor. All department heads are required to bring their annual reports and budget proposals for review.",
 }
 
 # Core emotions matching our reference sound files
 CORE_EMOTIONS = ["joy", "sadness", "anger", "surprise", "neutral"]
 
 # Generic text to test across all models with core emotions
-GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions."
+GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions. This should sound different with different emotions even if it's the same text."
 
 
 def test_model(repo_id):
@@ -170,6 +168,36 @@ def test_model(repo_id):
             print(f"Successfully saved to: {output_path}")
         else:
             print(f"Failed to save to: {output_path}")
+
+    # Test 3: Custom text with neutral voice
+    print("\nTesting custom text with custom reference voice:")
+    print("-" * 80)
+
+    custom_text = "I really like our new original song tho. Every single day I wake up and it's stuck in my head."
+    print(f"Text: {custom_text}")
+
+    start = time.time()
+    print("Generating speech...")
+
+    audio = tts.inference(
+        text=custom_text,
+        ref_s=tts.compute_style("asset/ref_sound/custom.wav"),
+        alpha=0.3,
+        beta=0.7,
+        diffusion_steps=DIFFUSION_STEPS,
+        embedding_scale=1,
+    )
+
+    duration = time.time() - start
+    print(f"Time taken: {duration:.2f}s")
+
+    # Save audio
+    output_path = output_dir / "custom_reference.wav"
+    sf.write(str(output_path), audio, 24000)
+    if output_path.exists():
+        print(f"Successfully saved to: {output_path}")
+    else:
+        print(f"Failed to save to: {output_path}")
 
 
 def main():

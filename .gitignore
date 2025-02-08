@@ -78,3 +78,5 @@ Data_prep/audio_preprocessor/audio_preprocessor.py
 benchmark/resultLLMs/
 /temp
 /models
+/benchmark/results/Amelia10_ft_StyleTTS2
+/benchmark/results

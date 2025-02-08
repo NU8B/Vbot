@@ -238,11 +238,9 @@ def download_from_youtube(url, idx):
 if __name__ == "__main__":
     # Example YouTube URLs
     youtube_urls = [
-        "https://www.youtube.com/watch?v=MPb3HMp5clg",
-        "https://www.youtube.com/watch?v=1KYRDR9rnTw",
-        "https://www.youtube.com/watch?v=aS5MtVQnLGw",
-        "https://www.youtube.com/watch?v=BvjagRepqxU",
-        "https://www.youtube.com/watch?v=piAlPCZxRNc",
+        "https://www.youtube.com/watch?v=p67zRZJ3Ib4",
+        "https://www.youtube.com/watch?v=US9P4LZAGCo",
+        "https://www.youtube.com/watch?v=S9wrSFJyW5g",
         # Add more URLs as needed
     ]
 
