@@ -1,19 +1,25 @@
-import logging
 import os
 import sys
+
+# Add the project root directory to Python path when run directly
+if __name__ == "__main__":
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    sys.path.append(project_root)
+
+import logging
 import time
-import math  # Added for math functions
-import random  # Added for random blinking intervals
+import math
+import random
 from typing import List, Optional
 
 import torch
 import wx
-import numpy as np  # Added for numpy array handling
+import numpy as np
 
 from tha4.charmodel.character_model import CharacterModel
 from tha4.poser.modes.mode_14 import create_poser
 from tha4.poser.poser import PoseParameterCategory
-from tha4.image_util import convert_output_image_from_torch_to_numpy  # Added for image conversion
+from tha4.image_util import convert_output_image_from_torch_to_numpy
 from tha4.app.animations.happy_animation import HappyAnimation
 from tha4.app.animations.sad_animation import SadAnimation
 from tha4.app.animations.angry_animation import AngryAnimation
@@ -515,10 +521,37 @@ class AutonomousAnimationFrame(wx.Frame):
                 pose[head_x_index] = animation_values.get('head_x', -0.5)  # Ensure negative value for down tilt
         elif self.animation_presets['angry'].is_active:
             animation_values = self.angry_animation.update(delta_time)
-            # Apply angry-specific parameters
-            mouth_angry_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_angry")
-            if mouth_angry_index >= 0:
-                pose[mouth_angry_index] = animation_values.get('mouth_angry', 0.9)
+            
+            # Handle eyebrow parameters
+            eyebrow_angry_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_angry")
+            if eyebrow_angry_index >= 0:
+                pose[eyebrow_angry_index] = animation_values.get('eyebrow_angry_left', 0.8)
+                pose[eyebrow_angry_index + 1] = animation_values.get('eyebrow_angry_right', 0.8)
+            
+            # Handle eye parameters
+            eye_unimpressed_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_unimpressed")
+            if eye_unimpressed_index >= 0:
+                pose[eye_unimpressed_index] = animation_values.get('eye_unimpressed_left', 0.35)
+                pose[eye_unimpressed_index + 1] = animation_values.get('eye_unimpressed_right', 0.35)
+            
+            # Handle mouth parameters
+            mouth_smirk_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_smirk")
+            if mouth_smirk_index >= 0:
+                pose[mouth_smirk_index] = animation_values.get('mouth_smirk', 1.0)
+            
+            # Handle iris parameters
+            iris_small_index = self.get_parameter_index(PoseParameterCategory.IRIS_MORPH, "iris_small")
+            if iris_small_index >= 0:
+                iris_left = animation_values.get('iris_small_left', 0.5)
+                iris_right = animation_values.get('iris_small_right', 0.5)
+                print(f"Iris values - Left: {iris_left}, Right: {iris_right}, Index: {iris_small_index}")
+                pose[iris_small_index] = iris_left
+                pose[iris_small_index + 1] = iris_right
+            
+            # Handle head rotation
+            head_x_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x")
+            if head_x_index >= 0:
+                pose[head_x_index] = animation_values.get('head_x', -0.5)  # Ensure negative value for down tilt
         else:
             return
         

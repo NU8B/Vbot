@@ -3,12 +3,16 @@ import os
 import sys
 import time
 from typing import List
-
+# Add the project root directory to Python path when run directly
+if __name__ == "__main__":
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    sys.path.append(project_root)
 from tha4.charmodel.character_model import CharacterModel
 from tha4.image_util import resize_PIL_image, convert_output_image_from_torch_to_numpy
 from tha4.poser.modes.mode_14 import get_pose_parameters
 
 sys.path.append(os.getcwd())
+
 
 import PIL.Image
 import torch
