@@ -47,16 +47,19 @@ class InferenceHandler:
         return speech, detected_emotion, style_path
 
     def play_audio(self, speech, duration, avatar, audio_processor):
-        """Play audio with mouth animation."""
+        """Play audio with avatar animation."""
         # Save audio to outputs directory
         output_path = self.output_dir / "output.wav"
         sf.write(str(output_path), speech, 24000)
 
-        # Start mouth animation
-        threading.Thread(
-            target=avatar.animate_mouth, args=(duration,), daemon=True
-        ).start()
+        # Start avatar animation
+        avatar.start_speaking()
 
         # Small delay to ensure animation starts before audio
         time.sleep(0.1)
+
+        # Play audio
         audio_processor.play_audio(speech, duration=duration)
+
+        # Stop avatar animation
+        avatar.stop_speaking()

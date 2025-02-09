@@ -2,15 +2,21 @@ import requests
 import threading
 import time
 from pathlib import Path
+import json
 
 # Ollama settings
-MAX_HISTORY = 4  # Maximum number of conversation turns to keep
+MAX_HISTORY = 10  # Maximum number of conversation turns to keep
 SYSTEM_PROMPT = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. You are not to break character under any circumstances. You are to always talk in first person. You are not to describe your actions in your response. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
 
 
 class OllamaHandler:
     def __init__(
-        self, gui, tts_model, audio_processor, emotion_handler, inference_handler=None
+        self,
+        gui=None,
+        tts_model=None,
+        audio_processor=None,
+        emotion_handler=None,
+        inference_handler=None,
     ):
         self.gui = gui
         self.tts_model = tts_model
@@ -21,69 +27,54 @@ class OllamaHandler:
         self.is_processing = False
         self.is_speaking = False
         self.timings = {}
+        self.warmup_time = None
 
         # Create outputs directory if it doesn't exist
         self.output_dir = Path("asset/outputs")
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    @classmethod
-    def initialize(cls):
-        """Initialize OllamaHandler with warmup"""
-        warmup_start = time.time()
-        response = cls.call_ollama_static(
-            "This is a warmup prompt. Ignore.", [], MAX_HISTORY, SYSTEM_PROMPT
-        )
-        warmup_time = time.time() - warmup_start
-        if response is None:
-            print("Ollama warm-up failed (this is not critical)")
-        return warmup_time
+    @staticmethod
+    def initialize():
+        """Static initialization method for parallel loading"""
+        try:
+            # Test connection
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "mistral",
+                    "prompt": "Test connection",
+                    "stream": False,
+                },
+                timeout=30,
+            )
+            if response.status_code == 200:
+                return True
+            return False
+        except Exception as e:
+            print(f"Error initializing Ollama: {str(e)}")
+            return False
 
     @staticmethod
     def call_ollama_static(prompt, message_history, max_history, system_prompt):
         """Static version of call_ollama for initialization"""
         try:
-            # Add new user message to history
-            message_history.append({"role": "user", "content": prompt})
+            # Prepare conversation history
+            messages = [{"role": "system", "content": system_prompt}]
 
-            # If history exceeds max length, remove oldest messages
-            while len(message_history) > max_history:
-                message_history.pop(0)
+            # Add message history
+            if message_history:
+                messages.extend(message_history[-max_history:])
 
-            # Construct messages list with system prompt always first
-            messages = [{"role": "system", "content": system_prompt}] + message_history
+            # Add current prompt
+            messages.append({"role": "user", "content": prompt})
 
+            # Make API call
             response = requests.post(
                 "http://localhost:11434/api/chat",
                 json={
-                    "model": "stheno",
+                    "model": "mistral",
                     "messages": messages,
                     "stream": False,
-                    "options": {
-                        # Core Performance Parameters
-                        "num_gpu": 100,
-                        "num_thread": 32,
-                        "batch_size": 512,
-                        "f16_kv": True,
-                        # Memory Management
-                        "num_ctx": 2048,
-                        "num_keep": 25,
-                        "num_beam": 1,
-                        "num_gqa": 8,
-                        # Generation Quality vs Speed
-                        "temperature": 0.7,
-                        "top_p": 0.9,
-                        "top_k": 40,
-                        "repeat_penalty": 1.1,
-                        # Advanced Tuning
-                        "rope_frequency_base": 10000,
-                        "rope_frequency_scale": 1.0,
-                        "mirostat": 2,
-                        "mirostat_eta": 0.1,
-                        "mirostat_tau": 5.0,
-                        # Optimization Flags
-                        "use_flash_attn": True,
-                        "compress_pos_emb": 1.0,
-                    },
                 },
                 timeout=30,
             )
@@ -139,6 +130,19 @@ class OllamaHandler:
             speech, detected_emotion, style_path = self.inference_handler.process_text(
                 text, response, self.timings
             )
+
+            # Update avatar emotion
+            avatar = self.gui.get_avatar()
+            if avatar:
+                # Map emotion to animation state
+                if "happy" in detected_emotion or "joy" in detected_emotion or "excited" in detected_emotion:
+                    avatar.set_emotion("happy")
+                elif "sad" in detected_emotion or "disappointed" in detected_emotion:
+                    avatar.set_emotion("sad")
+                elif "angry" in detected_emotion or "annoyed" in detected_emotion:
+                    avatar.set_emotion("angry")
+                else:
+                    avatar.set_emotion("neutral")
 
             # Calculate total time
             total_time = time.time() - processing_start
