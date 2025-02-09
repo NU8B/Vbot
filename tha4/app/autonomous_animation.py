@@ -522,6 +522,18 @@ class AutonomousAnimationFrame(wx.Frame):
         elif self.animation_presets['angry'].is_active:
             animation_values = self.angry_animation.update(delta_time)
             
+            # Handle mouth parameters
+            mouth_delta_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_delta")
+            mouth_lowered_left_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_left")
+            mouth_lowered_right_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_right")
+            
+            if mouth_delta_index >= 0:
+                pose[mouth_delta_index] = animation_values.get('mouth_delta', 0.7)
+            if mouth_lowered_left_index >= 0:
+                pose[mouth_lowered_left_index] = animation_values.get('mouth_lowered_corner_left', 0.6)
+            if mouth_lowered_right_index >= 0:
+                pose[mouth_lowered_right_index] = animation_values.get('mouth_lowered_corner_right', 0.6)
+            
             # Handle eyebrow parameters
             eyebrow_angry_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_angry")
             if eyebrow_angry_index >= 0:

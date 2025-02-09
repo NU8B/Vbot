@@ -8,11 +8,11 @@ class AngryAnimation(BaseAnimation):
         self.base_cycle = 0.0
         self.cycle_speed = 0.8  # Medium speed for tense movements
         
-        # Head movement - sharp, tense movements
+        # Head movement - sharp, tense movements with downward tilt
         self.head_tense_cycle = 0.0
-        self.head_tense_speed = 0.6
-        self.head_tense_amount = 0.3
-        self.head_forward_tilt = 0.4    # Forward aggressive tilt
+        self.head_tense_speed = 0.5
+        self.head_tense_amount = 0.2
+        self.head_forward_tilt = -0.1    # Downward tilt
         
         # Eyes - using exact parameters from image
         self.eye_unimpressed_value = 0.35  # Set to match image
@@ -26,14 +26,23 @@ class AngryAnimation(BaseAnimation):
         self.blink_speed = 0.2           # Quick blinks
         self.time_until_next_blink = random.uniform(2.0, 4.0)
         
-        # Mouth parameters
-        self.mouth_smirk_value = 1.0     # Maximum smirk for angry expression
+        # Enhanced mouth parameters for anger
+        self.mouth_delta = 1.0          # Keep current delta for opening
+        self.mouth_corner_droop_left = 1.0  # Maximum corner droop
+        self.mouth_corner_droop_right = 1.0 # Maximum corner droop
         self.mouth_cycle = 0.0
         self.mouth_variation_speed = 0.4
-        self.mouth_variation_amount = 0.1
+        self.mouth_variation_amount = 0.05  # Small variation
+        
+        # Reset other mouth parameters to 0
+        self.mouth_ooo_value = 0.0
+        self.mouth_aaa_value = 0.0
+        self.mouth_iii_value = 0.0
+        self.mouth_uuu_value = 0.0
+        self.mouth_eee_value = 0.0
         
         # Iris parameters
-        self.iris_small_value = 0.2      # Smaller value = bigger iris (0 = biggest, 1 = smallest)
+        self.iris_small_value = 0.2      # Smaller value = bigger iris
         
         # Body movement - tense, controlled
         self.body_tense_cycle = 0.0
@@ -57,7 +66,7 @@ class AngryAnimation(BaseAnimation):
             self.blink_cycle = min(1.0, self.blink_cycle + delta_time / self.blink_speed)
             
         # Calculate movements
-        # Head movements
+        # Head movements with downward tilt
         head_x = math.sin(self.head_tense_cycle) * self.head_tense_amount + self.head_forward_tilt
         head_y = math.sin(self.base_cycle * 0.5) * 0.2
         head_z = math.sin(self.head_tense_cycle * 0.7) * 0.15
@@ -75,20 +84,22 @@ class AngryAnimation(BaseAnimation):
         
         # Return all parameters for angry expression
         return {
-            'breathing': 0.7 + math.sin(self.base_cycle) * 0.3,  # More pronounced breathing
+            'breathing': 0.7 + math.sin(self.base_cycle) * 0.3,
             'head_x': head_x,
             'head_y': head_y,
             'head_z': head_z,
             'body_y': body_y,
             'body_z': body_z,
             'eye_openness': eye_openness,
-            'eye_unimpressed_left': self.eye_unimpressed_value,   # Exact from image
-            'eye_unimpressed_right': self.eye_unimpressed_value,  # Exact from image
-            'eyebrow_angry_left': self.eyebrow_angry_value,      # Exact from image
-            'eyebrow_angry_right': self.eyebrow_angry_value,     # Exact from image
-            'mouth_smirk': self.mouth_smirk_value + mouth_variation, # Maximum smirk with slight variation
-            'iris_small_left': self.iris_small_value,            # Both eyes set to same value
-            'iris_small_right': self.iris_small_value,           # Both eyes set to same value
+            'eye_unimpressed_left': self.eye_unimpressed_value,
+            'eye_unimpressed_right': self.eye_unimpressed_value,
+            'eyebrow_angry_left': self.eyebrow_angry_value,
+            'eyebrow_angry_right': self.eyebrow_angry_value,
+            'mouth_delta': self.mouth_delta + mouth_variation,  # Only using delta
+            'mouth_lowered_corner_left': self.mouth_corner_droop_left,
+            'mouth_lowered_corner_right': self.mouth_corner_droop_right,
+            'iris_small_left': self.iris_small_value,
+            'iris_small_right': self.iris_small_value,
             'blink': blink_value,
             'iris_x': math.sin(self.base_cycle * 0.2) * 0.2,
             'iris_y': -0.1  # Slightly looking down
