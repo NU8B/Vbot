@@ -108,6 +108,31 @@ class AnimatedCharacter:
         idle_params = self.idle_animation.update(delta_time)
         params.update(idle_params)
         
+        # Add speaking animation if currently speaking
+        if self.is_speaking:
+            # Create a natural-looking talking animation
+            talk_speed = 0.5  # Extremely slow for observation (was 4.0)
+            talk_cycle = (current_time * talk_speed) % 1.0
+            
+            # Use smoother sine wave for more natural transitions
+            mouth_open = abs(math.sin(talk_cycle * math.pi * 2))
+            
+            # Base mouth parameters - reduced overall to make movements smaller
+            base_aaa = 0.25  # Slightly reduced from 0.3 for subtler movement
+            base_iii = 0.12  # Slightly reduced from 0.15
+            base_ooo = 0.15  # Slightly reduced from 0.2
+            
+            # Smooth transitions between mouth shapes
+            if talk_cycle < 0.3:  # Slightly open
+                params["mouth_aaa"] = base_aaa * mouth_open
+                params["mouth_iii"] = base_iii * (1 - mouth_open)
+            elif talk_cycle < 0.6:  # More open
+                params["mouth_aaa"] = base_aaa * mouth_open
+                params["mouth_ooo"] = base_ooo * (1 - mouth_open)
+            else:  # Transition back to slightly open
+                params["mouth_aaa"] = base_aaa * mouth_open * 0.7
+                params["mouth_iii"] = base_iii * (1 - mouth_open)
+        
         # Blend with emotion animation if transitioning
         if self.emotion_blend > 0:
             if self.target_emotion == "happy":
