@@ -330,8 +330,31 @@ class StyleTTS2Inference:
             x, _ = self.model.predictor.lstm(d)
             duration = self.model.predictor.duration_proj(x)
 
+            # Get raw durations with sigmoid activation
             duration = torch.sigmoid(duration).sum(axis=-1)
-            pred_dur = torch.round(duration.squeeze()).clamp(min=1)
+            pred_dur = torch.round(duration.squeeze())
+
+            # Calculate adaptive frames per phoneme based on text characteristics
+            num_phonemes = input_lengths[0].item()
+
+            # Base frames per phoneme for medium-length text (around 20 phonemes)
+            BASE_FRAMES_PER_PHONEME = 2.0
+
+            # Scale factor that increases for very short texts and decreases for very long texts
+            # This helps maintain natural timing for short phrases while keeping longer texts flowing
+            length_scale = 1.0 + (2.0 / (1.0 + np.exp(0.1 * (num_phonemes - 20))))
+
+            frames_per_phoneme = BASE_FRAMES_PER_PHONEME * length_scale
+
+            # Calculate target duration with adaptive scaling
+            target_total_duration = int(frames_per_phoneme * num_phonemes)
+
+            # Scale durations to match target duration while preserving relative lengths
+            current_total = pred_dur.sum()
+            scaling_factor = target_total_duration / current_total
+
+            # Apply scaling with minimum duration protection
+            pred_dur = torch.round(pred_dur * scaling_factor).clamp(min=1)
 
             # Precompute pred_aln_trg tensor on the device
             pred_aln_trg = torch.zeros(
