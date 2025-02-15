@@ -23,7 +23,7 @@ warnings.filterwarnings("ignore")
 # List of models to test (repo IDs)
 MODELS_TO_TEST = [
     "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2",
-    "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
+    # "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
 ]
 
 # Base output directory
@@ -66,7 +66,7 @@ EMOTION_SPECIFIC_PROMPTS = {
 CORE_EMOTIONS = ["joy", "sadness", "anger", "surprise", "neutral"]
 
 # Generic text to test across all models with core emotions
-GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions. This should sound different with different emotions."
+GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions. This should sound different with different emotions. And now I will just be yapping because I can and nobody can stop me. Try me if you dare!"
 
 
 def test_model(repo_id):

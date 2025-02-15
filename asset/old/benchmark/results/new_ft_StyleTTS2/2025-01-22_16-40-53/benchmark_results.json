@@ -1,0 +1,551 @@
+{
+  "benchmark_info": {
+    "timestamp": "2025-01-22_16-40-53",
+    "dataset_path": "Data_prep\\raw_data\\raw_audio2",
+    "total_files": 49,
+    "processed_files": 38,
+    "valid_pesq_scores": 38,
+    "model_path": "nonoJDWAOIDAWKDA/new_ft_StyleTTS2"
+  },
+  "individual_results": [
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 02.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 02.wav",
+      "text": "Hello! Thank you for waiting, thank you for waiting! Thank you for waiting!",
+      "metrics": {
+        "speaker_similarity": 0.7473188638687134,
+        "pesq_score": 1.1367409229278564,
+        "transcription_accuracy": 0.8,
+        "stoi_score": 0.18952478300489445,
+        "sdr_score": -20.670070236152647,
+        "original_transcription": "hello, thank you for waiting! thank you for waiting! thank you for waiting!",
+        "generated_transcription": "hello, thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank you for waiting. thank"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 04.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 04.wav",
+      "text": "might sound a bit different. Yes mom, it finally plugged me in. Wahoo! Hehehehe, different. Yes mom, it finally plugged me in. Wahoo!",
+      "metrics": {
+        "speaker_similarity": 0.8859031200408936,
+        "pesq_score": 1.0956246852874756,
+        "transcription_accuracy": 0.25,
+        "stoi_score": 0.06956661395910253,
+        "sdr_score": -25.364195674701094,
+        "original_transcription": "it might sound a bit different. yes, mama finally plugged me in! wahoo! eh, heh heh heh. yeah, i forgot to turn it off, but although i'm probably in the background. i'm not, but to much of the trouble with the colors are so beautiful. good job. that might sound a bit different. yes, mama finally reported me in. wahoo! heh heh heh!",
+        "generated_transcription": "i sound a bit different. yes, mom, it finally plugged me in. wahoo. hey, i had different. yes, mom, it finally plugged me in."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 06.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 06.wav",
+      "text": "Oh, sounds a little weird. You're you're a little weird. What's it? What did this?",
+      "metrics": {
+        "speaker_similarity": 0.8931739862664946,
+        "pesq_score": 1.0715346336364746,
+        "transcription_accuracy": 0.875,
+        "stoi_score": 0.1707657896367026,
+        "sdr_score": -18.03649864759209,
+        "original_transcription": "sounds a little weird. you're a little weird. what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what's a little weird? what",
+        "generated_transcription": "oh, sounds a little weird. you're you're a little weird. what's it? what did this?"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 07.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 07.wav",
+      "text": "just kidding I'm reading chat I'm not I'm not taking a picture I'm not I did not",
+      "metrics": {
+        "speaker_similarity": 0.8677996397018433,
+        "pesq_score": 1.0584787130355835,
+        "transcription_accuracy": 0.6363636363636364,
+        "stoi_score": 0.14644394055061388,
+        "sdr_score": -25.0957873913384,
+        "original_transcription": "just kidding i'm reading chat i'm not i'm not taking a picture i'm not i did not",
+        "generated_transcription": "just kidding, i'm reading chat i'm not i'm not taking picture"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 08.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 08.wav",
+      "text": "I usually sound weird. Yeah, but that's why you guys watch me, right? If you guys enjoyed this video, don't forget to like, share, and subscribe to my channel.",
+      "metrics": {
+        "speaker_similarity": 0.8494734674378331,
+        "pesq_score": 1.1658835411071777,
+        "transcription_accuracy": 0.65625,
+        "stoi_score": 0.08705439047052695,
+        "sdr_score": -22.102194884992503,
+        "original_transcription": "i usually sound weird. yeah, but that's why you guys watch me, right? if you like this video, don't forget to like, subscribe, and turn on the notification bell, so you don't miss the next video.",
+        "generated_transcription": "i usually sound weird. yeah, but that's why you guys watch me, right? if you guys enjoyed this video, don't forget to like, share, and subscribe to my channel. yeah, but that's why you guys watch me, right? if you guys enjoyed this video, don't forget to like, share, and subscribe to my channel. yeah, but that's why you guys watch me, right? if you guys enjoyed this video, don't forget to like, share, and subscribe to my channel. yeah, but that's why you guys watch me, right? if you guys enjoyed this video, don't forget to like, share, and subscribe to my channel. yeah, but that's why you guys watch me, right? if you guys enjoyed this video, don't forget to like, share, and subscribe to my channel."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 09.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 09.wav",
+      "text": "It sounds crisp, that's cause this microphone, it's easier to keep close to my face as opposed to my other one where I like to keep it kind of off to the side. That's cause this microphone, it's easier to keep close to my face as opposed to my other one where I like to keep it kind of off to the side. That's cause this microphone, it's easier to keep close to my face as opposed to my other one where I like to keep it kind of off to the side.",
+      "metrics": {
+        "speaker_similarity": 0.920660491029055,
+        "pesq_score": 2.7535152435302734,
+        "transcription_accuracy": 0.8846153846153846,
+        "stoi_score": 0.19451078926815107,
+        "sdr_score": -23.803362837174017,
+        "original_transcription": "it sounds crisp, that's cause this microphone, it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side. that's cause this microphone, it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side.",
+        "generated_transcription": "sounds crisp! let's cause this microphone. it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side. let's cause this microphone. it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side. let's cause this microphone. it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side. let's cause this microphone. it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 12.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 12.wav",
+      "text": "while that hiccup tasted like chocolate pancakes. Yummy!",
+      "metrics": {
+        "speaker_similarity": 0.8842062950134277,
+        "pesq_score": 1.0511109828948975,
+        "transcription_accuracy": 0.625,
+        "stoi_score": 0.18433740242977614,
+        "sdr_score": -23.526639860939223,
+        "original_transcription": "while that hiccup tasted like chocolate pancakes. yummy!",
+        "generated_transcription": "all that hiccup tasted like chocolate pancakes, yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy yummy"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 127.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 127.wav",
+      "text": "Become the mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor? Is there a mayor?",
+      "metrics": {
+        "speaker_similarity": 0.7964125396959474,
+        "pesq_score": 1.2282637357711792,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 0.15335845742586934,
+        "sdr_score": -20.230215980724104,
+        "original_transcription": "become the mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor? is there a mayor?",
+        "generated_transcription": ""
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 13.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 13.wav",
+      "text": "Sorry, I just had to fix something, those Other me anyways Nice to see you guys again Other me anyways",
+      "metrics": {
+        "speaker_similarity": 0.8730285243375004,
+        "pesq_score": 1.124351978302002,
+        "transcription_accuracy": 0.8125,
+        "stoi_score": 0.05123325656149263,
+        "sdr_score": -24.662472770554643,
+        "original_transcription": "sorry, i just had to fix something, those other me anyways. nice to see you guys again! nice to see you again! nice to see you guys again! nice to see you guys again!",
+        "generated_transcription": "sorry, i just had to fix something. those other me anyways nice to see you guys again, other me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any me, any"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 131.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 131.wav",
+      "text": "But, I guess,",
+      "metrics": {
+        "speaker_similarity": 0.8293071490939186,
+        "pesq_score": 1.3203293085098267,
+        "transcription_accuracy": 0.6666666666666666,
+        "stoi_score": 0.4348834993299261,
+        "sdr_score": -13.070179676144589,
+        "original_transcription": "but i guess,",
+        "generated_transcription": "but i guess."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 14.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 14.wav",
+      "text": "Haven't seen you since Saturday, right? That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the... That was the...",
+      "metrics": {
+        "speaker_similarity": 0.775354266166687,
+        "pesq_score": 1.2288554906845093,
+        "transcription_accuracy": 0.2222222222222222,
+        "stoi_score": 0.234700573674102,
+        "sdr_score": -24.63102586988668,
+        "original_transcription": "haven't seen you since saturday, right? that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the... that was the...",
+        "generated_transcription": "continues saturday, right?"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 17.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 17.wav",
+      "text": "Concert pretty much mostly concert. Yeah Everyone was fantastic. Yeah, it was really cool. Oh my god our new song Mostly concert. Yeah Everyone was fantastic. Yeah, it was really cool. Oh my god our new song our new song",
+      "metrics": {
+        "speaker_similarity": 0.9110939774243233,
+        "pesq_score": 1.1029253005981445,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 0.10991627491838622,
+        "sdr_score": -24.80780487233183,
+        "original_transcription": "concert, pretty much mostly concert, yeah everyone was fantastic, yeah, it was really cool oh my god, our new song",
+        "generated_transcription": ""
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 18.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 18.wav",
+      "text": "is it gets stuck in my head all the time it gets stuck in my head all the time i'm like ahhh...",
+      "metrics": {
+        "speaker_similarity": 0.8477878155961317,
+        "pesq_score": 1.0871233940124512,
+        "transcription_accuracy": 0.9090909090909091,
+        "stoi_score": 0.1478841355133737,
+        "sdr_score": -24.20165308789062,
+        "original_transcription": "it gets stuck in my head all the time i'm like",
+        "generated_transcription": "is it gets stuck in my head all the time it gets stuck in my head all the time. i'm like, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah, ah,"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 19.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 19.wav",
+      "text": "Okay, I have this BGM stuck in my brain. So it's not coming to mind right away. I'd sing it, but I'd sing it, but I'd sing it.",
+      "metrics": {
+        "speaker_similarity": 0.8958516716957092,
+        "pesq_score": 1.1329734325408936,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.23592116927855006,
+        "sdr_score": -22.219056405794085,
+        "original_transcription": "okay, i have this bgm stuck in my brain. so it's not coming to mind right away. i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it, but i'd sing it,",
+        "generated_transcription": "okay, i have this bgm stuck in my brain. so it's not coming to mind right away. i'd sing it, but i'd sing it, but i'd sing it. but i'd sing it. but i'd sing it, but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it. but i'd sing it."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 20.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 20.wav",
+      "text": "I was so cool Violet violet violet violingamera",
+      "metrics": {
+        "speaker_similarity": 0.6889442616071869,
+        "pesq_score": 1.1893064975738525,
+        "transcription_accuracy": 0.375,
+        "stoi_score": 0.36621825218565457,
+        "sdr_score": -17.228391468424228,
+        "original_transcription": "i was so cool thank you. thank you violet violet",
+        "generated_transcription": "i saw cool violet violin gabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabgabg"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 22.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 22.wav",
+      "text": "and that I always sing like the second verse I guess for Violet completely wrong. I always sing like the second verse for Violet completely wrong.",
+      "metrics": {
+        "speaker_similarity": 0.9246734976768494,
+        "pesq_score": 1.1017022132873535,
+        "transcription_accuracy": 0.7857142857142857,
+        "stoi_score": 0.22510427040521555,
+        "sdr_score": -24.012230249810624,
+        "original_transcription": "that i sang, i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong. i always sing like the second verse, i guess, for violet completely wrong.",
+        "generated_transcription": "and i always sing like the second verse, i guess for violet completely wrong. i always sing like the second verse for violet completely wrong. and i always sing like the second verse, i guess for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong. i always sing like the second verse for violet completely wrong."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 24.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 24.wav",
+      "text": "Oh, then you get a fix.",
+      "metrics": {
+        "speaker_similarity": 0.8035486691805248,
+        "pesq_score": 1.0757765769958496,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 0.22153743941009493,
+        "sdr_score": -15.176056810782793,
+        "original_transcription": "oh, then you get a fix.",
+        "generated_transcription": ""
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 27.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 27.wav",
+      "text": "There we go.",
+      "metrics": {
+        "speaker_similarity": 0.7567642782190025,
+        "pesq_score": 1.4660238027572632,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 1e-05,
+        "sdr_score": -18.97764914918524,
+        "original_transcription": "i'm going to go ahead. there we go! ok. here we go. ok. there we go. ok. ok.",
+        "generated_transcription": "and because. and because. and because."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 28.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 28.wav",
+      "text": "Yeah, so then we also had Oh Guna and Ina and I did end of a life. wasn't so cool What was the root of it? I couldn't say I used to stumble upon where it was. dance You'reULO Ina",
+      "metrics": {
+        "speaker_similarity": 0.9276726841926575,
+        "pesq_score": 1.1265183687210083,
+        "transcription_accuracy": 0.7307692307692307,
+        "stoi_score": 0.13415416577979272,
+        "sdr_score": -26.822083190108557,
+        "original_transcription": "so then we also had gud\u00e4 and ina and i did end of a life wasn't so cool what was the root of it all? i couldn't say i used thumpbing",
+        "generated_transcription": "yeah, so then we also had oguna and inna and i did end of a life. wasn't so cool, what was the root of it? i couldn't say, i used to stumble upon where it was. dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o. and dance your u.l.o"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 29.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 29.wav",
+      "text": "Yeah, they're sitting on the chairs, it was relaxing. Very relaxing performance. They are sitting on the chairs. It was relaxing, very relaxing performance.",
+      "metrics": {
+        "speaker_similarity": 0.903547248561438,
+        "pesq_score": 1.092794418334961,
+        "transcription_accuracy": 0.75,
+        "stoi_score": 0.17732709485815984,
+        "sdr_score": -26.026816863563038,
+        "original_transcription": "they're sitting on the chairs. it was relaxing. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. and they're sitting on the chairs. and they're sitting on the chairs. and they're sitting on the chairs. and they're sitting on the chairs. it was relaxing. it was relaxing. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance. very relaxing performance.",
+        "generated_transcription": "now they're sitting on the chairs, it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance. they're sitting on the chairs, it was relaxing, very relaxing performance."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 31.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 31.wav",
+      "text": "The Evangelion. Evangelion. The Shinji Chair. Oh.",
+      "metrics": {
+        "speaker_similarity": 0.8529724391086378,
+        "pesq_score": 1.1333789825439453,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.21546493879360812,
+        "sdr_score": -15.640065937466801,
+        "original_transcription": "the evangelion, evangelion, the shinji chair.",
+        "generated_transcription": "the evangelion, the shinji chair."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 32.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 32.wav",
+      "text": "Oh yeah, I get his tails to uhh... It's a ghost tale I guess or something. You know spirit tale, yeah. That's why I was going through the chair and chair tail. Yeah, yeah.",
+      "metrics": {
+        "speaker_similarity": 0.9102757573127747,
+        "pesq_score": 1.1699917316436768,
+        "transcription_accuracy": 0.8076923076923077,
+        "stoi_score": 0.216262449749104,
+        "sdr_score": -23.239742795589947,
+        "original_transcription": "oh yeah, i get his tails to... it's a ghost tail, i guess, or something? you know, spirit tail, yeah. yeah, that's why it was going through the chair.",
+        "generated_transcription": "oh yeah, i get his tails to ooh. it's a ghost tail, i guess, or something. you know, spirit tail, yeah? that's why i was going through the chair and chair tail. \ufffd\ufffd"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 35.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 35.wav",
+      "text": "You totally could don't do that though. Now that I shouldn't have said that",
+      "metrics": {
+        "speaker_similarity": 0.9322912970868144,
+        "pesq_score": 1.0615973472595215,
+        "transcription_accuracy": 0.2857142857142857,
+        "stoi_score": 0.05327928810264502,
+        "sdr_score": -28.403818228469802,
+        "original_transcription": "right you totally could. don't do that though, now that i shouldn't have said that.",
+        "generated_transcription": "you totally could don't do that, though."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 38.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 38.wav",
+      "text": "I like it. I like it. I like it. I like it. I like the pencil. Hashtag, quite as simple.",
+      "metrics": {
+        "speaker_similarity": 0.8828421761299492,
+        "pesq_score": 1.0482274293899536,
+        "transcription_accuracy": 0.6,
+        "stoi_score": 0.3030726058313108,
+        "sdr_score": -16.742623991033387,
+        "original_transcription": "i like it. i like it. i like it. i like it like this",
+        "generated_transcription": "i like it. i like it. i like it. i like it. i like it. i like it. i like the pencil hashtag quite as simple"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 40.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 40.wav",
+      "text": "Oh, good as split! Yeah, I was really surprised. I should have tried. I think you guys have seen me try a split before. I think I can get a little bit further than Kelly?",
+      "metrics": {
+        "speaker_similarity": 0.95938152316919,
+        "pesq_score": 1.1221579313278198,
+        "transcription_accuracy": 0.8928571428571429,
+        "stoi_score": 0.17497380716447508,
+        "sdr_score": -25.249625212769402,
+        "original_transcription": "oh, good as split! yeah, i was really surprised. i should have tried. i think you guys have seen me try a split before. i think i can get a little bit further than kelly?",
+        "generated_transcription": "oh, good to split. yeah, i was really surprised. i should have tried. i think you guys have seen me try a split before. i think i can get a little bit further than kelly."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 41.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 41.wav",
+      "text": "a little bit but definitely I cannot do like a whole split. Maybe if I stretched- if I stretched for like a month straight or something I think I could probably maybe maybe more than a month. I don't know. I'm pretty flexible but... But I'm pretty flexible but.... I'm pretty flexible but... But I'm pretty flexible, but...",
+      "metrics": {
+        "speaker_similarity": 0.9233865096203409,
+        "pesq_score": 1.0849192142486572,
+        "transcription_accuracy": 0.8,
+        "stoi_score": 0.18462292075590914,
+        "sdr_score": -29.436271025660588,
+        "original_transcription": "a little bit, but definitely i cannot do a whole split. maybe if i stretched, if i stretched for a month straight or something, i think i could probably, maybe more than a month, i don't know. i'm pretty flexible, but i'm pretty flexible,",
+        "generated_transcription": "a little bit, but definitely i cannot do like a whole split. maybe if i stretch, if i stretch for like a month straight or something, i think i could probably maybe maybe more than a month. i don't know, i'm pretty flexible but. but i'm pretty flexible but. i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but. but i'm pretty flexible but."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 42.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 42.wav",
+      "text": "those muscles that you need um I don't know maybe you have to be maybe you know you can you can train to do a split right it's not like babies are born out of the womb and they're like I could do a split maybe you know you can you can train to do a split right it's not like babies are born out of the womb",
+      "metrics": {
+        "speaker_similarity": 0.8433436155319214,
+        "pesq_score": 1.0965114831924438,
+        "transcription_accuracy": 0.8235294117647058,
+        "stoi_score": 0.16530065173870173,
+        "sdr_score": -26.178703851127054,
+        "original_transcription": "that those muscles that you need, i don't know, maybe you have to be, maybe, no, you can train to do a split, right? it's not like babies are born out of the womb and they're like, i can do a split, i can do a split, i can do a split, maybe?",
+        "generated_transcription": "also muscles that you need. i don't know, maybe you have to be. maybe, you know. you can train to do a split right? it's not like babies are born out of the womb. and they're like, i can do a split. maybe, you know. you can you can train to do a split, right? it's not like babies are born out of the... confrontation."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 43.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 43.wav",
+      "text": "like school",
+      "metrics": {
+        "speaker_similarity": 0.7956661581993103,
+        "pesq_score": 1.0583574771881104,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 0.28613680041668216,
+        "sdr_score": -10.690546324074898,
+        "original_transcription": "yeah, so, like, happening. yeah, like spoo, like a like, school. yeah, like, school, like, school... like, school. yeah, like, like, like, school for...",
+        "generated_transcription": ""
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 45.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 45.wav",
+      "text": "shark split! Next time there's like a cafe they should do like man that'd be so cool to collaborate with like a ice cream place",
+      "metrics": {
+        "speaker_similarity": 0.9299831667537445,
+        "pesq_score": 1.1548949480056763,
+        "transcription_accuracy": 0.8636363636363636,
+        "stoi_score": 0.14841156347696785,
+        "sdr_score": -22.208278269767373,
+        "original_transcription": "shark split. next time there's like a cafe they should do like oh man that'd be so cool to collaborate with like a ice cream,",
+        "generated_transcription": "shark split. next time there's like a cafe, they should do like man that'd be so cool to collaborate with like an ice cream play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play, play,"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 47.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 47.wav",
+      "text": "Or maybe somebody has a milkshake, or something, then girl's going to be like a banana shark split. like it's going to be like a banana shark split. like a banana shark split.",
+      "metrics": {
+        "speaker_similarity": 0.8988498449325562,
+        "pesq_score": 1.0990328788757324,
+        "transcription_accuracy": 0.6666666666666666,
+        "stoi_score": 0.1930290377399937,
+        "sdr_score": -29.211000945698675,
+        "original_transcription": "or maybe somebody can have like a milkshake or something. then girls can be like a banana shark split. or maybe somebody can have like a milkshake or something. then girls can be like a banana shark split. or maybe somebody can have like a milkshake or something. then girls can be like a banana shark split. or maybe somebody can have like a milkshake or something. then girls can be like a banana shark split. then girls can be like a banana shark split. then girls can be like a banana shark split. then girls can be like a banana shark split. then girls can be like a banana shark split. then girls can be like a banana shark split. then girls can be like a banana shark split. then girls can be like a banana shark split.",
+        "generated_transcription": "or maybe somebody has a milkshake or something and girls going to be like a banana shark split like it's going to be like a banana shark split like a banana shark split like a banana"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 49.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 49.wav",
+      "text": "I like a nice smooth blue with strawberry sauce. strawberry sauce and then",
+      "metrics": {
+        "speaker_similarity": 0.8961240587308458,
+        "pesq_score": 1.1367312669754028,
+        "transcription_accuracy": 0.9166666666666666,
+        "stoi_score": 0.17194214092724597,
+        "sdr_score": -23.852284116440266,
+        "original_transcription": "i like a nice smooth blue with strawberry sauce. strawberry sauce and then",
+        "generated_transcription": "i like a nice smooth blue with strawberry sauce, strawberry sauce and then"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 50.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 50.wav",
+      "text": "that'd be good",
+      "metrics": {
+        "speaker_similarity": 0.8676669676502382,
+        "pesq_score": 1.0521973371505737,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 1e-05,
+        "sdr_score": -11.439731439025596,
+        "original_transcription": "that'd be good",
+        "generated_transcription": ""
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 52.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 52.wav",
+      "text": "And it came out green! It's the blue, what is it? There's red 40 and there's blue... I don't know what the dye color is for blue. I don't know what the dye color is for blue. It's...it's the blue, what is it? I think there's red 40 and there's blue...I don't know what the dye color is for blue. I think there's ready-mimmed- identity.",
+      "metrics": {
+        "speaker_similarity": 0.9098743796348572,
+        "pesq_score": 1.223051905632019,
+        "transcription_accuracy": 0.75,
+        "stoi_score": 0.14338205284650346,
+        "sdr_score": -27.770419180993265,
+        "original_transcription": "and it came out green! there's, it's the blue, what is it? you know, there's red 40 and there's blue. i don't know what the dye color is for blue. i don't know what the dye color is for blue. i don't know what the dye color is for blue. i don't know what the dye color is for blue. it's the blue, what is it? there's red 40 and there's blue.",
+        "generated_transcription": "i came out green. it's the blue. what is it? there's red 40 and there's blue i don't know what the dye color is for blue. i don't know what the dye color is for blue it's it's a blue. what is it? i think there's red 40 and there's blue. i don't know what the dye color is for blue i think there's ready memd identity i don't know what the dye color is for blue. i think there's ready memd identity i don't know what the dye color is for blue. i think there's ready memd identity"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 54.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 54.wav",
+      "text": "that's part of the fun",
+      "metrics": {
+        "speaker_similarity": 0.794849181021726,
+        "pesq_score": 1.1279748678207397,
+        "transcription_accuracy": 0.6,
+        "stoi_score": 0.17380502445416368,
+        "sdr_score": -15.909540769191906,
+        "original_transcription": "that's part of the fun",
+        "generated_transcription": "that's part of"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 58.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 58.wav",
+      "text": "and her mom was telling me maybe about how that went.. that it came out the other side i guess she was so excited, she didn't even chew it she didn't even chew it i guess she was so excited, she didn't even chew it she didn't even chew it",
+      "metrics": {
+        "speaker_similarity": 0.8615525025592004,
+        "pesq_score": 1.18503999710083,
+        "transcription_accuracy": 0.7857142857142857,
+        "stoi_score": 0.08913836875770122,
+        "sdr_score": -28.491017475595868,
+        "original_transcription": "and her mom was telling me about how, you know, how that went, that it came out, you know, the other side. i guess she was so excited. she didn't even chew it. she didn't even chew it.",
+        "generated_transcription": "my mom was telling me maybe about how that went, that it came out the other side. i guess she was so excited. she didn't even chew it. she didn't even chew it. i guess she was so excited. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. i guess she was so excited. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it. she didn't even chew it."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 60.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 60.wav",
+      "text": "I guess you can make it more dry. It's too goopy.",
+      "metrics": {
+        "speaker_similarity": 0.8095371964435938,
+        "pesq_score": 1.1581764221191406,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.1562785536631321,
+        "sdr_score": -23.52829311668377,
+        "original_transcription": "i guess you can make it more dry. it's too goopy.",
+        "generated_transcription": "i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. i guess you can make it more dry. it's too goopy. i guess you can make it more dry. it's too goopy. i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. it's too goopy. i guess you can make it more dry. it's too goopy. it"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 62.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 62.wav",
+      "text": "and then I put some soy sauce and I was like, alright. But I did, I, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh, uh,",
+      "metrics": {
+        "speaker_similarity": 0.7519556732151327,
+        "pesq_score": 1.077103614807129,
+        "transcription_accuracy": 0.6111111111111112,
+        "stoi_score": 0.05835815948916066,
+        "sdr_score": -23.674804242932215,
+        "original_transcription": "and then, i put some soy sauce in, and i was like, all right, but! but i did, i uh ... i uh,",
+        "generated_transcription": "and then i put some soy sauce and i was like, all right, but i did i"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 64.wav",
+      "generated_file": "benchmark\\results\\new_ft_StyleTTS2\\2025-01-22_16-40-53\\generated_samples\\generated_Sound 64.wav",
+      "text": "Result Okay, anyways, we're getting distracted Okay, anyways, we're getting distracted",
+      "metrics": {
+        "speaker_similarity": 0.8366288542747498,
+        "pesq_score": 1.0452479124069214,
+        "transcription_accuracy": 0.0,
+        "stoi_score": 0.04625142868891013,
+        "sdr_score": -26.833368924187564,
+        "original_transcription": "result okay, anyways, we're getting distracted okay, anyways, we're getting distracted",
+        "generated_transcription": ""
+      }
+    }
+  ],
+  "average_metrics": {
+    "speaker_similarity": 0.8589395723205712,
+    "pesq_score": 1.174853315478877,
+    "transcription_accuracy": 0.5890205415069968,
+    "stoi_score": 0.166162423454121,
+    "sdr_score": -22.346434783547352
+  }
+}

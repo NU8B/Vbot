@@ -80,3 +80,4 @@ benchmark/resultLLMs/
 /models
 /benchmark/results/Amelia10_ft_StyleTTS2
 /benchmark/results
+/mos_evaluation/static/audio

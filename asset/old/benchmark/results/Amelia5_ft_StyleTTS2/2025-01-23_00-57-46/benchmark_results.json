@@ -1,0 +1,705 @@
+{
+  "benchmark_info": {
+    "timestamp": "2025-01-23_00-57-46",
+    "dataset_path": "Data_prep\\raw_data\\raw_audio2",
+    "total_files": 49,
+    "processed_files": 49,
+    "valid_pesq_scores": 49,
+    "model_path": "nonoJDWAOIDAWKDA/Amelia5_ft_StyleTTS2"
+  },
+  "individual_results": [
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 02.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 02.wav",
+      "text": "hello! thank you for waiting!",
+      "metrics": {
+        "speaker_similarity": 0.7461333274841309,
+        "pesq_score": 1.3308379650115967,
+        "transcription_accuracy": 0.6,
+        "stoi_score": 0.2035679405390115,
+        "sdr_score": -25.269385848724454,
+        "original_transcription": "hello! thank you for waiting!",
+        "generated_transcription": "hello, thank you for waiting."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 04.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 04.wav",
+      "text": "that might sound a bit different. yes, mom, it finally plugged me in. woo-hoo!",
+      "metrics": {
+        "speaker_similarity": 0.8760232403264514,
+        "pesq_score": 1.093531608581543,
+        "transcription_accuracy": 0.9285714285714286,
+        "stoi_score": 0.08925180260547805,
+        "sdr_score": -22.27715585117653,
+        "original_transcription": "that might sound a bit different. yes, mom, it finally plugged me in. woo-hoo!",
+        "generated_transcription": "that might sound a bit different. yes, mom, it finally plugged me in. woohoo!"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 05.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 05.wav",
+      "text": "i'm taking pictures of you guys. sounds good? okay. yeah, uh, it's not an xbox headset, okay?",
+      "metrics": {
+        "speaker_similarity": 0.8707053324790401,
+        "pesq_score": 1.1523176431655884,
+        "transcription_accuracy": 0.8235294117647058,
+        "stoi_score": 0.07446898189290031,
+        "sdr_score": -28.469819123815228,
+        "original_transcription": "i'm taking pictures of you guys. sounds good? okay. yeah, uh, it's not an xbox headset, okay?",
+        "generated_transcription": "i'm taking pictures of you guys. sounds good. okay. yeah, uh, it's not an xbox headset. okay."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 06.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 06.wav",
+      "text": "oh, sounds a little weird. you're- you're a little weird. what's-",
+      "metrics": {
+        "speaker_similarity": 0.8317224182751737,
+        "pesq_score": 1.098022699356079,
+        "transcription_accuracy": 0.75,
+        "stoi_score": -0.0419407192547209,
+        "sdr_score": -23.996104721749532,
+        "original_transcription": "oh, sounds a little weird. you're- you're a little weird. what's-",
+        "generated_transcription": "oh, sounds a little weird. you're a little weird."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 07.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 07.wav",
+      "text": "just kidding, i'm reading chat, i'm not taking a picture. i'm not, i did not take a picture.",
+      "metrics": {
+        "speaker_similarity": 0.9133934327002442,
+        "pesq_score": 1.2556657791137695,
+        "transcription_accuracy": 0.8461538461538461,
+        "stoi_score": 0.18952358118811047,
+        "sdr_score": -17.396791396907798,
+        "original_transcription": "just kidding, i'm reading chat, i'm not taking a picture. i'm not, i did not take a picture.",
+        "generated_transcription": "just kidding? i'm reading chat. i'm not taking a picture. i'm not, i did not take a picture."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 08.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 08.wav",
+      "text": "i usually sound weird. yeah, but that's why you guys watch me, right?",
+      "metrics": {
+        "speaker_similarity": 0.8525071398170934,
+        "pesq_score": 1.050612449645996,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.22497368444764812,
+        "sdr_score": -22.215270091283287,
+        "original_transcription": "i usually sound weird. yeah, but that's why you guys watch me, right?",
+        "generated_transcription": "i usually sound weird. yeah, but that's why you guys watch me, right?"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 09.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 09.wav",
+      "text": "sounds crisp, that's because this microphone, it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side.",
+      "metrics": {
+        "speaker_similarity": 0.9167498300522481,
+        "pesq_score": 1.1203750371932983,
+        "transcription_accuracy": 0.9230769230769231,
+        "stoi_score": 0.20180587344402748,
+        "sdr_score": -21.095730903100733,
+        "original_transcription": "sounds crisp, that's because this microphone, it's easier to keep close to my face as opposed to my other one where i like to keep it kind of off to the side.",
+        "generated_transcription": "sounds crisp, that's because this microphone is easier to keep close to my face as opposed to my other one where i like to keep it kind of off the side."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 12.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 12.wav",
+      "text": "wow, that hiccup tasted like chocolate pancakes. yummy!",
+      "metrics": {
+        "speaker_similarity": 0.8505087494850159,
+        "pesq_score": 1.0487993955612183,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.2343769655100569,
+        "sdr_score": -20.141162541471907,
+        "original_transcription": "wow, that hiccup tasted like chocolate pancakes. yummy!",
+        "generated_transcription": "wow, that hiccup tasted like chocolate pancakes. yummy!"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 127.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 127.wav",
+      "text": "become the mayor? is there a mayor?",
+      "metrics": {
+        "speaker_similarity": 0.7672643800220277,
+        "pesq_score": 1.1363849639892578,
+        "transcription_accuracy": 1.0,
+        "stoi_score": -0.002569864211215674,
+        "sdr_score": -24.627362918510507,
+        "original_transcription": "become the mayor? is there a mayor?",
+        "generated_transcription": "become the mayor. is there a mayor?"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 128.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 128.wav",
+      "text": "ian rico, yeah, i'm glad you guys enjoyed how everything turned out. i was skeptical, i'm not gonna lie, i'm like...",
+      "metrics": {
+        "speaker_similarity": 0.9157741716042671,
+        "pesq_score": 1.041529655456543,
+        "transcription_accuracy": 0.7368421052631579,
+        "stoi_score": 0.0890469208227429,
+        "sdr_score": -22.468666461658202,
+        "original_transcription": "ian rico, yeah, i'm glad you guys enjoyed how everything turned out. i was skeptical, i'm not gonna lie, i'm like...",
+        "generated_transcription": "enrico, yeah, i'm glad you guys enjoyed how everything turned out. i was skeptical. i'm not gonna lie. i'm like"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 13.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 13.wav",
+      "text": "sorry, i just had to fix something that was bothering me anyways. nice to see you guys again.",
+      "metrics": {
+        "speaker_similarity": 0.8390014171600342,
+        "pesq_score": 1.0548287630081177,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.006651036953612775,
+        "sdr_score": -29.186729505675906,
+        "original_transcription": "sorry, i just had to fix something that was bothering me anyways. nice to see you guys again.",
+        "generated_transcription": "sorry, i just had to fix something that was bothering me anyways. nice to see you guys again."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 131.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 131.wav",
+      "text": "but i guess it helped.",
+      "metrics": {
+        "speaker_similarity": 0.6721416311179631,
+        "pesq_score": 1.1654404401779175,
+        "transcription_accuracy": 0.6,
+        "stoi_score": 0.22156715151382947,
+        "sdr_score": -15.892473878922583,
+        "original_transcription": "but i guess it helped.",
+        "generated_transcription": "but say, yes it helped."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 14.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 14.wav",
+      "text": "i haven't seen you since saturday, right? that was the.",
+      "metrics": {
+        "speaker_similarity": 0.8085396999991133,
+        "pesq_score": 1.3807024955749512,
+        "transcription_accuracy": 0.9,
+        "stoi_score": 0.1255017491247007,
+        "sdr_score": -24.626438985617234,
+        "original_transcription": "i haven't seen you since saturday, right? that was the.",
+        "generated_transcription": "i haven't seen you since saturday, right? that was the..."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 15.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 15.wav",
+      "text": "myth anniversary live! and yeah, i was gonna stream yesterday, but...",
+      "metrics": {
+        "speaker_similarity": 0.8964724540710449,
+        "pesq_score": 1.0627079010009766,
+        "transcription_accuracy": 0.9090909090909091,
+        "stoi_score": 0.17472676773477963,
+        "sdr_score": -22.316604463553293,
+        "original_transcription": "myth anniversary live! and yeah, i was gonna stream yesterday, but...",
+        "generated_transcription": "myth anniversary live, and yeah, i was gonna stream yesterday, but..."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 16.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 16.wav",
+      "text": "um, i wish to talk about the live. a myth anniversary.",
+      "metrics": {
+        "speaker_similarity": 0.8846684361895457,
+        "pesq_score": 1.3951501846313477,
+        "transcription_accuracy": 0.9090909090909091,
+        "stoi_score": 0.24267923765462315,
+        "sdr_score": -24.10243628318385,
+        "original_transcription": "um, i wish to talk about the live. a myth anniversary.",
+        "generated_transcription": "um, i wish to talk about the live. myth anniversary."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 17.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 17.wav",
+      "text": "concert pretty much. mostly concert, yeah. everyone was fantastic. yeah, it was really cool. oh my god, our new song.",
+      "metrics": {
+        "speaker_similarity": 0.8505829826171099,
+        "pesq_score": 1.1596050262451172,
+        "transcription_accuracy": 0.7894736842105263,
+        "stoi_score": 0.19473528765555148,
+        "sdr_score": -27.000017921880325,
+        "original_transcription": "concert pretty much. mostly concert, yeah. everyone was fantastic. yeah, it was really cool. oh my god, our new song.",
+        "generated_transcription": "concert pretty much. mostly concert. yeah, everyone was fantastic. yeah, it was really cool. oh my god our new song"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 18.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 18.wav",
+      "text": "it gets stuck in my head all the time. i'm like, uh... ooh! ah!",
+      "metrics": {
+        "speaker_similarity": 0.8045585635041349,
+        "pesq_score": 1.0388977527618408,
+        "transcription_accuracy": 0.7142857142857143,
+        "stoi_score": 0.2915644421519491,
+        "sdr_score": -25.765840456299884,
+        "original_transcription": "it gets stuck in my head all the time. i'm like, uh... ooh! ah!",
+        "generated_transcription": "it gets stuck in my head all the time. i'm like a uh-uh-uh."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 19.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 19.wav",
+      "text": "okay, i have this bgm stuck in my brain, so it's not coming to mind right away. i'd sing it, but...",
+      "metrics": {
+        "speaker_similarity": 0.9055707724562522,
+        "pesq_score": 1.1017826795578003,
+        "transcription_accuracy": 0.9523809523809523,
+        "stoi_score": 0.13707402420260115,
+        "sdr_score": -27.69057329583879,
+        "original_transcription": "okay, i have this bgm stuck in my brain, so it's not coming to mind right away. i'd sing it, but...",
+        "generated_transcription": "okay, i have this bgm stuck in my brain so it's not coming to mind right away. i'd sing it, but..."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 20.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 20.wav",
+      "text": "i was so cool. thank you, thank you. violet.",
+      "metrics": {
+        "speaker_similarity": 0.8214244352922194,
+        "pesq_score": 1.1303507089614868,
+        "transcription_accuracy": 0.875,
+        "stoi_score": 0.23954754216073046,
+        "sdr_score": -23.887111533297944,
+        "original_transcription": "i was so cool. thank you, thank you. violet.",
+        "generated_transcription": "i was so cool. thank you. thank you. violet."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 22.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 22.wav",
+      "text": "i sang, i always sing like the second verse i guess for violet completely wrong.",
+      "metrics": {
+        "speaker_similarity": 0.9049994945526123,
+        "pesq_score": 1.037232518196106,
+        "transcription_accuracy": 0.9230769230769231,
+        "stoi_score": 0.10621382855082305,
+        "sdr_score": -28.73221355616543,
+        "original_transcription": "i sang, i always sing like the second verse i guess for violet completely wrong.",
+        "generated_transcription": "i sang, i always sing like the second verse, i guess for violet completely wrong."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 23.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 23.wav",
+      "text": "but i got it right, i think, this time. i hope... i hope...",
+      "metrics": {
+        "speaker_similarity": 0.806138277053833,
+        "pesq_score": 1.0906692743301392,
+        "transcription_accuracy": 0.7777777777777778,
+        "stoi_score": 0.13033879455120648,
+        "sdr_score": -24.6229806618723,
+        "original_transcription": "but i got it right, i think, this time. i hope... i hope...",
+        "generated_transcription": "but i got it right, i think, this time, i hope. i hope."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 24.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 24.wav",
+      "text": "hold on, i'm gonna fix one more thing.",
+      "metrics": {
+        "speaker_similarity": 0.801322889249154,
+        "pesq_score": 1.043696403503418,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.29625403032775555,
+        "sdr_score": -17.995207384714742,
+        "original_transcription": "hold on, i'm gonna fix one more thing.",
+        "generated_transcription": "hold on, i'm gonna fix one more thing."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 27.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 27.wav",
+      "text": "it. there we go. okay.",
+      "metrics": {
+        "speaker_similarity": 0.8069475178091253,
+        "pesq_score": 2.2135419845581055,
+        "transcription_accuracy": 0.8,
+        "stoi_score": 1e-05,
+        "sdr_score": -21.69669623417212,
+        "original_transcription": "it. there we go. okay.",
+        "generated_transcription": "there we go. okay."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 28.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 28.wav",
+      "text": "yeah, so then we also had, oh, guda and ena, and i did end of a life, wasn't so cool. what was the root of it all? i couldn't say, i used to stumble upon, the drug it and clich\u00e9.",
+      "metrics": {
+        "speaker_similarity": 0.8854267069443059,
+        "pesq_score": 1.0409458875656128,
+        "transcription_accuracy": 0.90625,
+        "stoi_score": 0.0905092606642501,
+        "sdr_score": -26.391074489056557,
+        "original_transcription": "yeah, so then we also had, oh, guda and ena, and i did end of a life, wasn't so cool. what was the root of it all? i couldn't say, i used to stumble upon, the drug it and clich\u00e9.",
+        "generated_transcription": "yeah, so then we also had, oh, guda and ena and i did end of a life, wasn't so cool. what was the root of it all? i couldn't say, i used to stumble upon the drug it and cliche."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 29.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 29.wav",
+      "text": "yeah, they're sitting on the chairs. it was relaxing. very relaxing performance.",
+      "metrics": {
+        "speaker_similarity": 0.8820650507250474,
+        "pesq_score": 1.0895237922668457,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.03671851171418538,
+        "sdr_score": -28.754635422607603,
+        "original_transcription": "yeah, they're sitting on the chairs. it was relaxing. very relaxing performance.",
+        "generated_transcription": "yeah, they're sitting on the chairs. it was relaxing. very relaxing performance."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 30.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 30.wav",
+      "text": "i really like our new original song though. it's so good. every single day i wake up and it's stuck in my head.",
+      "metrics": {
+        "speaker_similarity": 0.9094012325645244,
+        "pesq_score": 1.125566005706787,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.2167462568736616,
+        "sdr_score": -21.603585200372585,
+        "original_transcription": "i really like our new original song though. it's so good. every single day i wake up and it's stuck in my head.",
+        "generated_transcription": "i really like our new original song though. it's so good. every single day i wake up and it's stuck in my head."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 31.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 31.wav",
+      "text": "the evangelion, evangelion, the shinji chair.",
+      "metrics": {
+        "speaker_similarity": 0.8334590097343346,
+        "pesq_score": 1.0412681102752686,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.041810560128795124,
+        "sdr_score": -25.27016358891273,
+        "original_transcription": "the evangelion, evangelion, the shinji chair.",
+        "generated_transcription": "the evangelion, evangelion, the shinji chair."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 32.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 32.wav",
+      "text": "oh yeah, i get his tales to, uh... it's a ghost tale, i guess, or something, you know, spirit tale, yeah, that's why it was going through the chair.",
+      "metrics": {
+        "speaker_similarity": 0.903177017162862,
+        "pesq_score": 1.0973939895629883,
+        "transcription_accuracy": 0.8461538461538461,
+        "stoi_score": 0.1814454924775745,
+        "sdr_score": -22.350147937167325,
+        "original_transcription": "oh yeah, i get his tales to, uh... it's a ghost tale, i guess, or something, you know, spirit tale, yeah, that's why it was going through the chair.",
+        "generated_transcription": "oh yeah, i get his tales to a... it's a ghost tale i guess or something, you know, spirit tale, yeah, that's why i was going through the chair."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 35.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 35.wav",
+      "text": "you totally could. don't do that though. now that i shouldn't have said that.",
+      "metrics": {
+        "speaker_similarity": 0.8990436732199013,
+        "pesq_score": 1.0466358661651611,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.065654440822867,
+        "sdr_score": -24.71677251582635,
+        "original_transcription": "you totally could. don't do that though. now that i shouldn't have said that.",
+        "generated_transcription": "you totally could. don't do that though. now that i shouldn't have said that."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 38.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 38.wav",
+      "text": "yeah, i liked it. i liked it.",
+      "metrics": {
+        "speaker_similarity": 0.8030849934543671,
+        "pesq_score": 1.0832372903823853,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.41815318133849794,
+        "sdr_score": -18.499052501484904,
+        "original_transcription": "yeah, i liked it. i liked it.",
+        "generated_transcription": "yeah, i liked it. i liked it."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 40.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 40.wav",
+      "text": "oh good at split. yeah, i was really surprised. i should have tried. i think you guys have seen me try a split before. i think i can get a little bit further than cali.",
+      "metrics": {
+        "speaker_similarity": 0.9385730624198914,
+        "pesq_score": 1.1641302108764648,
+        "transcription_accuracy": 0.9285714285714286,
+        "stoi_score": 0.1316307755107701,
+        "sdr_score": -25.840759829965666,
+        "original_transcription": "oh good at split. yeah, i was really surprised. i should have tried. i think you guys have seen me try a split before. i think i can get a little bit further than cali.",
+        "generated_transcription": "oh good at split? yeah, i was really surprised. i should have tried. i think you guys have seen me try a split before. i think i can get a little bit further than collie."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 41.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 41.wav",
+      "text": "a little bit, but definitely i cannot do like a whole split. maybe if i stretched, if i stretched for like a month straight or something, i think i could probably, maybe more than a month, i don't know. i'm pretty flexible, but.",
+      "metrics": {
+        "speaker_similarity": 0.9152398008394069,
+        "pesq_score": 1.0943104028701782,
+        "transcription_accuracy": 0.96875,
+        "stoi_score": 0.0528046696832572,
+        "sdr_score": -27.432956765131152,
+        "original_transcription": "a little bit, but definitely i cannot do like a whole split. maybe if i stretched, if i stretched for like a month straight or something, i think i could probably, maybe more than a month, i don't know. i'm pretty flexible, but.",
+        "generated_transcription": "a little bit, but definitely i cannot do like a whole split. maybe if i stretched, if i stretched for like a month straight or something, i think i could probably, maybe more than a month, i don't know. i'm pretty flexible, but..."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 42.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 42.wav",
+      "text": "at those muscles that you need. i don't know. maybe you have to be, maybe, no, you can train to do a split, right? it's not like babies are born out of the womb and they're like, i can do a split.",
+      "metrics": {
+        "speaker_similarity": 0.9137482643127441,
+        "pesq_score": 1.0568557977676392,
+        "transcription_accuracy": 0.9714285714285714,
+        "stoi_score": 0.12717525925644768,
+        "sdr_score": -24.430394562986002,
+        "original_transcription": "at those muscles that you need. i don't know. maybe you have to be, maybe, no, you can train to do a split, right? it's not like babies are born out of the womb and they're like, i can do a split.",
+        "generated_transcription": "and those muscles that you need. i don't know. maybe you have to be, maybe, no, you can train to do a split, right? it's not like babies are born out of the womb and they're like, i can do a split."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 43.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 43.wav",
+      "text": "yes, i, i, i, yeah, pretty flexible.",
+      "metrics": {
+        "speaker_similarity": 0.825916553316014,
+        "pesq_score": 1.1593679189682007,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.18460449054134237,
+        "sdr_score": -23.566239730832095,
+        "original_transcription": "yes, i, i, i, yeah, pretty flexible.",
+        "generated_transcription": "yes, i, i, i, yeah, pretty flexible."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 44.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 44.wav",
+      "text": "i'll train. it was very smooth split.",
+      "metrics": {
+        "speaker_similarity": 0.7916681294639047,
+        "pesq_score": 1.1208999156951904,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.17185405762033934,
+        "sdr_score": -19.946282693885397,
+        "original_transcription": "i'll train. it was very smooth split.",
+        "generated_transcription": "i'll train. it was very smooth split."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 45.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 45.wav",
+      "text": "shark split. next time there's like a cafe they should do like oh man that'd be so cool to collaborate with like an ice cream place.",
+      "metrics": {
+        "speaker_similarity": 0.9216268062591553,
+        "pesq_score": 1.0418570041656494,
+        "transcription_accuracy": 0.9583333333333334,
+        "stoi_score": 0.16502783485220957,
+        "sdr_score": -21.298764526408664,
+        "original_transcription": "shark split. next time there's like a cafe they should do like oh man that'd be so cool to collaborate with like an ice cream place.",
+        "generated_transcription": "shark split. next time there's like a cafe they should do like, oh man, that'd be so cool to collaborate with like an ice cream place."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 47.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 47.wav",
+      "text": "or maybe somebody can have like a milkshake or something. then girls gotta be like a banana shark split.",
+      "metrics": {
+        "speaker_similarity": 0.8845192193984985,
+        "pesq_score": 1.0866940021514893,
+        "transcription_accuracy": 0.6875,
+        "stoi_score": 0.09755244872168349,
+        "sdr_score": -27.592807370002397,
+        "original_transcription": "or maybe somebody can have like a milkshake or something. then girls gotta be like a banana shark split.",
+        "generated_transcription": "maybe somebody can have like a milkshake or something and there's got to be like banana shark split"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 49.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 49.wav",
+      "text": "like a nice smooth blue with with strawberry sauce. yeah, strawberry sauce and then banana.",
+      "metrics": {
+        "speaker_similarity": 0.895981126784155,
+        "pesq_score": 1.1656064987182617,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.22758898382693032,
+        "sdr_score": -18.768028918179184,
+        "original_transcription": "like a nice smooth blue with with strawberry sauce. yeah, strawberry sauce and then banana.",
+        "generated_transcription": "like a nice smooth blue with a strawberry sauce. yeah, strawberry sauce and then banana."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 50.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 50.wav",
+      "text": "that'd be good. bubble gum, cotton candy.",
+      "metrics": {
+        "speaker_similarity": 0.8658140381685488,
+        "pesq_score": 1.144761085510254,
+        "transcription_accuracy": 0.7142857142857143,
+        "stoi_score": 0.19283212259117466,
+        "sdr_score": -19.38305601188015,
+        "original_transcription": "that'd be good. bubble gum, cotton candy.",
+        "generated_transcription": "that'd be good. bubble gum. cotton. candy."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 51.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 51.wav",
+      "text": "i don't like blue ice cream. i ate blue ice cream as a kid once and i think i told you guys that before.",
+      "metrics": {
+        "speaker_similarity": 0.87627765167587,
+        "pesq_score": 1.0630894899368286,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.14429092171935842,
+        "sdr_score": -21.075095752121996,
+        "original_transcription": "i don't like blue ice cream. i ate blue ice cream as a kid once and i think i told you guys that before.",
+        "generated_transcription": "i don't like blue ice cream. i ate blue ice cream as a kid once and i think i told you guys that before."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 52.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 52.wav",
+      "text": "and it came out green! there's, it's the blue, what is it? there's red 40, and there's blue, i don't know what the dye color is for blue.",
+      "metrics": {
+        "speaker_similarity": 0.861083984375,
+        "pesq_score": 1.2516963481903076,
+        "transcription_accuracy": 0.9090909090909091,
+        "stoi_score": 0.19027462173484436,
+        "sdr_score": -20.324385827113474,
+        "original_transcription": "and it came out green! there's, it's the blue, what is it? there's red 40, and there's blue, i don't know what the dye color is for blue.",
+        "generated_transcription": "and it came out green, there's, it's the blue, what is it? there's red 40 and there's blue. i don't know what the dye color is for blue."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 53.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 53.wav",
+      "text": "but, uh, yeah, it's, um, doesn't get, it doesn't get digested.",
+      "metrics": {
+        "speaker_similarity": 0.8965853452682495,
+        "pesq_score": 1.0921332836151123,
+        "transcription_accuracy": 0.9,
+        "stoi_score": 0.1405413204712177,
+        "sdr_score": -21.154905100293732,
+        "original_transcription": "but, uh, yeah, it's, um, doesn't get, it doesn't get digested.",
+        "generated_transcription": "but, uh, yeah, it's um, doesn't get, it doesn't get digested."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 54.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 54.wav",
+      "text": "that's part of the fun.",
+      "metrics": {
+        "speaker_similarity": 0.7895918127772755,
+        "pesq_score": 1.0377957820892334,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.050246178312697495,
+        "sdr_score": -22.717399438209974,
+        "original_transcription": "that's part of the fun.",
+        "generated_transcription": "that's part of the fun."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 55.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 55.wav",
+      "text": "hey, i had a friend she told me about, i don't like oatmeal, but she would tell me about.",
+      "metrics": {
+        "speaker_similarity": 0.8548327684402466,
+        "pesq_score": 1.0430971384048462,
+        "transcription_accuracy": 0.9375,
+        "stoi_score": 0.19999249481724832,
+        "sdr_score": -22.892649658156255,
+        "original_transcription": "hey, i had a friend she told me about, i don't like oatmeal, but she would tell me about.",
+        "generated_transcription": "hey, i had a friend she told me about. i don't like oatmeal, but she would tell me about."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 57.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 57.wav",
+      "text": "the egg like dissipates and you get like a little dino edible. it's not a toy. okay. it's like a marshmallow kind of i guess",
+      "metrics": {
+        "speaker_similarity": 0.8840154409408569,
+        "pesq_score": 1.0712260007858276,
+        "transcription_accuracy": 0.75,
+        "stoi_score": 0.10747502246453493,
+        "sdr_score": -28.841686479142766,
+        "original_transcription": "the egg like dissipates and you get like a little dino edible. it's not a toy. okay. it's like a marshmallow kind of i guess",
+        "generated_transcription": "the egg, like dissipates and you get like a little denno edible. it's not a toy. okay, it's like a marshmallow kind of eye."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 58.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 58.wav",
+      "text": "and her mom was telling me about how we know how that went and that it came out, you know, the other side. i guess she was so excited. she didn't she didn't even chew it.",
+      "metrics": {
+        "speaker_similarity": 0.9397101402282715,
+        "pesq_score": 1.1359565258026123,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.15779518496031344,
+        "sdr_score": -24.003505916843885,
+        "original_transcription": "and her mom was telling me about how we know how that went and that it came out, you know, the other side. i guess she was so excited. she didn't she didn't even chew it.",
+        "generated_transcription": "and her mom was telling me about how we know how that went and that it came out, you know, the other side. i guess she was so excited. she didn't, she didn't even chew it."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 60.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 60.wav",
+      "text": "i guess you can make it more dry. it's too goofy.",
+      "metrics": {
+        "speaker_similarity": 0.8886889484134007,
+        "pesq_score": 1.1809329986572266,
+        "transcription_accuracy": 1.0,
+        "stoi_score": 0.1322579539540949,
+        "sdr_score": -18.5550259208509,
+        "original_transcription": "i guess you can make it more dry. it's too goofy.",
+        "generated_transcription": "i guess you can make it more dry. it's too goofy."
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 62.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 62.wav",
+      "text": "and then i put some soy sauce and it was like, all right. but i did, i, uh.",
+      "metrics": {
+        "speaker_similarity": 0.8901503086090088,
+        "pesq_score": 1.0787409543991089,
+        "transcription_accuracy": 0.75,
+        "stoi_score": 0.18134905950123942,
+        "sdr_score": -23.38132129829903,
+        "original_transcription": "and then i put some soy sauce and it was like, all right. but i did, i, uh.",
+        "generated_transcription": "and then i put some soy sauce and it was like, all right, but i did i uh"
+      }
+    },
+    {
+      "reference_file": "Data_prep\\raw_data\\raw_audio2\\Sound 64.wav",
+      "generated_file": "benchmark\\results\\Amelia5_ft_StyleTTS2\\2025-01-23_00-57-46\\generated_samples\\generated_Sound 64.wav",
+      "text": "resorto. i love risotto. okay, anyways, we're getting distracted.",
+      "metrics": {
+        "speaker_similarity": 0.8885257840156555,
+        "pesq_score": 1.1101762056350708,
+        "transcription_accuracy": 0.7777777777777778,
+        "stoi_score": 0.10478351223293421,
+        "sdr_score": -22.320422812743278,
+        "original_transcription": "resorto. i love risotto. okay, anyways, we're getting distracted.",
+        "generated_transcription": "resorto, i love rissado. okay, anyways, we're getting distracted."
+      }
+    }
+  ],
+  "average_metrics": {
+    "speaker_similarity": 0.8608440298536597,
+    "pesq_score": 1.1393179966478932,
+    "transcription_accuracy": 0.8931426972527623,
+    "stoi_score": 0.14776497298691169,
+    "sdr_score": -23.318038658940143
+  }
+}

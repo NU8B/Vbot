@@ -1,0 +1,119 @@
+{
+  "timestamp": "2025-01-23_01-06-57",
+  "models_tested": [
+    "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/new2_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia1_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia2_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia3_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia4_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia5_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia6_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia7_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia8_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia9_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2"
+  ],
+  "completed_models": [
+    "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/new2_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia1_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia2_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia3_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia4_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia5_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia6_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia7_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia8_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia9_ft_StyleTTS2",
+    "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2"
+  ],
+  "failed_models": [],
+  "results": {
+    "nonoJDWAOIDAWKDA/new_ft_StyleTTS2": {
+      "speaker_similarity": 0.8828134592655662,
+      "pesq_score": 1.1510707237282578,
+      "transcription_accuracy": 0.8802134003170997,
+      "stoi_score": 0.18419569201065972,
+      "sdr_score": -22.218973453983942
+    },
+    "nonoJDWAOIDAWKDA/new2_ft_StyleTTS2": {
+      "speaker_similarity": 0.8421968460507663,
+      "pesq_score": 1.1857728568875059,
+      "transcription_accuracy": 0.9027962826033372,
+      "stoi_score": 0.17465723857644871,
+      "sdr_score": -23.477185579834725
+    },
+    "nonoJDWAOIDAWKDA/Amelia1_ft_StyleTTS2": {
+      "speaker_similarity": 0.8266022704232485,
+      "pesq_score": 1.1323608549273745,
+      "transcription_accuracy": 0.8955731062514564,
+      "stoi_score": 0.15576290074209118,
+      "sdr_score": -23.119385476292763
+    },
+    "nonoJDWAOIDAWKDA/Amelia2_ft_StyleTTS2": {
+      "speaker_similarity": 0.861799507673329,
+      "pesq_score": 1.1570370221624569,
+      "transcription_accuracy": 0.8624620049747995,
+      "stoi_score": 0.1583092013320292,
+      "sdr_score": -24.178328751284194
+    },
+    "nonoJDWAOIDAWKDA/Amelia3_ft_StyleTTS2": {
+      "speaker_similarity": 0.8513370516955204,
+      "pesq_score": 1.1598774146060555,
+      "transcription_accuracy": 0.8845881594045334,
+      "stoi_score": 0.15391470179473918,
+      "sdr_score": -23.400115653911477
+    },
+    "nonoJDWAOIDAWKDA/Amelia4_ft_StyleTTS2": {
+      "speaker_similarity": 0.8614989973960357,
+      "pesq_score": 1.1545605659484863,
+      "transcription_accuracy": 0.8687062285593303,
+      "stoi_score": 0.16257131106978612,
+      "sdr_score": -23.057350014617228
+    },
+    "nonoJDWAOIDAWKDA/Amelia5_ft_StyleTTS2": {
+      "speaker_similarity": 0.8608440298536597,
+      "pesq_score": 1.1393179966478932,
+      "transcription_accuracy": 0.8931426972527623,
+      "stoi_score": 0.14776497298691169,
+      "sdr_score": -23.318038658940143
+    },
+    "nonoJDWAOIDAWKDA/Amelia6_ft_StyleTTS2": {
+      "speaker_similarity": 0.8767144375693235,
+      "pesq_score": 1.160946094259924,
+      "transcription_accuracy": 0.9049875216311528,
+      "stoi_score": 0.14719823943679,
+      "sdr_score": -23.748452510367617
+    },
+    "nonoJDWAOIDAWKDA/Amelia7_ft_StyleTTS2": {
+      "speaker_similarity": 0.8623120821135005,
+      "pesq_score": 1.1664656984562776,
+      "transcription_accuracy": 0.8886803205994903,
+      "stoi_score": 0.16162242249871298,
+      "sdr_score": -23.55256866389953
+    },
+    "nonoJDWAOIDAWKDA/Amelia8_ft_StyleTTS2": {
+      "speaker_similarity": 0.8861306215379282,
+      "pesq_score": 1.1474603487520803,
+      "transcription_accuracy": 0.8935304576902007,
+      "stoi_score": 0.1475250056053674,
+      "sdr_score": -23.69839048690624
+    },
+    "nonoJDWAOIDAWKDA/Amelia9_ft_StyleTTS2": {
+      "speaker_similarity": 0.8923546687744699,
+      "pesq_score": 1.1421602745445407,
+      "transcription_accuracy": 0.8825272837187222,
+      "stoi_score": 0.15604077796987187,
+      "sdr_score": -23.02476403165692
+    },
+    "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2": {
+      "speaker_similarity": 0.888107798245487,
+      "pesq_score": 1.1474715665895112,
+      "transcription_accuracy": 0.8869371346295872,
+      "stoi_score": 0.1558079216896545,
+      "sdr_score": -23.278968641813123
+    }
+  },
+  "last_error": null
+}
