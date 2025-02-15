@@ -16,6 +16,7 @@ import warnings
 import logging
 import re
 import contextlib
+from utils.emotion_utils import EMOTION_CONFIG
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
@@ -274,8 +275,33 @@ class StyleTTS2Inference:
 
         return text
 
-    def inference(self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale):
+    def inference(
+        self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale, speed=None
+    ):
         """Generate speech from text"""
+        # Determine speed from reference file if not explicitly provided
+        if speed is None:
+            # Get the reference file name from the style cache keys
+            ref_file = None
+            for path in self._style_cache:
+                if torch.equal(self._style_cache[path], ref_s):
+                    ref_file = Path(path).name
+                    break
+
+            # Find matching emotion config
+            if ref_file:
+                for emotion, config in EMOTION_CONFIG.items():
+                    if config["file"] == ref_file:
+                        speed = config["speed"]
+                        break
+
+            # Default to neutral speed if no match found
+            if speed is None:
+                speed = EMOTION_CONFIG["neutral"]["speed"]
+
+        # Print speed information
+        print(f"Generating speech with speed: {speed:.2f}x")
+
         # Clean text minimally
         text = self.clean_text(text)
 
@@ -285,10 +311,6 @@ class StyleTTS2Inference:
         # Tokenize the phonemized text
         ps = word_tokenize(ps[0])
         ps = " ".join(ps)
-
-        # # Add $ token only at the end for EOS
-        # if not ps.endswith("$"):
-        #     ps = ps + "$"
 
         # Convert to tokens using the simple TextCleaner
         tokens = self.text_cleaner(ps)
@@ -330,24 +352,8 @@ class StyleTTS2Inference:
             x, _ = self.model.predictor.lstm(d)
             duration = self.model.predictor.duration_proj(x)
 
-            # Get raw durations with sigmoid activation
-            duration = torch.sigmoid(duration).sum(axis=-1)
-            pred_dur = torch.round(duration.squeeze())
-
-            # Calculate adaptive frames per phoneme based on text characteristics
-            num_phonemes = input_lengths[0].item()
-
-            frames_per_phoneme = 2.25
-
-            # Calculate target duration with adaptive scaling
-            target_total_duration = int(frames_per_phoneme * num_phonemes)
-
-            # Scale durations to match target duration while preserving relative lengths
-            current_total = pred_dur.sum()
-            scaling_factor = target_total_duration / current_total
-
-            # Apply scaling with minimum duration protection
-            pred_dur = torch.round(pred_dur * scaling_factor).clamp(min=1)
+            duration = torch.sigmoid(duration).sum(axis=-1) / speed
+            pred_dur = torch.round(duration.squeeze()).clamp(min=1)
 
             # Precompute pred_aln_trg tensor on the device
             pred_aln_trg = torch.zeros(

@@ -39,7 +39,9 @@ class DockerHandler:
             # Wait for container to be fully running
             container = self.client.containers.get("ollama")
             while container.status != "running":
-                print(f"Waiting for container to start... Current status: {container.status}")
+                print(
+                    f"Waiting for container to start... Current status: {container.status}"
+                )
                 time.sleep(1)
                 container.reload()
 
@@ -50,13 +52,13 @@ class DockerHandler:
             print("Checking model status...")
             container = self.client.containers.get("ollama")
             result = container.exec_run("ollama list")
-            if "mistral" not in result.output.decode():
-                print("Mistral model not found. Pulling model...")
-                pull_result = container.exec_run("ollama pull mistral")
+            if "stheno" not in result.output.decode():
+                print("Stheno model not found. Pulling model...")
+                pull_result = container.exec_run("ollama pull stheno")
                 if pull_result.exit_code != 0:
                     print(f"Error pulling model: {pull_result.output.decode()}")
-                    raise Exception("Failed to pull Mistral model")
-                print("Mistral model pulled successfully")
+                    raise Exception("Failed to pull Stheno model")
+                print("Stheno model pulled successfully")
 
             return time.time() - setup_start
 
@@ -72,7 +74,7 @@ class DockerHandler:
         print("Waiting for Ollama API to be ready...")
         start_time = time.time()
         last_error = None
-        
+
         while time.time() - start_time < timeout:
             try:
                 # Try the root endpoint first (this should always work if server is up)
@@ -80,26 +82,28 @@ class DockerHandler:
                 if response.status_code == 200:
                     print("Ollama API is ready")
                     return
-                    
+
                 # If root fails, try a model list request as fallback
                 response = requests.get("http://localhost:11434/api/tags")
                 if response.status_code == 200:
                     print("Ollama API is ready (via tags endpoint)")
                     return
-                    
+
                 last_error = f"Unexpected status code: {response.status_code}"
             except requests.ConnectionError:
                 last_error = "Connection refused - container might still be starting"
             except Exception as e:
                 last_error = str(e)
-            
-            print(f"Waiting for Ollama API... ({int(time.time() - start_time)}s) - {last_error}")
-            
+
+            print(
+                f"Waiting for Ollama API... ({int(time.time() - start_time)}s) - {last_error}"
+            )
+
             if time.time() - start_time + interval >= timeout:
                 break
-                
+
             time.sleep(interval)
-            
+
         raise TimeoutError(f"Ollama API failed to become ready: {last_error}")
 
     def cleanup(self):

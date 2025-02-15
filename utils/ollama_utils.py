@@ -10,8 +10,9 @@ MAX_HISTORY = 10  # Maximum number of conversation turns to keep
 SYSTEM_PROMPT = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. You are not to break character under any circumstances. You are to always talk in first person. You are not to describe your actions in your response. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
 
 # Get Ollama host from environment or default to localhost
-OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
-OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '60'))  # 60 second default timeout
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "60"))  # 60 second default timeout
+
 
 class OllamaHandler:
     def __init__(
@@ -45,7 +46,9 @@ class OllamaHandler:
             try:
                 response = requests.get(OLLAMA_HOST, timeout=OLLAMA_TIMEOUT)
                 if response.status_code != 200:
-                    print(f"Ollama server check failed with status code: {response.status_code}")
+                    print(
+                        f"Ollama server check failed with status code: {response.status_code}"
+                    )
                     return False
             except requests.RequestException as e:
                 print(f"Ollama server check failed: {str(e)}")
@@ -55,22 +58,22 @@ class OllamaHandler:
             response = requests.post(
                 f"{OLLAMA_HOST}/api/chat",
                 json={
-                    "model": "mistral",
-                    "messages": [
-                        {"role": "user", "content": "Test connection"}
-                    ],
+                    "model": "stheno",
+                    "messages": [{"role": "user", "content": "Test connection"}],
                     "stream": False,
                 },
                 timeout=OLLAMA_TIMEOUT,
             )
-            
+
             if response.status_code == 200:
                 return True
             elif response.status_code == 404:
-                print("Model not found - make sure 'mistral' model is pulled")
+                print("Model not found - make sure 'stheno' model is pulled")
                 return False
             else:
-                print(f"Ollama chat test failed with status code: {response.status_code}")
+                print(
+                    f"Ollama chat test failed with status code: {response.status_code}"
+                )
                 print(f"Response: {response.text}")
                 return False
 
@@ -102,7 +105,7 @@ class OllamaHandler:
             response = requests.post(
                 f"{OLLAMA_HOST}/api/chat",
                 json={
-                    "model": "mistral",
+                    "model": "stheno",
                     "messages": messages,
                     "stream": False,
                 },
@@ -130,7 +133,9 @@ class OllamaHandler:
             print(f"Request timed out after {OLLAMA_TIMEOUT} seconds")
             return None
         except requests.ConnectionError:
-            print("Connection error - check if Ollama service is running and accessible")
+            print(
+                "Connection error - check if Ollama service is running and accessible"
+            )
             return None
         except Exception as e:
             print(f"Error calling Ollama: {str(e)}")
@@ -179,7 +184,9 @@ class OllamaHandler:
             speech, detected_emotion, style_path = self.inference_handler.process_text(
                 text, response, self.timings
             )
-            print(f"Inference processing completed in {time.time() - inference_start:.2f}s")
+            print(
+                f"Inference processing completed in {time.time() - inference_start:.2f}s"
+            )
 
             # Update avatar emotion
             print("Updating avatar emotion...")
@@ -187,7 +194,11 @@ class OllamaHandler:
             if avatar:
                 # Map emotion to animation state
                 print(f"Current detected emotion: {detected_emotion}")
-                if "happy" in detected_emotion or "joy" in detected_emotion or "excited" in detected_emotion:
+                if (
+                    "happy" in detected_emotion
+                    or "joy" in detected_emotion
+                    or "excited" in detected_emotion
+                ):
                     avatar.set_emotion("happy")
                 elif "sad" in detected_emotion or "disappointed" in detected_emotion:
                     avatar.set_emotion("sad")
@@ -206,11 +217,55 @@ class OllamaHandler:
             print("Input:", text)
             print("Output:", response)
             print("Detected emotion:", detected_emotion)
-            print("Animation category:", "neutral" if detected_emotion in ["neutral", "confusion", "caring", "curiosity", "desire", "relief"] 
-                  else "happy" if detected_emotion in ["admiration", "amusement", "approval", "excitement", "gratitude", "joy", "love", "optimism", "pride"]
-                  else "sad" if detected_emotion in ["disappointment", "embarrassment", "fear", "grief", "nervousness", "remorse", "sadness"]
-                  else "angry" if detected_emotion in ["disapproval", "disgust", "anger", "annoyance"]
-                  else "neutral")
+            print(
+                "Animation category:",
+                (
+                    "neutral"
+                    if detected_emotion
+                    in [
+                        "neutral",
+                        "confusion",
+                        "caring",
+                        "curiosity",
+                        "desire",
+                        "relief",
+                    ]
+                    else (
+                        "happy"
+                        if detected_emotion
+                        in [
+                            "admiration",
+                            "amusement",
+                            "approval",
+                            "excitement",
+                            "gratitude",
+                            "joy",
+                            "love",
+                            "optimism",
+                            "pride",
+                        ]
+                        else (
+                            "sad"
+                            if detected_emotion
+                            in [
+                                "disappointment",
+                                "embarrassment",
+                                "fear",
+                                "grief",
+                                "nervousness",
+                                "remorse",
+                                "sadness",
+                            ]
+                            else (
+                                "angry"
+                                if detected_emotion
+                                in ["disapproval", "disgust", "anger", "annoyance"]
+                                else "neutral"
+                            )
+                        )
+                    )
+                ),
+            )
 
             print(f"\nProcessing took {total_time:.2f}s")
 
@@ -239,6 +294,7 @@ class OllamaHandler:
             print("\n=== Error in text processing ===")
             print(f"Error details: {str(e)}")
             import traceback
+
             print("Full traceback:")
             print(traceback.format_exc())
         finally:

@@ -62,10 +62,10 @@ EMOTION_SPECIFIC_PROMPTS = {
         "I'm getting married to the love of my life next month!",
     ],
     "sadness": [
-        "I had to say goodbye to my best friend today, and my heart feels so heavy.",
-        "Looking through old photos makes me miss those times so much.",
-        "Sometimes I wonder if things will ever get better.",
-        "The news about the accident left me completely devastated.",
+        "I had to say goodbye to my best friend today, I'm going to miss him.",
+        "I miss the past so much, I can't stop crying.",
+        "I feel like things will never get better.",
+        "I can't believe I lost my job, I'm so sad.",
     ],
     "anger": [
         "They completely destroyed the project I spent months working on!",
@@ -99,12 +99,16 @@ DYNAMIC_TEST_PROMPTS = [
     "Why won't this computer just work properly for once?",
     "I think we should consider all options carefully before deciding.",
     "Did you hear what happened at the party last night?",
-    "Sometimes I sit and wonder about the meaning of life.",
+    "Sometimes I sit and think about the meaning of life.",
     "Can you believe how beautiful the sunset is today?",
     "I've been working on this project for weeks now.",
     "Let's meet up for coffee and catch up soon.",
     "The traffic today is absolutely terrible.",
     "I just finished reading the most incredible book.",
+    "I'm so excited to see you tomorrow!",
+    "I'm so lost and alone in this big city.",
+    "I don't know what to do with my life.",
+    "Did you know about that?" "I don't care what they said about me at all.",
 ]
 
 # Core emotions matching our reference sound files
