@@ -37,6 +37,7 @@ class AnimatedCharacter:
         self.character_model = None
         self.poser = None
         self.param_mapping = None  # Initialize param_mapping as None
+        self.cached_character_image = None  # Cache for character base image
         self.load_character_model()
         
         # Initialize animations
@@ -59,6 +60,10 @@ class AnimatedCharacter:
         # Store last update time
         self.last_update_time = time.time()
         
+        # Memory optimization flags
+        self.frame_count = 0
+        self.memory_clear_interval = 30  # Clear memory every 30 frames
+        
         # Start animation timer (15 FPS)
         self.timer = wx.Timer(self.panel)
         self.panel.Bind(wx.EVT_TIMER, self.update_animation)
@@ -77,8 +82,8 @@ class AnimatedCharacter:
             self.character_model = CharacterModel.load(model_path)
             print("Character model loaded")
             
-            # Get the character image and poser
-            self.character_model.get_character_image(self.device)  # Load image into memory
+            # Cache the character image in memory
+            self.cached_character_image = self.character_model.get_character_image(self.device)
             self.poser = self.character_model.get_poser(self.device)
             print("Character image and poser loaded successfully")
             
@@ -134,7 +139,8 @@ class AnimatedCharacter:
             traceback.print_exc()
             self.character_model = None
             self.poser = None
-            self.param_mapping = None  # Also clear parameter mapping if loading fails
+            self.param_mapping = None
+            self.cached_character_image = None
 
     def update_animation(self, event=None):
         """Update animation state and redraw"""
@@ -155,6 +161,9 @@ class AnimatedCharacter:
                 print(f"Warning: Long animation frame time: {delta_time*1000:.1f}ms")
             
             self.last_update_time = current_time
+
+            # Update frame counter for memory management
+            self.frame_count = (self.frame_count + 1) % self.memory_clear_interval
 
             # Update emotion blending
             if self.current_emotion != self.target_emotion:
@@ -231,29 +240,29 @@ class AnimatedCharacter:
                 try:
                     pose_start = time.time()
                     
-                    # Create parameter array
-                    pose = torch.zeros((1, self.poser.num_parameters), device=self.device)
+                    # Create parameter array (use float16 for less memory)
+                    pose = torch.zeros((1, self.poser.num_parameters), 
+                                    device=self.device, 
+                                    dtype=torch.float16)  # Use float16 instead of float32
                     
                     # Set parameters based on mapping
                     for param_name, value in params.items():
                         if param_name in self.param_mapping and self.param_mapping[param_name] >= 0:
                             index = self.param_mapping[param_name]
-                            if param_name == "eye_blink":  # Special case for eyes to make them blink together
+                            if param_name == "eye_blink":
                                 pose[0, index] = value
                                 pose[0, index + 1] = value
                             else:
                                 pose[0, index] = value
                     
-                    # Get character image and generate pose
-                    character_image = self.character_model.get_character_image(self.device)
-                    
+                    # Use cached character image
                     with torch.no_grad():
-                        output_image = self.poser.pose(character_image, pose)
+                        output_image = self.poser.pose(self.cached_character_image, pose)
                         output_image = output_image[0].detach().cpu()
                         output_image = convert_output_image_from_torch_to_numpy(output_image)
                         
                         pose_time = time.time() - pose_start
-                        if pose_time > 0.067:  # Log if pose generation takes more than one frame at 15 FPS
+                        if pose_time > 0.067:
                             print(f"Warning: Slow pose generation: {pose_time*1000:.1f}ms")
                         
                         # Convert to bitmap
@@ -268,9 +277,14 @@ class AnimatedCharacter:
                             
                             self.result_bitmap = wx.Bitmap(wx_image)
                             
-                            # Clear CUDA cache periodically
-                            if torch.cuda.is_available() and pose_time > 0.033:
+                            # Periodic memory cleanup
+                            if self.frame_count == 0 and torch.cuda.is_available():
                                 torch.cuda.empty_cache()
+                                
+                            # Clear intermediate tensors
+                            del output_image
+                            del pose
+                            
                         else:
                             print(f"Error: Invalid image format - shape: {output_image.shape}")
                 except Exception as e:
