@@ -6,6 +6,7 @@ import torch
 import wx.siplib
 import win32gui
 import win32con
+from PIL import Image, ImageTk
 
 from .avatar import AnimatedCharacter
 
@@ -15,6 +16,11 @@ class ChatGUI:
         self.root = root
         self.root.title("AI Chatbot")
         self.root.geometry("1200x800")  # Increased window size to fit larger avatar
+
+        # Configure style
+        style = ttk.Style()
+        style.configure("Custom.TButton", padding=10, font=('Helvetica', 12))
+        style.configure("Mic.TButton", padding=10, font=('Helvetica', 12))
 
         self.on_send = on_send_callback
         self.on_voice_toggle = on_voice_toggle_callback
@@ -85,29 +91,47 @@ class ChatGUI:
         self.root.after(10, process_wx_events)
 
     def setup_chat(self):
-        # Chat area
+        # Chat area with custom font and colors
         self.text_area = scrolledtext.ScrolledText(
-            self.chat_frame, wrap=tk.WORD, width=50, height=20
+            self.chat_frame,
+            wrap=tk.WORD,
+            width=50,
+            height=20,
+            font=('Helvetica', 12),
+            bg='#FFFFFF',
         )
         self.text_area.pack(expand=True, fill=tk.BOTH)
+        
+        # Configure tags for different speakers
+        self.text_area.tag_configure("user", foreground="#007AFF")  # Blue for user
+        self.text_area.tag_configure("ai", foreground="#FF2D55")    # Pink for AI
 
         # Input frame
         self.input_frame = ttk.Frame(self.chat_frame)
-        self.input_frame.pack(pady=5)
-        self.input_entry = ttk.Entry(self.input_frame, width=40)
+        self.input_frame.pack(pady=10)
+        
+        # Input entry with larger font
+        self.input_entry = ttk.Entry(self.input_frame, width=40, font=('Helvetica', 12))
         self.input_entry.pack(side=tk.LEFT, padx=5)
 
         # Bind Enter key to send
         self.input_entry.bind("<Return>", lambda e: self._on_send_click())
 
-        # Buttons
+        # Send button with custom style
         self.send_button = ttk.Button(
-            self.input_frame, text="Send", command=self._on_send_click
+            self.input_frame,
+            text="Send",
+            command=self._on_send_click,
+            style="Custom.TButton"
         )
-        self.send_button.pack(side=tk.LEFT)
+        self.send_button.pack(side=tk.LEFT, padx=5)
 
+        # Voice button with mic icon (🎤)
         self.voice_button = ttk.Button(
-            self.input_frame, text="Voice Input", command=self._on_voice_click
+            self.input_frame,
+            text="🎤",
+            command=self._on_voice_click,
+            style="Mic.TButton"
         )
         self.voice_button.pack(side=tk.LEFT, padx=5)
 
@@ -125,8 +149,13 @@ class ChatGUI:
         self.on_voice_toggle()
 
     def update_chat(self, speaker, text):
-        """Add a message to the chat area"""
-        self.text_area.insert(tk.END, f"{speaker}: {text}\n")
+        """Add a message to the chat area with color"""
+        if speaker == "You" or speaker == "You said":
+            self.text_area.insert(tk.END, f"{speaker}: ", "user")
+            self.text_area.insert(tk.END, f"{text}\n")
+        else:
+            self.text_area.insert(tk.END, f"{speaker}: ", "ai")
+            self.text_area.insert(tk.END, f"{text}\n")
         self.text_area.see(tk.END)
 
     def disable_input_controls(self):
@@ -144,7 +173,8 @@ class ChatGUI:
 
     def set_voice_button_text(self, text):
         """Update the voice button text"""
-        self.voice_button.config(text=text)
+        # Keep the mic icon, just change color when active/inactive
+        self.voice_button.config(text="🎤")
 
     def get_avatar(self):
         """Get the avatar instance"""
