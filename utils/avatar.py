@@ -253,7 +253,7 @@ class AnimatedCharacter:
                         output_image = convert_output_image_from_torch_to_numpy(output_image)
                         
                         pose_time = time.time() - pose_start
-                        if pose_time > 0.033:  # Log if pose generation takes more than one frame (33ms)
+                        if pose_time > 0.067:  # Log if pose generation takes more than one frame at 15 FPS
                             print(f"Warning: Slow pose generation: {pose_time*1000:.1f}ms")
                         
                         # Convert to bitmap
