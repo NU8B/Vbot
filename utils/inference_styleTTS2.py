@@ -337,7 +337,7 @@ class StyleTTS2Inference:
             # Calculate adaptive frames per phoneme based on text characteristics
             num_phonemes = input_lengths[0].item()
 
-            frames_per_phoneme = 2
+            frames_per_phoneme = 2.25
 
             # Calculate target duration with adaptive scaling
             target_total_duration = int(frames_per_phoneme * num_phonemes)

@@ -50,33 +50,34 @@ class InferenceHandler:
         """Play audio with avatar animation."""
         try:
             print("\n=== Starting audio playback ===")
-            
+
             # Save audio to outputs directory
             print("Saving audio file...")
             output_path = self.output_dir / "output.wav"
             sf.write(str(output_path), speech, 24000)
-            
+
             # Start avatar animation
             print("Starting avatar speaking animation...")
             avatar.start_speaking()
-            
+
             # Small delay to ensure animation starts before audio
             time.sleep(0.1)
-            
+
             # Play audio
             print(f"Playing audio (duration: {duration:.2f}s)...")
             audio_processor.play_audio(speech, duration=duration)
             print("Audio playback completed")
-            
+
             # Stop avatar animation and reset to idle
             print("Stopping avatar speaking animation and resetting to idle...")
             avatar.stop_speaking()
             avatar.set_emotion("neutral")  # Reset to neutral/idle state
             print("=== Audio playback complete ===\n")
-            
+
         except Exception as e:
             print(f"Error in audio playback: {str(e)}")
             import traceback
+
             print(traceback.format_exc())
             # Make sure to stop speaking animation and reset state even if there's an error
             if avatar:
