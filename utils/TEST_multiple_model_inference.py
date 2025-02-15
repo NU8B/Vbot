@@ -55,18 +55,18 @@ def ensure_output_directory(path):
 
 # Test prompts optimized for each emotion
 EMOTION_SPECIFIC_PROMPTS = {
-    "joy": "I am absolutely thrilled to announce that I just got promoted to senior manager at work! After five years of dedication and hard work, this is truly the happiest moment of my career. I can't stop smiling!",
-    "sadness": "Today, I had to say goodbye to my best friend who is moving across the country. We've been inseparable for fifteen years, and now everything feels empty and quiet. I miss them already, and my heart feels so heavy.",
-    "anger": "I cannot believe they completely destroyed the project I spent six months working on without even consulting me! All those late nights and weekends wasted because of their incompetence. This is absolutely unacceptable!",
-    "surprise": "Oh my goodness, I can't believe what just happened! I actually won the grand prize in the national lottery - fifty million dollars! I had to check the numbers ten times because I couldn't believe my eyes!",
-    "neutral": "The quarterly business meeting is scheduled for three o'clock in the main conference room on the third floor. All department heads are required to bring their annual reports and budget proposals for review.",
+    "joy": "I just got promoted at work! This is the happiest day of my life! I won't let anybody ruin it!",
+    "sadness": "I had to say goodbye to my best friend today, and my heart feels so heavy.",
+    "anger": "They completely destroyed the project I spent months working on!",
+    "surprise": "I can't believe I just won the lottery! This is unbelievable!",
+    "neutral": "The meeting is scheduled for three o'clock in the conference room.",
 }
 
 # Core emotions matching our reference sound files
 CORE_EMOTIONS = ["joy", "sadness", "anger", "surprise", "neutral"]
 
 # Generic text to test across all models with core emotions
-GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions. This should sound different with different emotions even if it's the same text."
+GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions. This should sound different with different emotions."
 
 
 def test_model(repo_id):
