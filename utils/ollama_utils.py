@@ -108,10 +108,12 @@ class OllamaHandler:
     def _process_text(self, text, timings=None):
         """Process text input and generate a response"""
         try:
+            print("\n=== Starting text processing ===")
             self.timings = timings if timings else {"processing_start": time.time()}
             processing_start = self.timings["processing_start"]
 
             # Get LLM response
+            print("Calling Ollama LLM...")
             llm_start = time.time()
             response = self.call_ollama_static(
                 text, self.message_history, MAX_HISTORY, SYSTEM_PROMPT
@@ -119,22 +121,29 @@ class OllamaHandler:
             if response and not response.endswith((".", "!", "?")):
                 response += "!"
             self.timings["llm"] = time.time() - llm_start
+            print(f"LLM Response received in {self.timings['llm']:.2f}s")
 
             if not response:
+                print("Error: No response from LLM")
                 self.gui.update_chat(
                     "AI", "Sorry, I'm having trouble connecting to my brain right now!"
                 )
                 return
 
             # Process response with inference handler
+            print("Processing response through inference handler...")
+            inference_start = time.time()
             speech, detected_emotion, style_path = self.inference_handler.process_text(
                 text, response, self.timings
             )
+            print(f"Inference processing completed in {time.time() - inference_start:.2f}s")
 
             # Update avatar emotion
+            print("Updating avatar emotion...")
             avatar = self.gui.get_avatar()
             if avatar:
                 # Map emotion to animation state
+                print(f"Current detected emotion: {detected_emotion}")
                 if "happy" in detected_emotion or "joy" in detected_emotion or "excited" in detected_emotion:
                     avatar.set_emotion("happy")
                 elif "sad" in detected_emotion or "disappointed" in detected_emotion:
@@ -143,14 +152,23 @@ class OllamaHandler:
                     avatar.set_emotion("angry")
                 else:
                     avatar.set_emotion("neutral")
+            else:
+                print("Warning: Avatar not found!")
 
             # Calculate total time
             total_time = time.time() - processing_start
 
             # Print detailed information
-            print("\nInput:", text)
+            print("\n=== Processing Summary ===")
+            print("Input:", text)
             print("Output:", response)
             print("Detected emotion:", detected_emotion)
+            print("Animation category:", "neutral" if detected_emotion in ["neutral", "confusion", "caring", "curiosity", "desire", "relief"] 
+                  else "happy" if detected_emotion in ["admiration", "amusement", "approval", "excitement", "gratitude", "joy", "love", "optimism", "pride"]
+                  else "sad" if detected_emotion in ["disappointment", "embarrassment", "fear", "grief", "nervousness", "remorse", "sadness"]
+                  else "angry" if detected_emotion in ["disapproval", "disgust", "anger", "annoyance"]
+                  else "neutral")
+
             print(f"\nProcessing took {total_time:.2f}s")
 
             # Print timing breakdown
@@ -163,17 +181,28 @@ class OllamaHandler:
             print(f"└─ TTS: {self.timings['tts']:.2f}s")
 
             # Update UI and play audio
+            print("\nPlaying audio and updating UI...")
             duration = len(speech) / 24000
             self.gui.update_chat("AI", response)
 
+            print(f"Starting audio playback (duration: {duration:.2f}s)...")
             # Play audio with animation
             self.inference_handler.play_audio(
                 speech, duration, self.gui.get_avatar(), self.audio_processor
             )
+            print("Audio playback completed")
 
         except Exception as e:
-            print(f"Error in text processing: {str(e)}")
+            print("\n=== Error in text processing ===")
+            print(f"Error details: {str(e)}")
+            import traceback
+            print("Full traceback:")
+            print(traceback.format_exc())
         finally:
+            print("\n=== Cleanup ===")
+            print("Resetting processing flags...")
             self.is_processing = False
             self.is_speaking = False
+            print("Enabling input controls...")
             self.gui.enable_input_controls()
+            print("Processing complete\n")
