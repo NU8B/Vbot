@@ -81,16 +81,19 @@ Assistant:"""
             response = requests.post(
                 "http://localhost:11434/api/generate",
                 json={
-                    "model": "mistral",
+                    "model": "tinyllama",
                     "prompt": full_prompt,
-                    "stream": False,  # Important: disable streaming
+                    "stream": False,
                     "options": {
                         "temperature": 0.7,
                         "top_p": 0.9,
-                        "num_predict": 1024,  # Increased for longer responses
+                        "num_predict": 50,
+                        "stop": ["User:", "Assistant:"],
+                        "num_gpu": 1,
+                        "num_thread": 4
                     }
                 },
-                timeout=60
+                timeout=10
             )
             
             print(f"Response status: {response.status_code}")
@@ -99,26 +102,19 @@ Assistant:"""
                 try:
                     response_json = response.json()
                     if "response" in response_json:
-                        response_text = response_json["response"].strip()
-                        # Clean up response if needed
-                        if not response_text.endswith((".", "!", "?")):
-                            response_text += "."
-                        return response_text
+                        return response_json["response"].strip()
                     else:
                         print(f"Unexpected response format: {response_json}")
-                        return "I apologize, but I'm having trouble formulating a response."
+                        return "I apologize, but I'm having trouble right now."
                 except json.JSONDecodeError as e:
                     print(f"JSON decode error: {e}")
-                    print(f"Raw response: {response.text}")
-                    return "I apologize, but I'm having trouble processing right now."
+                    return "I apologize, but I'm having trouble processing."
             else:
                 print(f"Error status code: {response.status_code}")
-                print(f"Error response: {response.text}")
-                return "I apologize, but I'm having trouble connecting right now."
+                return "I apologize, but I'm having connection issues."
 
         except Exception as e:
             print(f"Error calling Ollama: {str(e)}")
-            print(f"Full error: {type(e).__name__}: {str(e)}")
             return "I apologize, but I'm experiencing technical difficulties."
 
     def handle_text_input(self, text):

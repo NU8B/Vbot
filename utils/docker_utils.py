@@ -43,18 +43,18 @@ class DockerHandler:
             self._wait_for_ollama()
             
             # Verify model is loaded
-            print("Verifying Mistral model...")
+            print("Verifying TinyLlama model...")
             response = requests.get("http://localhost:11434/api/tags")
             if response.status_code == 200:
                 models = response.json()
-                if not any(model.get('name', '').startswith('mistral') for model in models.get('models', [])):
-                    print("Pulling Mistral model...")
+                if not any(model.get('name', '').startswith('tinyllama') for model in models.get('models', [])):
+                    print("Pulling TinyLlama model...")
                     pull_response = requests.post(
                         "http://localhost:11434/api/pull",
-                        json={"name": "mistral"}
+                        json={"name": "tinyllama"}
                     )
                     if pull_response.status_code != 200:
-                        raise Exception("Failed to pull Mistral model")
+                        raise Exception("Failed to pull TinyLlama model")
             
             return time.time() - setup_start
 
