@@ -39,11 +39,13 @@ class OllamaHandler:
         try:
             # Test connection
             response = requests.post(
-                "http://localhost:11434/api/generate",
+                "http://localhost:11434/api/chat",
                 json={
                     "model": "mistral",
-                    "prompt": "Test connection",
-                    "stream": False,
+                    "messages": [
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": "Test connection"}
+                    ]
                 },
                 timeout=30,
             )
@@ -58,40 +60,66 @@ class OllamaHandler:
     def call_ollama_static(prompt, message_history, max_history, system_prompt):
         """Static version of call_ollama for initialization"""
         try:
-            # Prepare conversation history
-            messages = [{"role": "system", "content": system_prompt}]
-
-            # Add message history
+            # Prepare conversation history as a formatted string
+            conversation = ""
             if message_history:
-                messages.extend(message_history[-max_history:])
+                for msg in message_history[-max_history:]:
+                    role = "Assistant" if msg["role"] == "assistant" else "User"
+                    conversation += f"{role}: {msg['content']}\n"
 
-            # Add current prompt
-            messages.append({"role": "user", "content": prompt})
+            # Construct the complete prompt
+            full_prompt = f"""{system_prompt}
 
-            # Make API call
+Previous conversation:
+{conversation}
+
+User: {prompt}
+Assistant:"""
+
+            print("\nSending request to Ollama...")
+            
             response = requests.post(
-                "http://localhost:11434/api/chat",
+                "http://localhost:11434/api/generate",
                 json={
                     "model": "mistral",
-                    "messages": messages,
-                    "stream": False,
+                    "prompt": full_prompt,
+                    "stream": False,  # Important: disable streaming
+                    "options": {
+                        "temperature": 0.7,
+                        "top_p": 0.9,
+                        "num_predict": 1024,  # Increased for longer responses
+                    }
                 },
-                timeout=30,
+                timeout=60
             )
-
+            
+            print(f"Response status: {response.status_code}")
+            
             if response.status_code == 200:
-                response_content = response.json()["message"]["content"]
-                message_history.append(
-                    {"role": "assistant", "content": response_content}
-                )
-                return response_content
+                try:
+                    response_json = response.json()
+                    if "response" in response_json:
+                        response_text = response_json["response"].strip()
+                        # Clean up response if needed
+                        if not response_text.endswith((".", "!", "?")):
+                            response_text += "."
+                        return response_text
+                    else:
+                        print(f"Unexpected response format: {response_json}")
+                        return "I apologize, but I'm having trouble formulating a response."
+                except json.JSONDecodeError as e:
+                    print(f"JSON decode error: {e}")
+                    print(f"Raw response: {response.text}")
+                    return "I apologize, but I'm having trouble processing right now."
             else:
-                print(f"Error: {response.status_code}")
-                return None
+                print(f"Error status code: {response.status_code}")
+                print(f"Error response: {response.text}")
+                return "I apologize, but I'm having trouble connecting right now."
 
         except Exception as e:
             print(f"Error calling Ollama: {str(e)}")
-            return None
+            print(f"Full error: {type(e).__name__}: {str(e)}")
+            return "I apologize, but I'm experiencing technical difficulties."
 
     def handle_text_input(self, text):
         """Handle text input from GUI"""
@@ -108,101 +136,29 @@ class OllamaHandler:
     def _process_text(self, text, timings=None):
         """Process text input and generate a response"""
         try:
-            print("\n=== Starting text processing ===")
-            self.timings = timings if timings else {"processing_start": time.time()}
-            processing_start = self.timings["processing_start"]
-
-            # Get LLM response
-            print("Calling Ollama LLM...")
+            print("\nCalling Ollama LLM...")
             llm_start = time.time()
+            
             response = self.call_ollama_static(
-                text, self.message_history, MAX_HISTORY, SYSTEM_PROMPT
+                text, 
+                self.message_history, 
+                MAX_HISTORY, 
+                SYSTEM_PROMPT
             )
-            if response and not response.endswith((".", "!", "?")):
-                response += "!"
+            
             self.timings["llm"] = time.time() - llm_start
             print(f"LLM Response received in {self.timings['llm']:.2f}s")
 
             if not response:
                 print("Error: No response from LLM")
-                self.gui.update_chat(
-                    "AI", "Sorry, I'm having trouble connecting to my brain right now!"
-                )
-                return
+                return "I'm having trouble thinking right now!"
 
-            # Process response with inference handler
-            print("Processing response through inference handler...")
-            inference_start = time.time()
-            speech, detected_emotion, style_path = self.inference_handler.process_text(
-                text, response, self.timings
-            )
-            print(f"Inference processing completed in {time.time() - inference_start:.2f}s")
+            # Update message history
+            self.message_history.append({"role": "user", "content": text})
+            self.message_history.append({"role": "assistant", "content": response})
 
-            # Update avatar emotion
-            print("Updating avatar emotion...")
-            avatar = self.gui.get_avatar()
-            if avatar:
-                # Map emotion to animation state
-                print(f"Current detected emotion: {detected_emotion}")
-                if "happy" in detected_emotion or "joy" in detected_emotion or "excited" in detected_emotion:
-                    avatar.set_emotion("happy")
-                elif "sad" in detected_emotion or "disappointed" in detected_emotion:
-                    avatar.set_emotion("sad")
-                elif "angry" in detected_emotion or "annoyed" in detected_emotion:
-                    avatar.set_emotion("angry")
-                else:
-                    avatar.set_emotion("neutral")
-            else:
-                print("Warning: Avatar not found!")
-
-            # Calculate total time
-            total_time = time.time() - processing_start
-
-            # Print detailed information
-            print("\n=== Processing Summary ===")
-            print("Input:", text)
-            print("Output:", response)
-            print("Detected emotion:", detected_emotion)
-            print("Animation category:", "neutral" if detected_emotion in ["neutral", "confusion", "caring", "curiosity", "desire", "relief"] 
-                  else "happy" if detected_emotion in ["admiration", "amusement", "approval", "excitement", "gratitude", "joy", "love", "optimism", "pride"]
-                  else "sad" if detected_emotion in ["disappointment", "embarrassment", "fear", "grief", "nervousness", "remorse", "sadness"]
-                  else "angry" if detected_emotion in ["disapproval", "disgust", "anger", "annoyance"]
-                  else "neutral")
-
-            print(f"\nProcessing took {total_time:.2f}s")
-
-            # Print timing breakdown
-            if "stt" in self.timings:
-                print(f"├─ STT: {self.timings['stt']:.2f}s")
-            print(
-                f"├─ LLM: {self.timings['llm']:.2f}s ({len(response.split()) / self.timings['llm']:.1f} words/s)"
-            )
-            print(f"├─ Emotion: {self.timings['emotion']:.2f}s")
-            print(f"└─ TTS: {self.timings['tts']:.2f}s")
-
-            # Update UI and play audio
-            print("\nPlaying audio and updating UI...")
-            duration = len(speech) / 24000
-            self.gui.update_chat("AI", response)
-
-            print(f"Starting audio playback (duration: {duration:.2f}s)...")
-            # Play audio with animation
-            self.inference_handler.play_audio(
-                speech, duration, self.gui.get_avatar(), self.audio_processor
-            )
-            print("Audio playback completed")
+            return response
 
         except Exception as e:
-            print("\n=== Error in text processing ===")
-            print(f"Error details: {str(e)}")
-            import traceback
-            print("Full traceback:")
-            print(traceback.format_exc())
-        finally:
-            print("\n=== Cleanup ===")
-            print("Resetting processing flags...")
-            self.is_processing = False
-            self.is_speaking = False
-            print("Enabling input controls...")
-            self.gui.enable_input_controls()
-            print("Processing complete\n")
+            print(f"Error in text processing: {str(e)}")
+            return "Sorry, I'm having trouble connecting to my brain right now!"

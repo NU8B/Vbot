@@ -21,59 +21,67 @@ class DockerHandler:
                     container.start()
             except docker.errors.NotFound:
                 print("Creating new Ollama container...")
-                # Create and start the container with GPU support
-                self.client.containers.run(
+                container = self.client.containers.run(
                     "ollama/ollama",
                     name="ollama",
                     detach=True,
-                    # runtime="nvidia",  # Comment out GPU support
-                    # environment=["NVIDIA_VISIBLE_DEVICES=all"],  # Comment out GPU environment
-                    volumes={"ollama": {"bind": "/root/.ollama", "mode": "rw"}},
+                    volumes={
+                        "ollama": {"bind": "/root/.ollama", "mode": "rw"}
+                    },
                     ports={"11434/tcp": 11434},
+                    network_mode="bridge",  # Explicitly set network mode
+                    environment={
+                        "OLLAMA_HOST": "0.0.0.0",  # Listen on all interfaces
+                        "OLLAMA_ORIGINS": "*"       # Allow all origins
+                    }
                 )
 
-            # Wait for Ollama API to be ready
+            # Wait for container to be fully ready
+            time.sleep(5)
+            
+            # Wait for Ollama API
             self._wait_for_ollama()
-
-            # Check if Stheno model exists
-            container = self.client.containers.get("ollama")
-            result = container.exec_run("ollama list")
-            if "stheno" not in result.output.decode():
-                print("Stheno model not found. Setting up...")
-                # Pull the model from Hugging Face
-                print("Pulling model from Hugging Face...")
-                container.exec_run(
-                    "ollama pull hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf"
-                )
-
-                # Copy to Stheno
-                print("Setting up as Stheno...")
-                container.exec_run(
-                    "ollama cp hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf stheno"
-                )
-
-                # Clean up
-                container.exec_run(
-                    'ollama rm "hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf"'
-                )
-                print("Stheno model setup complete")
-
+            
+            # Verify model is loaded
+            print("Verifying Mistral model...")
+            response = requests.get("http://localhost:11434/api/tags")
+            if response.status_code == 200:
+                models = response.json()
+                if not any(model.get('name', '').startswith('mistral') for model in models.get('models', [])):
+                    print("Pulling Mistral model...")
+                    pull_response = requests.post(
+                        "http://localhost:11434/api/pull",
+                        json={"name": "mistral"}
+                    )
+                    if pull_response.status_code != 200:
+                        raise Exception("Failed to pull Mistral model")
+            
             return time.time() - setup_start
 
         except Exception as e:
             print(f"Error setting up Docker container: {str(e)}")
             raise
 
-    def _wait_for_ollama(self, timeout=60):
-        """Wait for Ollama API to be ready"""
-        start_time = time.time()
-        while time.time() - start_time < timeout:
+    def _wait_for_ollama(self):
+        """Wait for Ollama API to be ready with simplified check"""
+        max_attempts = 30
+        delay = 2
+        
+        print("Waiting for Ollama API to be ready...")
+        for i in range(max_attempts):
             try:
-                requests.get("http://localhost:11434/api/health")
-                return
-            except requests.exceptions.RequestException:
-                time.sleep(1)
-        raise TimeoutError("Ollama API failed to become ready")
+                # Only test base endpoint first
+                response = requests.get("http://localhost:11434/", timeout=5)
+                if response.status_code == 200:
+                    print("Ollama API is ready!")
+                    return
+            except requests.exceptions.RequestException as e:
+                print(f"API test failed (attempt {i + 1}/{max_attempts}): {str(e)}")
+            
+            if i < max_attempts - 1:
+                time.sleep(delay)
+        
+        raise Exception("Ollama API failed to become ready")
 
     def cleanup(self):
         """Cleanup method to stop the container"""
