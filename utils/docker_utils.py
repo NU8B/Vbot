@@ -26,8 +26,8 @@ class DockerHandler:
                     "ollama/ollama",
                     name="ollama",
                     detach=True,
-                    runtime="nvidia",
-                    environment=["NVIDIA_VISIBLE_DEVICES=all"],
+                    # runtime="nvidia",  # Comment out GPU support
+                    # environment=["NVIDIA_VISIBLE_DEVICES=all"],  # Comment out GPU environment
                     volumes={"ollama": {"bind": "/root/.ollama", "mode": "rw"}},
                     ports={"11434/tcp": 11434},
                 )

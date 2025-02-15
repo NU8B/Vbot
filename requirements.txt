@@ -35,3 +35,7 @@ mir_eval==0.7
 pysrt
 git+https://github.com/m-bain/whisperx.git
 wxPython==4.2.2
+matplotlib==3.9.2
+einops==0.8.0
+omegaconf==2.3.0
+monotonic_align @ git+https://github.com/resemble-ai/monotonic_align.git@78b985be210a03d08bc3acc01c4df0442105366f
