@@ -3,11 +3,15 @@ import threading
 import time
 from pathlib import Path
 import json
+import os
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
 SYSTEM_PROMPT = """You are Amelia Watson, a time-traveling detective VTuber from Hololive English. You are not to break character under any circumstances. You are to always talk in first person. You are not to describe your actions in your response. Keep your response consise and under 30 words. Only use string text in your response. NO EMOJIS"""
 
+# Get Ollama host from environment or default to localhost
+OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
+OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '60'))  # 60 second default timeout
 
 class OllamaHandler:
     def __init__(
@@ -37,18 +41,44 @@ class OllamaHandler:
     def initialize():
         """Static initialization method for parallel loading"""
         try:
-            # Test connection
+            # First check if server is up using root endpoint
+            try:
+                response = requests.get(OLLAMA_HOST, timeout=OLLAMA_TIMEOUT)
+                if response.status_code != 200:
+                    print(f"Ollama server check failed with status code: {response.status_code}")
+                    return False
+            except requests.RequestException as e:
+                print(f"Ollama server check failed: {str(e)}")
+                return False
+
+            # Then test model availability with a simple chat request
             response = requests.post(
-                "http://localhost:11434/api/generate",
+                f"{OLLAMA_HOST}/api/chat",
                 json={
                     "model": "mistral",
-                    "prompt": "Test connection",
+                    "messages": [
+                        {"role": "user", "content": "Test connection"}
+                    ],
                     "stream": False,
                 },
-                timeout=30,
+                timeout=OLLAMA_TIMEOUT,
             )
+            
             if response.status_code == 200:
                 return True
+            elif response.status_code == 404:
+                print("Model not found - make sure 'mistral' model is pulled")
+                return False
+            else:
+                print(f"Ollama chat test failed with status code: {response.status_code}")
+                print(f"Response: {response.text}")
+                return False
+
+        except requests.Timeout:
+            print(f"Connection timed out after {OLLAMA_TIMEOUT} seconds")
+            return False
+        except requests.ConnectionError:
+            print("Connection error - check if Ollama service is running")
             return False
         except Exception as e:
             print(f"Error initializing Ollama: {str(e)}")
@@ -68,27 +98,40 @@ class OllamaHandler:
             # Add current prompt
             messages.append({"role": "user", "content": prompt})
 
-            # Make API call
+            # Make API call with increased timeout
             response = requests.post(
-                "http://localhost:11434/api/chat",
+                f"{OLLAMA_HOST}/api/chat",
                 json={
                     "model": "mistral",
                     "messages": messages,
                     "stream": False,
                 },
-                timeout=30,
+                timeout=OLLAMA_TIMEOUT,
             )
 
             if response.status_code == 200:
-                response_content = response.json()["message"]["content"]
-                message_history.append(
-                    {"role": "assistant", "content": response_content}
-                )
-                return response_content
+                try:
+                    response_data = response.json()
+                    response_content = response_data["message"]["content"]
+                    message_history.append(
+                        {"role": "assistant", "content": response_content}
+                    )
+                    return response_content
+                except (KeyError, json.JSONDecodeError) as e:
+                    print(f"Error parsing response: {str(e)}")
+                    print(f"Raw response: {response.text}")
+                    return None
             else:
                 print(f"Error: {response.status_code}")
+                print(f"Response: {response.text}")
                 return None
 
+        except requests.Timeout:
+            print(f"Request timed out after {OLLAMA_TIMEOUT} seconds")
+            return None
+        except requests.ConnectionError:
+            print("Connection error - check if Ollama service is running and accessible")
+            return None
         except Exception as e:
             print(f"Error calling Ollama: {str(e)}")
             return None
