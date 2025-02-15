@@ -59,10 +59,10 @@ class AnimatedCharacter:
         # Store last update time
         self.last_update_time = time.time()
         
-        # Start animation timer (30 FPS)
+        # Start animation timer (15 FPS)
         self.timer = wx.Timer(self.panel)
         self.panel.Bind(wx.EVT_TIMER, self.update_animation)
-        self.timer.Start(33)  # ~30 FPS
+        self.timer.Start(67)  # ~15 FPS (67ms interval)
 
     def load_character_model(self):
         """Load the character model from YAML config"""
