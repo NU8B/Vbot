@@ -56,7 +56,7 @@ def ensure_output_directory(path):
 # Test prompts optimized for each emotion
 EMOTION_SPECIFIC_PROMPTS = {
     "joy": "I just got promoted at work! This is the happiest day of my life! I won't let anybody ruin it!",
-    "sadness": "I had to say goodbye to my best friend today, and my heart feels so heavy.",
+    "sadness": "I had to say goodbye to my best friend today, I'm so sad.",
     "anger": "They completely destroyed the project I spent months working on!",
     "surprise": "I can't believe I just won the lottery! This is unbelievable!",
     "neutral": "The meeting is scheduled for three o'clock in the conference room.",
@@ -66,7 +66,7 @@ EMOTION_SPECIFIC_PROMPTS = {
 CORE_EMOTIONS = ["joy", "sadness", "anger", "surprise", "neutral"]
 
 # Generic text to test across all models with core emotions
-GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions. This should sound different with different emotions. And now I will just be yapping because I can and nobody can stop me. Try me if you dare!"
+GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions."
 
 
 def test_model(repo_id):
