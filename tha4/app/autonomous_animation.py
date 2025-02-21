@@ -23,6 +23,7 @@ from tha4.image_util import convert_output_image_from_torch_to_numpy
 from tha4.app.animations.happy_animation import HappyAnimation
 from tha4.app.animations.sad_animation import SadAnimation
 from tha4.app.animations.angry_animation import AngryAnimation
+from tha4.app.animations.surprise_animation import SurpriseAnimation
 
 class AnimationPreset:
     def __init__(self, name: str, description: str = ""):
@@ -44,15 +45,15 @@ class IdleAnimation:
         # Enhanced head movement
         self.head_x_cycle = 0.0  # Side to side
         self.head_y_cycle = 0.0  # Up and down
-        self.head_z_cycle = 0.0  # Tilt
+        self.neck_z_cycle = 0.0  # Tilt (renamed from head_z to neck_z)
         self.head_movement_speed = 0.15
-        self.head_movement_amount = 0.4  # Increased from 0.3
+        self.head_movement_amount = 0.4
         
         # Enhanced body movement
         self.body_y_cycle = 0.0  # Side to side
         self.body_z_cycle = 0.0  # Forward/backward
-        self.body_movement_speed = 0.15  # Increased from 0.1 for more active movement
-        self.body_movement_amount = 0.35  # Increased from 0.2 for larger movement range
+        self.body_movement_speed = 0.15
+        self.body_movement_amount = 0.35
         
         # Add slight body tilt for more natural sway
         self.body_tilt_cycle = 0.0
@@ -64,14 +65,14 @@ class IdleAnimation:
         self.body_z_offset = random.uniform(-0.1, 0.1)
         
         # Eye movement
-        self.iris_x_cycle = 0.0  # Left-right eye movement
-        self.iris_y_cycle = 0.0  # Up-down eye movement
-        self.iris_movement_speed = 0.08  # Very slow eye movement
-        self.iris_movement_amount = 0.4  # How far eyes move
+        self.iris_rotation_x_cycle = 0.0  # Left-right eye movement (renamed from iris_x)
+        self.iris_rotation_y_cycle = 0.0  # Up-down eye movement (renamed from iris_y)
+        self.iris_movement_speed = 0.08
+        self.iris_movement_amount = 0.4
         self.time_until_next_eye_movement = random.uniform(2.0, 4.0)
-        self.current_eye_target = (0, 0)  # Current look target
-        self.next_eye_target = (0, 0)     # Next look target
-        self.eye_movement_progress = 1.0   # Progress to next target (0-1)
+        self.current_eye_target = (0, 0)
+        self.next_eye_target = (0, 0)
+        self.eye_movement_progress = 1.0
         
         # Look target system
         self.current_look_target = (0, 0)
@@ -127,91 +128,35 @@ class IdleAnimation:
         self.sway_amount = 0.05  # Subtle amount
 
     def update(self, delta_time: float) -> dict:
-        # Update look target
-        self.time_until_next_look -= delta_time
-        if self.time_until_next_look <= 0:
-            self.current_look_target = self.next_look_target
-            
-            if random.random() < 0.8:  # 80% chance to look at interesting point
-                # Choose point based on weights
-                total_weight = sum(self.point_weights)
-                r = random.uniform(0, total_weight)
-                cumulative_weight = 0
-                chosen_index = 0
-                
-                for i, weight in enumerate(self.point_weights):
-                    cumulative_weight += weight
-                    if r <= cumulative_weight:
-                        chosen_index = i
-                        break
-                
-                self.next_look_target = self.interest_points[chosen_index]
-                # Add subtle variation
-                self.next_look_target = (
-                    self.next_look_target[0] + random.uniform(-0.05, 0.05),
-                    self.next_look_target[1] + random.uniform(-0.05, 0.05)
-                )
-            else:  # Return to neutral or slight offset
-                self.next_look_target = (
-                    random.uniform(-0.1, 0.1),  # Slight random neutral position
-                    random.uniform(-0.05, 0.15)
-                )
-            
-            self.look_transition_progress = 0.0
-            # Vary the time between looks based on distance
-            distance = math.sqrt(
-                (self.next_look_target[0] - self.current_look_target[0]) ** 2 +
-                (self.next_look_target[1] - self.current_look_target[1]) ** 2
-            )
-            # Longer pause for further movements
-            self.time_until_next_look = random.uniform(1.5, 2.5) + distance * 0.5
-        
-        # Update look transition with smoother easing
-        if self.look_transition_progress < 1.0:
-            self.look_transition_progress = min(1.0, 
-                self.look_transition_progress + delta_time / self.look_change_duration)
-            
-            # Smooth easing function (cubic)
-            t = self.look_transition_progress
-            t = t * t * (3 - 2 * t)  # Smoother curve
-            
-            # Calculate eye position
-            iris_x = self.current_look_target[0] + (self.next_look_target[0] - self.current_look_target[0]) * t
-            iris_y = self.current_look_target[1] + (self.next_look_target[1] - self.current_look_target[1]) * t
-            
-            # Head follows eyes with lag and smoother curve
-            head_t = max(0, min(1, (self.look_transition_progress - self.head_lag) / (1 - self.head_lag)))
-            head_t = head_t * head_t * (3 - 2 * head_t)  # Same smooth curve
-            head_x = self.current_look_target[0] + (self.next_look_target[0] - self.current_look_target[0]) * head_t
-            head_y = self.current_look_target[1] + (self.next_look_target[1] - self.current_look_target[1]) * head_t
-        else:
-            iris_x = self.next_look_target[0]
-            iris_y = self.next_look_target[1]
-            head_x = self.next_look_target[0]
-            head_y = self.next_look_target[1]
+        # Update breathing cycle
+        self.breathing_cycle = (self.breathing_cycle + delta_time * self.breathing_speed) % (math.pi * 2)
+        breathing_value = math.sin(self.breathing_cycle) * 0.5 + 0.5
 
-        # Scale head movement
-        head_x *= self.head_follow_amount
-        head_y *= self.head_follow_amount
+        # Update head movement cycles
+        self.head_x_cycle = (self.head_x_cycle + delta_time * self.head_movement_speed) % (math.pi * 2)
+        self.head_y_cycle = (self.head_y_cycle + delta_time * self.head_movement_speed * 0.7) % (math.pi * 2)
+        self.neck_z_cycle = (self.neck_z_cycle + delta_time * self.head_movement_speed * 0.5) % (math.pi * 2)
 
-        # Update gentle sway
-        self.sway_cycle = (self.sway_cycle + delta_time * self.sway_speed) % (math.pi * 2)
-        sway = math.sin(self.sway_cycle) * self.sway_amount
-        
-        # Add very subtle micro-movements
-        micro_movement = math.sin(time.time() * 3) * 0.01
-        head_x += micro_movement + sway
-        head_y += micro_movement * 0.5
-        
-        # Gentler head tilt
-        head_z = math.sin(time.time() * 0.5) * 0.08  # Very gentle base tilt
-        if self.look_transition_progress < 1.0:
-            # Smoother tilt during movement
-            tilt_amount = head_x * 0.15 * math.sin(self.look_transition_progress * math.pi)
-            head_z += tilt_amount
+        # Calculate head movement
+        head_x = math.sin(self.head_x_cycle) * self.head_movement_amount
+        head_y = math.sin(self.head_y_cycle) * self.head_movement_amount
+        neck_z = math.sin(self.neck_z_cycle) * self.head_movement_amount * 0.5
 
-        # Update breathing
-        self.breathing_cycle = (self.breathing_cycle + delta_time * self.breathing_speed) % 1.0
+        # Update body movement cycles
+        self.body_y_cycle = (self.body_y_cycle + delta_time * self.body_movement_speed) % (math.pi * 2)
+        self.body_z_cycle = (self.body_z_cycle + delta_time * self.body_movement_speed * 0.7) % (math.pi * 2)
+
+        # Calculate body movement
+        body_y = math.sin(self.body_y_cycle) * self.body_movement_amount + self.body_y_offset
+        body_z = math.sin(self.body_z_cycle) * self.body_movement_amount * 0.6 + self.body_z_offset
+
+        # Update eye movement
+        self.iris_rotation_x_cycle = (self.iris_rotation_x_cycle + delta_time * self.iris_movement_speed) % (math.pi * 2)
+        self.iris_rotation_y_cycle = (self.iris_rotation_y_cycle + delta_time * self.iris_movement_speed * 0.7) % (math.pi * 2)
+        
+        # Calculate eye movement
+        iris_rotation_x = math.sin(self.iris_rotation_x_cycle) * self.iris_movement_amount
+        iris_rotation_y = math.sin(self.iris_rotation_y_cycle) * self.iris_movement_amount
 
         # Update blinking
         self.time_until_next_blink -= delta_time
@@ -221,71 +166,19 @@ class IdleAnimation:
         
         if self.blink_cycle < 1.0:
             self.blink_cycle = min(1.0, self.blink_cycle + delta_time / self.blink_speed)
-
-        # Update eye movement
-        self.time_until_next_eye_movement -= delta_time
-        if self.time_until_next_eye_movement <= 0:
-            # Set new eye target
-            self.current_eye_target = self.next_eye_target
-            self.next_eye_target = (
-                random.uniform(-0.7, 0.7),  # x position
-                random.uniform(-0.5, 0.3)   # y position - look down more than up
-            )
-            self.eye_movement_progress = 0.0
-            self.time_until_next_eye_movement = random.uniform(2.0, 4.0)
         
-        # Smoothly interpolate eye movement
-        if self.eye_movement_progress < 1.0:
-            self.eye_movement_progress = min(1.0, 
-                self.eye_movement_progress + delta_time * 2.0)  # 0.5 seconds movement
-            # Smooth easing function
-            t = math.sin(self.eye_movement_progress * math.pi * 0.5)
-            iris_x = self.current_eye_target[0] + (self.next_eye_target[0] - self.current_eye_target[0]) * t
-            iris_y = self.current_eye_target[1] + (self.next_eye_target[1] - self.current_eye_target[1]) * t
-        else:
-            iris_x = self.next_eye_target[0]
-            iris_y = self.next_eye_target[1]
-
-        # Add micro-movements
-        micro_movement = math.sin(time.time() * 10) * 0.02
-        head_x += micro_movement
-        head_y += micro_movement * 0.5
-        
-        # Add slight head tilt during movement
-        head_z = math.sin(time.time() * 0.8) * 0.15  # Gentle head tilt
-        if self.look_transition_progress < 1.0:
-            # Add extra tilt during movement
-            head_z += (head_x * 0.2) * math.sin(self.look_transition_progress * math.pi)
-
-        # Update body movement cycles
-        self.body_y_cycle = (self.body_y_cycle + delta_time * self.body_movement_speed) % (math.pi * 2)
-        self.body_z_cycle = (self.body_z_cycle + delta_time * self.body_movement_speed * 0.7) % (math.pi * 2)
-        self.body_tilt_cycle = (self.body_tilt_cycle + delta_time * self.body_tilt_speed) % (math.pi * 2)
-        
-        # Calculate body movement with more natural swaying
-        body_y = (math.sin(self.body_y_cycle) * self.body_movement_amount) + self.body_y_offset
-        body_z = (math.sin(self.body_z_cycle) * self.body_movement_amount * 0.6) + self.body_z_offset
-        
-        # Add slight tilt that follows the side-to-side movement
-        body_tilt = math.sin(self.body_tilt_cycle) * self.body_tilt_amount
-        # Add counter-tilt when moving sideways for more natural movement
-        body_tilt += body_y * -0.15  # Counter-tilt against sideways movement
-        
-        # Add breathing influence to body movement
-        breathing_influence = math.sin(self.breathing_cycle * math.pi * 2) * 0.1
-        body_z += breathing_influence
+        eye_wink = math.sin(self.blink_cycle * math.pi) if self.blink_cycle < 1.0 else 0.0
 
         return {
-            'breathing': math.sin(self.breathing_cycle * math.pi * 2) * 0.5 + 0.5,
+            'breathing': breathing_value,
             'head_x': head_x,
             'head_y': head_y,
-            'head_z': head_z,
+            'neck_z': neck_z,
             'body_y': body_y,
             'body_z': body_z,
-            'body_rotation_z': body_tilt,  # Add body tilt to rotation
-            'blink': math.sin(self.blink_cycle * math.pi) if self.blink_cycle < 1.0 else 0.0,
-            'iris_x': iris_x,
-            'iris_y': iris_y,
+            'iris_rotation_x': iris_rotation_x,
+            'iris_rotation_y': iris_rotation_y,
+            'eye_wink': eye_wink
         }
 
 class AutonomousAnimationFrame(wx.Frame):
@@ -304,6 +197,7 @@ class AutonomousAnimationFrame(wx.Frame):
         self.happy_animation = HappyAnimation()
         self.sad_animation = SadAnimation()
         self.angry_animation = AngryAnimation()
+        self.surprise_animation = SurpriseAnimation()
         
         # Animation presets
         self.animation_presets = {
@@ -322,7 +216,11 @@ class AutonomousAnimationFrame(wx.Frame):
             'angry': AnimationPreset(
                 "Angry", 
                 "Tense, quick movements with intense expressions"
-            )
+            ),
+            'surprise': AnimationPreset(
+                "Surprise",
+                "Sudden wide-eyed expression with raised eyebrows"
+            ),
         }
         
         self.last_update_time = time.time()
@@ -489,8 +387,7 @@ class AutonomousAnimationFrame(wx.Frame):
             mouth_aaa_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_aaa")
             mouth_ooo_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_ooo")
             mouth_delta_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_delta")
-            mouth_lowered_left_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_left")
-            mouth_lowered_right_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_right")
+            mouth_lowered_corner_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner")
             
             if mouth_aaa_index >= 0:
                 pose[mouth_aaa_index] = animation_values.get('mouth_aaa', 0.2)
@@ -498,41 +395,56 @@ class AutonomousAnimationFrame(wx.Frame):
                 pose[mouth_ooo_index] = animation_values.get('mouth_ooo', 0.4)
             if mouth_delta_index >= 0:
                 pose[mouth_delta_index] = animation_values.get('mouth_delta', -0.3)
-            if mouth_lowered_left_index >= 0:
-                pose[mouth_lowered_left_index] = animation_values.get('mouth_lowered_corner_left', 0.8)
-            if mouth_lowered_right_index >= 0:
-                pose[mouth_lowered_right_index] = animation_values.get('mouth_lowered_corner_right', 0.8)
+            if mouth_lowered_corner_index >= 0:
+                pose[mouth_lowered_corner_index] = animation_values.get('mouth_lowered_corner_left', 0.8)
+                pose[mouth_lowered_corner_index + 1] = animation_values.get('mouth_lowered_corner_right', 0.8)
             
             # Handle troubled eyebrows
-            troubled_left_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_troubled")
-            if troubled_left_index >= 0:
-                pose[troubled_left_index] = animation_values.get('eyebrow_troubled_left', 1.0)
-                pose[troubled_left_index + 1] = animation_values.get('eyebrow_troubled_right', 1.0)
+            eyebrow_troubled_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_troubled")
+            if eyebrow_troubled_index >= 0:
+                pose[eyebrow_troubled_index] = animation_values.get('eyebrow_troubled_left', 1.0)
+                pose[eyebrow_troubled_index + 1] = animation_values.get('eyebrow_troubled_right', 1.0)
             
-            # Handle unimpressed eyes
-            unimpressed_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_unimpressed")
-            if unimpressed_index >= 0:
-                pose[unimpressed_index] = animation_values.get('eye_unimpressed_left', 0.2)
-                pose[unimpressed_index + 1] = animation_values.get('eye_unimpressed_right', 0.2)
+            # Handle eye parameters
+            eye_unimpressed_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_unimpressed")
+            if eye_unimpressed_index >= 0:
+                pose[eye_unimpressed_index] = animation_values.get('eye_unimpressed', 0.8)
+                pose[eye_unimpressed_index + 1] = animation_values.get('eye_unimpressed', 0.8)  # Set right eye
             
             # Handle head rotation
             head_x_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x")
             if head_x_index >= 0:
                 pose[head_x_index] = animation_values.get('head_x', -0.5)  # Ensure negative value for down tilt
+            
+            # Handle iris parameters for sad animation - keep centered
+            iris_small_index = self.get_parameter_index(PoseParameterCategory.IRIS_MORPH, "iris_small")
+            iris_rotation_x_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x")
+            iris_rotation_y_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y")
+            
+            if iris_small_index >= 0:
+                pose[iris_small_index] = animation_values.get('iris_small', 0.1)
+                pose[iris_small_index + 1] = animation_values.get('iris_small', 0.1)
+            
+            if iris_rotation_x_index >= 0:
+                # Set both eyes' x rotation to 0 (centered)
+                pose[iris_rotation_x_index] = 0.0
+                pose[iris_rotation_x_index + 1] = 0.0
+            
+            if iris_rotation_y_index >= 0:
+                pose[iris_rotation_y_index] = animation_values.get('iris_rotation_y', -0.6)
+                pose[iris_rotation_y_index + 1] = animation_values.get('iris_rotation_y', -0.6)
         elif self.animation_presets['angry'].is_active:
             animation_values = self.angry_animation.update(delta_time)
             
             # Handle mouth parameters
             mouth_delta_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_delta")
-            mouth_lowered_left_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_left")
-            mouth_lowered_right_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner_right")
+            mouth_lowered_corner_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner")
             
             if mouth_delta_index >= 0:
                 pose[mouth_delta_index] = animation_values.get('mouth_delta', 0.7)
-            if mouth_lowered_left_index >= 0:
-                pose[mouth_lowered_left_index] = animation_values.get('mouth_lowered_corner_left', 0.6)
-            if mouth_lowered_right_index >= 0:
-                pose[mouth_lowered_right_index] = animation_values.get('mouth_lowered_corner_right', 0.6)
+            if mouth_lowered_corner_index >= 0:
+                pose[mouth_lowered_corner_index] = animation_values.get('mouth_lowered_corner_left', 0.6)
+                pose[mouth_lowered_corner_index + 1] = animation_values.get('mouth_lowered_corner_right', 0.6)
             
             # Handle eyebrow parameters
             eyebrow_angry_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_angry")
@@ -551,19 +463,53 @@ class AutonomousAnimationFrame(wx.Frame):
             if mouth_smirk_index >= 0:
                 pose[mouth_smirk_index] = animation_values.get('mouth_smirk', 1.0)
             
-            # Handle iris parameters
+            # Handle iris parameters for angry animation - keep static
             iris_small_index = self.get_parameter_index(PoseParameterCategory.IRIS_MORPH, "iris_small")
+            iris_rotation_x_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x")
+            iris_rotation_y_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y")
+            
             if iris_small_index >= 0:
-                iris_left = animation_values.get('iris_small_left', 0.5)
-                iris_right = animation_values.get('iris_small_right', 0.5)
-                print(f"Iris values - Left: {iris_left}, Right: {iris_right}, Index: {iris_small_index}")
-                pose[iris_small_index] = iris_left
-                pose[iris_small_index + 1] = iris_right
+                pose[iris_small_index] = 0.0  # Default size for both eyes
+                pose[iris_small_index + 1] = 0.0
+            
+            if iris_rotation_x_index >= 0:
+                pose[iris_rotation_x_index] = 0.0  # Keep centered horizontally
+            
+            if iris_rotation_y_index >= 0:
+                pose[iris_rotation_y_index] = 0.0  # Keep centered vertically
             
             # Handle head rotation
             head_x_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x")
             if head_x_index >= 0:
                 pose[head_x_index] = animation_values.get('head_x', -0.5)  # Ensure negative value for down tilt
+        elif self.animation_presets['surprise'].is_active:
+            animation_values = self.surprise_animation.update(delta_time)
+            
+            # Handle eye parameters
+            eye_surprised_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_surprised")
+            if eye_surprised_index >= 0:
+                pose[eye_surprised_index] = animation_values.get('eye_surprised', 0.9)
+                pose[eye_surprised_index + 1] = animation_values.get('eye_surprised', 0.9)
+            
+            # Handle eyebrow parameters
+            eyebrow_raised_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_raised")
+            if eyebrow_raised_index >= 0:
+                pose[eyebrow_raised_index] = animation_values.get('eyebrow_raised', 0.8)
+                pose[eyebrow_raised_index + 1] = animation_values.get('eyebrow_raised', 0.8)
+            
+            # Handle mouth parameters
+            mouth_aaa_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_aaa")
+            mouth_ooo_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_ooo")
+            if mouth_aaa_index >= 0:
+                pose[mouth_aaa_index] = animation_values.get('mouth_aaa', 0.7)
+            if mouth_ooo_index >= 0:
+                pose[mouth_ooo_index] = animation_values.get('mouth_ooo', 0.3)
+            
+            # Handle iris parameters
+            iris_small_index = self.get_parameter_index(PoseParameterCategory.IRIS_MORPH, "iris_small")
+            if iris_small_index >= 0:
+                pose[iris_small_index] = animation_values.get('iris_small', -0.2)
+                pose[iris_small_index + 1] = animation_values.get('iris_small', -0.2)
         else:
             return
         
@@ -577,13 +523,13 @@ class AutonomousAnimationFrame(wx.Frame):
             # Set head rotation
             head_x_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x")
             head_y_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_y")
-            head_z_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "neck_z")
+            neck_z_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "neck_z")
             if head_x_index >= 0:
                 pose[head_x_index] = animation_values['head_x']
             if head_y_index >= 0:
                 pose[head_y_index] = animation_values['head_y']
-            if head_z_index >= 0:
-                pose[head_z_index] = animation_values['head_z']
+            if neck_z_index >= 0:
+                pose[neck_z_index] = animation_values['neck_z']  # Map neck_z to neck_z
             
             # Set body rotation
             body_y_index = self.get_parameter_index(PoseParameterCategory.BODY_ROTATION, "body_y")
@@ -595,18 +541,18 @@ class AutonomousAnimationFrame(wx.Frame):
             
             # Set blinking
             eye_index = self.get_parameter_index(PoseParameterCategory.EYE)
-            if eye_index >= 0 and 'blink' in animation_values:
-                blink_value = animation_values['blink']
-                pose[eye_index] = blink_value
-                pose[eye_index + 1] = blink_value
+            if eye_index >= 0 and 'eye_wink' in animation_values:
+                wink_value = animation_values['eye_wink']
+                pose[eye_index] = wink_value
+                pose[eye_index + 1] = wink_value
             
             # Set eye rotation
-            iris_x_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x")
-            iris_y_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y")
-            if iris_x_index >= 0:
-                pose[iris_x_index] = animation_values['iris_x']
-            if iris_y_index >= 0:
-                pose[iris_y_index] = animation_values['iris_y']
+            iris_rotation_x_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x")
+            iris_rotation_y_index = self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y")
+            if iris_rotation_x_index >= 0:
+                pose[iris_rotation_x_index] = animation_values['iris_rotation_x']
+            if iris_rotation_y_index >= 0:
+                pose[iris_rotation_y_index] = animation_values['iris_rotation_y']
             
             # Map mouth shape parameters
             mouth_shapes = ['mouth_aaa', 'mouth_iii', 'mouth_uuu', 'mouth_eee', 'mouth_ooo']
@@ -614,6 +560,13 @@ class AutonomousAnimationFrame(wx.Frame):
                 shape_index = self.get_parameter_index(PoseParameterCategory.MOUTH, shape)
                 if shape_index >= 0:
                     pose[shape_index] = animation_values.get(shape, 0.0)
+            
+            # Set eye wink
+            eye_wink_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_wink")
+            if eye_wink_index >= 0 and 'eye_wink' in animation_values:
+                wink_value = animation_values['eye_wink']
+                pose[eye_wink_index] = wink_value
+                pose[eye_wink_index + 1] = wink_value
         
         # Update image
         self.update_image(pose)

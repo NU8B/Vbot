@@ -16,6 +16,7 @@ from tha4.app.animations.sad_animation import SadAnimation
 from tha4.app.animations.angry_animation import AngryAnimation
 from tha4.app.animations.idle_animation import IdleAnimation
 from tha4.app.animations.base_animation import BaseAnimation
+from tha4.app.animations.surprise_animation import SurpriseAnimation
 
 
 class AnimatedCharacter:
@@ -45,6 +46,7 @@ class AnimatedCharacter:
         self.happy_animation = HappyAnimation()
         self.sad_animation = SadAnimation()
         self.angry_animation = AngryAnimation()
+        self.surprise_animation = SurpriseAnimation()
         self.current_animation: Optional[BaseAnimation] = self.idle_animation
         
         # Animation state
@@ -92,31 +94,32 @@ class AnimatedCharacter:
                 # Face rotation
                 "head_x": self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x"),
                 "head_y": self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_y"),
-                "head_z": self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "neck_z"),
+                "neck_z": self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "neck_z"),
                 
                 # Body rotation
                 "body_y": self.get_parameter_index(PoseParameterCategory.BODY_ROTATION, "body_y"),
                 "body_z": self.get_parameter_index(PoseParameterCategory.BODY_ROTATION, "body_z"),
                 
-                # Eyes and eyebrows
-                "eye_blink": self.get_parameter_index(PoseParameterCategory.EYE, "eye_blink"),
-                "eye_widen": self.get_parameter_index(PoseParameterCategory.EYE, "eye_widen"),
-                "eye_squint": self.get_parameter_index(PoseParameterCategory.EYE, "eye_squint"),
+                # Eyes
+                "eye_wink": self.get_parameter_index(PoseParameterCategory.EYE, "eye_wink"),
+                "eye_happy_wink": self.get_parameter_index(PoseParameterCategory.EYE, "eye_happy_wink"),
+                "eye_surprised": self.get_parameter_index(PoseParameterCategory.EYE, "eye_surprised"),
+                "eye_relaxed": self.get_parameter_index(PoseParameterCategory.EYE, "eye_relaxed"),
                 "eye_unimpressed": self.get_parameter_index(PoseParameterCategory.EYE, "eye_unimpressed"),
-                "eye_happy": self.get_parameter_index(PoseParameterCategory.EYE, "eye_happy"),
-                "eye_angry": self.get_parameter_index(PoseParameterCategory.EYE, "eye_angry"),
-                "eye_sad": self.get_parameter_index(PoseParameterCategory.EYE, "eye_sad"),
+                "eye_raised_lower_eyelid": self.get_parameter_index(PoseParameterCategory.EYE, "eye_raised_lower_eyelid"),
                 
                 # Iris
                 "iris_small": self.get_parameter_index(PoseParameterCategory.IRIS_MORPH, "iris_small"),
-                "iris_x": self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x"),
-                "iris_y": self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y"),
+                "iris_rotation_x": self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x"),
+                "iris_rotation_y": self.get_parameter_index(PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y"),
                 
                 # Eyebrows
                 "eyebrow_happy": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_happy"),
                 "eyebrow_angry": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_angry"),
-                "eyebrow_sad": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_sad"),
                 "eyebrow_troubled": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_troubled"),
+                "eyebrow_lowered": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_lowered"),
+                "eyebrow_raised": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_raised"),
+                "eyebrow_serious": self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_serious"),
                 
                 # Mouth
                 "mouth_aaa": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_aaa"),
@@ -125,11 +128,12 @@ class AnimatedCharacter:
                 "mouth_eee": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_eee"),
                 "mouth_ooo": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_ooo"),
                 "mouth_delta": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_delta"),
-                "mouth_smirk": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_smirk"),
                 "mouth_lowered_corner": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_lowered_corner"),
+                "mouth_raised_corner": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_raised_corner"),
+                "mouth_smirk": self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_smirk"),
                 
                 # Breathing
-                "breathing": self.get_parameter_index(PoseParameterCategory.BREATHING)
+                "breathing": self.get_parameter_index(PoseParameterCategory.BREATHING, "breathing")
             }
             print("Parameter mapping initialized successfully")
             
@@ -223,6 +227,8 @@ class AnimatedCharacter:
                         emotion_params = self.sad_animation.update(delta_time)
                     elif self.target_emotion == "angry":
                         emotion_params = self.angry_animation.update(delta_time)
+                    elif self.target_emotion == "surprise":
+                        emotion_params = self.surprise_animation.update(delta_time)
                     else:
                         emotion_params = {}
                     
