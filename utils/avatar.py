@@ -166,22 +166,26 @@ class AnimatedCharacter:
                 # Apply happy-specific parameters
                 mouth_smile_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_smile")
                 mouth_raised_corner_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_raised_corner")
+                mouth_aaa_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_aaa")
+                mouth_ooo_index = self.get_parameter_index(PoseParameterCategory.MOUTH, "mouth_ooo")
                 eyebrow_happy_index = self.get_parameter_index(PoseParameterCategory.EYEBROW, "eyebrow_happy")
-                eye_wink_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_wink")
                 eye_happy_index = self.get_parameter_index(PoseParameterCategory.EYE, "eye_happy")
                 
                 if mouth_smile_index >= 0:
                     pose[mouth_smile_index] = 1.0
                 if mouth_raised_corner_index >= 0:
-                    pose[mouth_raised_corner_index] = 0.7
-                    pose[mouth_raised_corner_index + 1] = 0.7
+                    pose[mouth_raised_corner_index] = 0.8
+                    pose[mouth_raised_corner_index + 1] = 0.8
+                if mouth_aaa_index >= 0:
+                    pose[mouth_aaa_index] = 0.6
+                if mouth_ooo_index >= 0:
+                    pose[mouth_ooo_index] = 0.25
                 if eyebrow_happy_index >= 0:
                     pose[eyebrow_happy_index] = 0.6
                     pose[eyebrow_happy_index + 1] = 0.6
-                if eye_wink_index >= 0:
-                    pose[eye_wink_index] = 0.0
                 if eye_happy_index >= 0:
                     pose[eye_happy_index] = 0.6
+                    pose[eye_happy_index + 1] = 0.6
 
             elif self.target_emotion == "sad":
                 animation_values = self.sad_animation.update(delta_time)
