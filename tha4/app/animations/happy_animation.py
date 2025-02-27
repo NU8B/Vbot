@@ -6,6 +6,7 @@ from .base_animation import BaseAnimation
 
 class HappyAnimation(BaseAnimation):
     def __init__(self):
+        super().__init__()  # Initialize base animation (including blink)
         # Bouncy movement
         self.bounce_cycle = 0.0
         self.bounce_speed = 3.0
@@ -48,6 +49,9 @@ class HappyAnimation(BaseAnimation):
         self.iris_amount = 0.3
 
     def update(self, delta_time: float) -> Dict[str, float]:
+        # Get blink value
+        blink = self.update_blink(delta_time)
+        
         # Update all cycles
         self.bounce_cycle = (self.bounce_cycle + delta_time * self.bounce_speed) % (math.pi * 2)
         self.head_cycle = (self.head_cycle + delta_time * self.head_speed) % (math.pi * 2)
@@ -85,11 +89,11 @@ class HappyAnimation(BaseAnimation):
             "head_y": max(min(head_y, 1.0), -1.0),
             "neck_z": max(min(head_z, 1.0), -1.0),
             
-            # Eye parameters
-            "eye_happy_wink": eye_sparkle,
-            "eye_wink": 0.0,
+            # Eye parameters - blend blink with happy eyes
+            "eye_wink": blink,
+            "eye_happy_wink": eye_sparkle * (1.0 - blink),
             "eye_surprised": 0.0,
-            "eye_relaxed": 0.3,
+            "eye_relaxed": 0.3 * (1.0 - blink),
             "eye_unimpressed": 0.0,
             "eye_raised_lower_eyelid": 0.0,
             

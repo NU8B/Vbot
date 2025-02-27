@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 import json
 import os
+from utils.emotion_utils import EmotionHandler
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
@@ -37,6 +38,8 @@ class OllamaHandler:
         # Create outputs directory if it doesn't exist
         self.output_dir = Path("asset/outputs")
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        self.emotion_handler = EmotionHandler()  # Initialize emotion handler
 
     @staticmethod
     def initialize():
@@ -143,24 +146,40 @@ class OllamaHandler:
 
     def handle_text_input(self, text):
         """Handle text input from GUI"""
-        if self.is_processing or self.is_speaking:
-            return
+        try:
+            if self.is_processing or self.is_speaking:
+                return
 
-        self.is_processing = True
-        self.gui.disable_input_controls()
-        self.timings = {"processing_start": time.time()}
+            self.is_processing = True
+            self.gui.disable_input_controls()
+            self.timings = {"processing_start": time.time()}
 
-        self.gui.update_chat("You", text)
-        threading.Thread(target=self._process_text, args=(text,), daemon=True).start()
+            self.gui.update_chat("You", text)
+            threading.Thread(target=self._process_text, args=(text,), daemon=True).start()
 
-    def _process_text(self, text, timings=None):
+        except Exception as e:
+            print(f"Error in text handling: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+    def _process_text(self, text):
         """Process text input and generate a response"""
         try:
             print("\n=== Starting text processing ===")
-            self.timings = timings if timings else {"processing_start": time.time()}
+            self.timings = {"processing_start": time.time()}
             processing_start = self.timings["processing_start"]
 
-            # Get LLM response
+            # Get user's emotion
+            user_emotion = self.emotion_handler.classify_emotion(text)
+            user_confidence = self.emotion_handler.get_last_confidence()
+            print(f"[DEBUG] User emotion: {user_emotion} (confidence: {user_confidence:.2f})")
+            
+            avatar = self.gui.get_avatar()
+            if avatar:
+                print(f"[DEBUG] Setting avatar emotion: {user_emotion}")
+                avatar.set_emotion(user_emotion)
+            
+            # Get LLM response first
             print("Calling Ollama LLM...")
             llm_start = time.time()
             response = self.call_ollama_static(
@@ -171,12 +190,17 @@ class OllamaHandler:
             self.timings["llm"] = time.time() - llm_start
             print(f"LLM Response received in {self.timings['llm']:.2f}s")
 
-            if not response:
-                print("Error: No response from LLM")
-                self.gui.update_chat(
-                    "AI", "Sorry, I'm having trouble connecting to my brain right now!"
-                )
-                return
+            # Get AI's emotion
+            ai_emotion = self.emotion_handler.classify_emotion(response)
+            ai_confidence = self.emotion_handler.get_last_confidence()
+            print(f"[DEBUG] AI emotion: {ai_emotion} (confidence: {ai_confidence:.2f})")
+
+            # Blend emotions based on confidence
+            avatar = self.gui.get_avatar()
+            if avatar:
+                final_emotion = self._blend_emotions(user_emotion, ai_emotion, user_confidence, ai_confidence)
+                print(f"[DEBUG] Final blended emotion: {final_emotion}")
+                avatar.set_emotion(final_emotion)
 
             # Process response with inference handler
             print("Processing response through inference handler...")
@@ -187,27 +211,6 @@ class OllamaHandler:
             print(
                 f"Inference processing completed in {time.time() - inference_start:.2f}s"
             )
-
-            # Update avatar emotion
-            print("Updating avatar emotion...")
-            avatar = self.gui.get_avatar()
-            if avatar:
-                # Map emotion to animation state
-                print(f"Current detected emotion: {detected_emotion}")
-                if (
-                    "happy" in detected_emotion
-                    or "joy" in detected_emotion
-                    or "excited" in detected_emotion
-                ):
-                    avatar.set_emotion("happy")
-                elif "sad" in detected_emotion or "disappointed" in detected_emotion:
-                    avatar.set_emotion("sad")
-                elif "angry" in detected_emotion or "annoyed" in detected_emotion:
-                    avatar.set_emotion("angry")
-                else:
-                    avatar.set_emotion("neutral")
-            else:
-                print("Warning: Avatar not found!")
 
             # Calculate total time
             total_time = time.time() - processing_start
@@ -305,3 +308,39 @@ class OllamaHandler:
             print("Enabling input controls...")
             self.gui.enable_input_controls()
             print("Processing complete\n")
+
+    def _blend_emotions(self, user_emotion, ai_emotion, user_conf, ai_conf):
+        """Blend emotions based on confidence scores and emotional intensity"""
+        # Define emotional intensity weights
+        intensity_weights = {
+            "angry": 1.2,  # Strong emotion
+            "surprise": 1.1,
+            "happy": 1.0,
+            "sad": 0.9,
+            "neutral": 0.7  # Weakest emotion
+        }
+        
+        # Get base emotional states
+        user_base = self.emotion_handler.get_base_emotion(user_emotion)
+        ai_base = self.emotion_handler.get_base_emotion(ai_emotion)
+        
+        # Calculate weighted scores
+        user_weight = user_conf * intensity_weights.get(user_base, 1.0)
+        ai_weight = ai_conf * intensity_weights.get(ai_base, 1.0)
+        
+        # If one emotion is significantly stronger, use it
+        if user_weight > ai_weight * 1.5:
+            return user_emotion
+        elif ai_weight > user_weight * 1.5:
+            return ai_emotion
+        
+        # If emotions are the same category, use the higher confidence one
+        if user_base == ai_base:
+            return user_emotion if user_conf > ai_conf else ai_emotion
+        
+        # If mixed emotions, prefer more active emotions
+        priority = ["angry", "surprise", "happy", "sad", "neutral"]
+        user_priority = priority.index(user_base)
+        ai_priority = priority.index(ai_base)
+        
+        return user_emotion if user_priority <= ai_priority else ai_emotion

@@ -12,7 +12,7 @@ import time
 import warnings
 from pathlib import Path
 
-from utils.audio_utils. import AudioProcessor
+from utils.audio_utils import AudioProcessor
 from utils.gui import ChatGUI
 from utils.inference_styleTTS2 import StyleTTS2Inference
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig

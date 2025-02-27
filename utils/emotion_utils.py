@@ -270,13 +270,35 @@ class EmotionHandler:
         result = self.emotion_classifier(text)
         emotion = result[0][0]["label"]
         confidence = result[0][0]["score"]
+        
+        # Store confidence for later use
+        self._last_confidence = confidence
 
         # Use neutral for low confidence predictions
         if confidence < 0.3:
             emotion = "neutral"
-
+        
         return emotion
 
     def get_style_for_emotion(self, emotion):
         """Get the corresponding voice style file for an emotion."""
         return EMOTION_MAPPING.get(emotion, "neutral.wav")
+
+    def get_last_confidence(self):
+        """Return the confidence score of the last emotion classification"""
+        return getattr(self, '_last_confidence', 0.3)
+
+    def get_base_emotion(self, emotion):
+        """Get the base emotion category"""
+        emotion_categories = {
+            "happy": ["admiration", "amusement", "approval", "excitement", "gratitude", "joy", "love", "optimism", "pride"],
+            "sad": ["disappointment", "embarrassment", "fear", "grief", "nervousness", "remorse", "sadness"],
+            "angry": ["disapproval", "disgust", "anger", "annoyance"],
+            "surprise": ["realization", "surprise"],
+            "neutral": ["neutral", "confusion", "caring", "curiosity", "desire", "relief"]
+        }
+        
+        for base, variants in emotion_categories.items():
+            if emotion in variants:
+                return base
+        return "neutral"

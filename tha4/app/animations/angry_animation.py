@@ -6,6 +6,7 @@ from .base_animation import BaseAnimation
 
 class AngryAnimation(BaseAnimation):
     def __init__(self):
+        super().__init__()  # Initialize base animation (including blink)
         # Tense, sharp movement
         self.tension_cycle = 0.0
         self.tension_speed = 2.0
@@ -46,6 +47,9 @@ class AngryAnimation(BaseAnimation):
         # Remove iris movement initialization since we want static iris
 
     def update(self, delta_time: float) -> Dict[str, float]:
+        # Get blink value
+        blink = self.update_blink(delta_time)
+        
         # Update all cycles
         self.tension_cycle = (self.tension_cycle + delta_time * self.tension_speed) % (math.pi * 2)
         self.head_cycle = (self.head_cycle + delta_time * self.head_speed) % (math.pi * 2)
@@ -81,12 +85,12 @@ class AngryAnimation(BaseAnimation):
             "neck_z": max(min(head_z, 1.0), -1.0),
             
             # Eye parameters
-            "eye_wink": 0.0,
+            "eye_wink": blink,
             "eye_happy_wink": 0.0,
             "eye_surprised": 0.0,
             "eye_relaxed": 0.0,
-            "eye_unimpressed": eye_narrow,
-            "eye_raised_lower_eyelid": 0.4,
+            "eye_unimpressed": eye_narrow * (1.0 - blink),  # Reduce narrow eyes during blink
+            "eye_raised_lower_eyelid": 0.4 * (1.0 - blink),
             
             # Eyebrow parameters
             "eyebrow_angry": brow_furrow,

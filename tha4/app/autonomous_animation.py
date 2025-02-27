@@ -411,10 +411,10 @@ class AutonomousAnimationFrame(wx.Frame):
                 pose[eye_unimpressed_index] = animation_values.get('eye_unimpressed', 0.8)
                 pose[eye_unimpressed_index + 1] = animation_values.get('eye_unimpressed', 0.8)  # Set right eye
             
-            # Handle head rotation
+            # Handle head rotation - ensure downward tilt is applied
             head_x_index = self.get_parameter_index(PoseParameterCategory.FACE_ROTATION, "head_x")
             if head_x_index >= 0:
-                pose[head_x_index] = animation_values.get('head_x', -0.5)  # Ensure negative value for down tilt
+                pose[head_x_index] = animation_values.get('head_x', -0.4)  # Default to -0.4 if not provided
             
             # Handle iris parameters for sad animation - keep centered
             iris_small_index = self.get_parameter_index(PoseParameterCategory.IRIS_MORPH, "iris_small")

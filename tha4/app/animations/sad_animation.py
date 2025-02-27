@@ -6,15 +6,17 @@ from .base_animation import BaseAnimation
 
 class SadAnimation(BaseAnimation):
     def __init__(self):
+        super().__init__()  # Initialize base animation (including blink)
         # Droop movement
         self.droop_cycle = 0.0
         self.droop_speed = 0.5
         self.droop_amount = 0.4
         
-        # Head movement
+        # Head movement - adjusted for more downward tilt
         self.head_cycle = 0.0
         self.head_speed = 0.3
         self.head_amount = 0.3
+        self.head_down_offset = -0.4  # Added constant downward tilt
         
         # Eye movement
         self.eye_droop_cycle = 0.0
@@ -22,7 +24,7 @@ class SadAnimation(BaseAnimation):
         self.eye_droop_amount = 0.9
         
         # Mouth
-        self.frown_amount = 0.7
+        self.frown_amount = 1.1
         self.mouth_quiver_cycle = 0.0
         self.mouth_quiver_speed = 3.0
         self.mouth_quiver_amount = 0.1
@@ -45,7 +47,7 @@ class SadAnimation(BaseAnimation):
         # Eyebrows (added)
         self.brow_cycle = 0.0
         self.brow_speed = 0.5
-        self.brow_amount = 0.6
+        self.brow_amount = 0.8
         
         # Modify iris movement parameters
         self.iris_cycle = 0.0
@@ -54,6 +56,9 @@ class SadAnimation(BaseAnimation):
         self.iris_down_offset = -0.6
 
     def update(self, delta_time: float) -> Dict[str, float]:
+        # Get blink value
+        blink = self.update_blink(delta_time)
+        
         # Update all cycles
         self.droop_cycle = (self.droop_cycle + delta_time * self.droop_speed) % (math.pi * 2)
         self.head_cycle = (self.head_cycle + delta_time * self.head_speed) % (math.pi * 2)
@@ -67,7 +72,7 @@ class SadAnimation(BaseAnimation):
         
         # Calculate movements with correct ranges (-1.0 to 1.0)
         droop = math.sin(self.droop_cycle) * self.droop_amount
-        head_x = (math.sin(self.head_cycle * 0.7) * self.head_amount - 0.5) * 0.5
+        head_x = (math.sin(self.head_cycle * 0.7) * self.head_amount - 0.5) * 0.5 + self.head_down_offset  # Added offset
         head_y = (math.sin(self.head_cycle) * self.head_amount + droop) * 0.5
         head_z = (math.sin(self.head_cycle * 0.5) * (self.head_amount * 0.3)) * 0.5
         eye_droop = (math.sin(self.eye_droop_cycle) * 0.5 + 0.5) * self.eye_droop_amount
@@ -84,7 +89,7 @@ class SadAnimation(BaseAnimation):
         head_y += micro_movement * 0.3
         
         # Set iris values - looking downward
-        iris_x = 0.0  # up down
+        iris_x = 0.2  # up down 
         iris_y = 0.0 # left right
         
         return {
@@ -94,12 +99,12 @@ class SadAnimation(BaseAnimation):
             "neck_z": max(min(head_z, 1.0), -1.0),
             
             # Eye parameters
-            "eye_wink": 0.0,
+            "eye_wink": blink,
             "eye_happy_wink": 0.0,
             "eye_surprised": 0.0,
-            "eye_relaxed": eye_droop * 1.0,
-            "eye_unimpressed": 0.8,
-            "eye_raised_lower_eyelid": 0.4,
+            "eye_relaxed": eye_droop * (1.0 - blink),
+            "eye_unimpressed": 0.8 * (1.0 - blink),
+            "eye_raised_lower_eyelid": 0.4 * (1.0 - blink),
             "eye_unimpressed_left": 0.8,
             "eye_unimpressed_right": 0.8,
             
