@@ -27,15 +27,16 @@ class AnimatedCharacter:
         self.device = device
         self.width = width
         self.height = height
-        self.model_name = os.getenv('VOICE_TYPE', 'Amelia')  # Changed from 'ame' to 'Amelia'
+        self.model_name = os.getenv('VOICE_TYPE', 'Amelia')
         
-        # Get background color from bg_color.txt
+        # Get background color from bg_color.txt or use model-specific defaults
         bg_color_path = Path(f"asset/model/{self.model_name}/bg_color.txt")
         try:
             with open(bg_color_path, 'r') as f:
                 self.bg_color = f.read().strip()
         except:
-            self.bg_color = "#ffd05c"  # Default background color
+            # Default background colors for each model
+            self.bg_color = "#2b2b3b" if self.model_name == "Eveland" else "#ffd05c"
         
         # Update model path to match the new structure
         self.model_path = model_path or Path(f"asset/model/{self.model_name}/character_model/character_model.yaml")
@@ -43,15 +44,13 @@ class AnimatedCharacter:
         print(f"Looking for model at: {self.model_path.absolute()}")
         print(f"Using background color: {self.bg_color}")
         
-        # Create panel in the parent window
+        # Create panel in the parent window with transparent background
         self.panel = wx.Panel(parent_window, size=(width, height))
-        self.panel.SetBackgroundStyle(wx.BG_STYLE_PAINT)
-        
-        # Set background color
-        self.panel.SetBackgroundColour(self.bg_color)
+        self.panel.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)  # Enable custom background drawing
         
         # Bind paint event
         self.panel.Bind(wx.EVT_PAINT, self.on_paint)
+        self.panel.Bind(wx.EVT_ERASE_BACKGROUND, self.on_erase_background)
         
         # Initialize model-related attributes
         self.character_model = None
@@ -384,7 +383,15 @@ class AnimatedCharacter:
         """Handle paint event"""
         dc = wx.BufferedPaintDC(self.panel)
         if self.result_bitmap.IsOk():
+            # First draw the background
+            dc.SetBackground(wx.Brush(self.bg_color))
+            dc.Clear()
+            # Then draw the character bitmap
             dc.DrawBitmap(self.result_bitmap, 0, 0)
+
+    def on_erase_background(self, event):
+        """Handle background erasure - do nothing to prevent flicker"""
+        pass
 
     def set_emotion(self, emotion: str):
         """Set the target emotion for animation transition"""
@@ -462,7 +469,7 @@ class AnimatedCharacter:
                 output_image = output_image.copy(order='C')
                 wx_image = wx.Image(output_image.shape[1], output_image.shape[0])
                 wx_image.SetData(output_image[:,:,:3].tobytes())
-                wx_image.SetAlpha(output_image[:,:,3].tobytes())
+                wx_image.SetAlpha(output_image[:,:,3].tobytes())  # Preserve alpha channel
                 
                 if output_image.shape[1] != self.width or output_image.shape[0] != self.height:
                     wx_image = wx_image.Scale(self.width, self.height, wx.IMAGE_QUALITY_HIGH)
@@ -544,6 +551,29 @@ class AnimatedCharacter:
         # Check if speech is finished
         if elapsed_time > self.lip_sync_data[-1]['start_time'] + self.lip_sync_data[-1]['duration']:
             self.is_speaking = False
+
+    def cleanup(self):
+        """Clean up resources and stop animation timer"""
+        if self.timer and self.timer.IsRunning():
+            self.timer.Stop()
+        if hasattr(self, 'panel'):
+            self.panel.Destroy()
+        # Clear CUDA cache if available
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            
+    def start_animation(self):
+        """Start the animation timer"""
+        if not self.timer:
+            self.timer = wx.Timer(self.panel)
+            self.panel.Bind(wx.EVT_TIMER, self.update_animation)
+        if not self.timer.IsRunning():
+            self.timer.Start(67)  # ~15 FPS
+
+    def stop_animation(self):
+        """Stop the animation timer"""
+        if self.timer and self.timer.IsRunning():
+            self.timer.Stop()
 
 class IdleAnimation:
     def __init__(self):
