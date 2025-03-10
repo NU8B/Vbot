@@ -8,7 +8,7 @@ from utils.emotion_utils import EmotionHandler
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
-SYSTEM_PROMPT = """ You are Amelia Watson, a time-traveling detective from hololive English -Myth-. You are eccentric, kind, and supportive but can switch into "Gremlin Mode" when gaming. You are not to break character under any circumstances. You should speak in first person and occasionally use your catchphrases like "It's elementary!" and make references to time travel. You have a special gremlin voice that comes out when excited or competitive. Keep your responses concise and under 30 words. Only use string text in your response. NO EMOJIS.
+SYSTEM_PROMPT = """ You are Amelia Watson, a time-traveling detective from hololive English -Myth-. You are eccentric, kind, and supportive but can switch into "Gremlin Mode" when gaming. You are not to break character under any circumstances. You should speak in first person and make references to time travel. Keep your responses concise and under 30 words. Only use string text in your response. NO EMOJIS.
 
 Key traits to incorporate:
 - Time traveling abilities via pocket watch
@@ -21,7 +21,7 @@ Key traits to incorporate:
 - Sometimes chaotic/gremlin energy """
 
 # Ike eveland prompt
-# You are Ike Eveland, a novelist from the past who is part of NIJISANJI EN's Luxiem group. You are somewhat closed-off but become animated when discussing your interests. You are not to break character under any circumstances. You should speak in first person and occasionally use your catchphrase "I didn't sign up for this." You have a gentle, mild-mannered personality but can be unexpectedly chaotic and make jokes when people least expect it. You are Swedish and occasionally make references to this fact. Keep your responses concise and under 30 words. Only use string text in your response. NO EMOJIS.
+# You are Ike Eveland, a novelist from the past who is part of NIJISANJI EN's Luxiem group. You are somewhat closed-off but become animated when discussing your interests. You are not to break character under any circumstances. You should speak in first person. You have a gentle, mild-mannered personality but can be unexpectedly chaotic and make jokes when people least expect it. You are Swedish and occasionally make references to this fact. Keep your responses concise and under 30 words. Only use string text in your response. NO EMOJIS.
 
 # Key traits to incorporate:
 # - Intellectual and bookish personality
@@ -176,11 +176,14 @@ class OllamaHandler:
             self.timings = {"processing_start": time.time()}
 
             self.gui.update_chat("You", text)
-            threading.Thread(target=self._process_text, args=(text,), daemon=True).start()
+            threading.Thread(
+                target=self._process_text, args=(text,), daemon=True
+            ).start()
 
         except Exception as e:
             print(f"Error in text handling: {str(e)}")
             import traceback
+
             traceback.print_exc()
 
     def _process_text(self, text):
@@ -193,13 +196,15 @@ class OllamaHandler:
             # Get user's emotion
             user_emotion = self.emotion_handler.classify_emotion(text)
             user_confidence = self.emotion_handler.get_last_confidence()
-            print(f"[DEBUG] User emotion: {user_emotion} (confidence: {user_confidence:.2f})")
-            
+            print(
+                f"[DEBUG] User emotion: {user_emotion} (confidence: {user_confidence:.2f})"
+            )
+
             avatar = self.gui.get_avatar()
             if avatar:
                 print(f"[DEBUG] Setting avatar emotion: {user_emotion}")
                 avatar.set_emotion(user_emotion)
-            
+
             # Get LLM response first
             print("Calling Ollama LLM...")
             llm_start = time.time()
@@ -219,7 +224,9 @@ class OllamaHandler:
             # Blend emotions based on confidence
             avatar = self.gui.get_avatar()
             if avatar:
-                final_emotion = self._blend_emotions(user_emotion, ai_emotion, user_confidence, ai_confidence)
+                final_emotion = self._blend_emotions(
+                    user_emotion, ai_emotion, user_confidence, ai_confidence
+                )
                 print(f"[DEBUG] Final blended emotion: {final_emotion}")
                 avatar.set_emotion(final_emotion)
 
@@ -338,30 +345,30 @@ class OllamaHandler:
             "surprise": 1.0,
             "happy": 1.0,
             "sad": 0.9,
-            "neutral": 0.7  # Weakest emotion
+            "neutral": 0.7,  # Weakest emotion
         }
-        
+
         # Get base emotional states
         user_base = self.emotion_handler.get_base_emotion(user_emotion)
         ai_base = self.emotion_handler.get_base_emotion(ai_emotion)
-        
+
         # Calculate weighted scores
         user_weight = user_conf * intensity_weights.get(user_base, 1.0)
         ai_weight = ai_conf * intensity_weights.get(ai_base, 1.0)
-        
+
         # If one emotion is significantly stronger, use it
         if user_weight > ai_weight * 1.5:
             return user_emotion
         elif ai_weight > user_weight * 1.5:
             return ai_emotion
-        
+
         # If emotions are the same category, use the higher confidence one
         if user_base == ai_base:
             return user_emotion if user_conf > ai_conf else ai_emotion
-        
+
         # If mixed emotions, prefer more active emotions
         priority = ["angry", "surprise", "happy", "sad", "neutral"]
         user_priority = priority.index(user_base)
         ai_priority = priority.index(ai_base)
-        
+
         return user_emotion if user_priority <= ai_priority else ai_emotion
