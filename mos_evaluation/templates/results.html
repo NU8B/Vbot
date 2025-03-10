@@ -78,16 +78,16 @@
                         </div>
                         <div class="row">
                             <div class="col-12 mb-3">
-                                <div class="stat-value">{{ "%.2f"|format(analysis[model].avg_naturalness) }}</div>
-                                <div class="stat-label">Average Naturalness (33.33%)</div>
+                                <div class="stat-value">{{ "%.2f"|format(analysis[model].avg_naturalness) }}<span style="font-size: 24px">/5</span></div>
+                                <div class="stat-label">Average Naturalness</div>
                             </div>
                             <div class="col-12 mb-3">
                                 <div class="stat-value">{{ "%.1f"|format(analysis[model].overall_accuracy) }}%</div>
-                                <div class="stat-label">Overall Emotion Recognition Accuracy (33.33%)</div>
+                                <div class="stat-label">Overall Emotion Recognition Accuracy</div>
                             </div>
                             <div class="col-12">
-                                <div class="stat-value">{{ "%.1f"|format(analysis[model].overall_confidence) }}</div>
-                                <div class="stat-label">Overall Confidence Rating (33.33%)</div>
+                                <div class="stat-value">{{ "%.1f"|format(analysis[model].overall_confidence) }}<span style="font-size: 24px">/5</span></div>
+                                <div class="stat-label">Overall Confidence Rating</div>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                 {% for model in models %}
                 <div class="col-md-6">
                     <div class="stat-card">
-                        <div class="stat-value">{{ "%.2f"|format(analysis[model].avg_naturalness) }}</div>
+                        <div class="stat-value">{{ "%.2f"|format(analysis[model].avg_naturalness) }}<span style="font-size: 24px">/5</span></div>
                         <div class="stat-label">Average Naturalness Score for {{ model }}</div>
                     </div>
                 </div>

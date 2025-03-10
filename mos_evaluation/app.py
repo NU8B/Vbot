@@ -222,12 +222,16 @@ def view_results():
             else 0
         )
 
-        # Calculate total score with equal weights (33.33% each)
+        # Calculate total score with 50% for naturalness and 50% for emotion evaluation
+        # (25% for accuracy and 25% for confidence)
         total_score = (
-            (avg_naturalness * 20)  # Convert 5-scale to 100
-            + overall_accuracy  # Already on 100 scale
-            + (overall_confidence * 20)  # Convert 5-scale to 100
-        ) / 3  # Average of the three components
+            (avg_naturalness * 20)
+            * 0.5  # 50% weight for naturalness (converted to 100-scale)
+            + overall_accuracy
+            * 0.25  # 25% weight for emotion accuracy (already on 100-scale)
+            + (overall_confidence * 20)
+            * 0.25  # 25% weight for confidence (converted to 100-scale)
+        )
 
         analysis[model] = {
             "total_score": round(total_score, 1),

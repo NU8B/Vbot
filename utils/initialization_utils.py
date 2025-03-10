@@ -10,8 +10,9 @@ from .TTS_utils import InferenceHandler
 
 
 class InitializationHandler:
-    def __init__(self):
+    def __init__(self, model_name="Amelia"):
         self.init_start = time.time()
+        self.model_name = model_name
         self.docker_handler = None
         self.tts_model = None
         self.audio_processor = None
@@ -64,7 +65,9 @@ class InitializationHandler:
         self._initialize_group2()
 
         # Create inference handler
-        self.inference_handler = InferenceHandler(self.tts_model, self.emotion_handler)
+        self.inference_handler = InferenceHandler(
+            self.tts_model, self.emotion_handler, model_name=self.model_name
+        )
 
         return self._get_initialization_results()
 
@@ -72,11 +75,11 @@ class InitializationHandler:
         """Initialize Ollama and StyleTTS2"""
         group1_start = time.time()
         print("\nWarming up Ollama...")
-        print("Initializing StyleTTS2...")
+        print(f"Initializing StyleTTS2 ({self.model_name} model)...")
 
         tasks = {
             "ollama": (OllamaHandler.initialize, [], {}),
-            "tts": (StyleTTS2Inference, [], {}),
+            "tts": (StyleTTS2Inference, [], {"model_name": self.model_name}),
         }
 
         self.results = self._run_parallel_tasks(tasks)
@@ -93,11 +96,11 @@ class InitializationHandler:
         print("\nInitializing Whisper model...")
         print("Initializing emotion classifier...")
 
-        # Check if all styles are cached
+        # Check if all styles are cached for this model
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{style_file}"
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}"
             if not self.tts_model.is_style_cached(style_path):
                 self.styles_were_cached = False
                 break
@@ -115,9 +118,8 @@ class InitializationHandler:
 
         if self.styles_were_cached:
             # When styles are cached, we can load and use them directly
-            cached_style = self.tts_model.get_cached_style(
-                "asset/ref_sound/neutral.wav"
-            )
+            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            cached_style = self.tts_model.get_cached_style(neutral_path)
 
             def warmup_task():
                 return self.tts_model.inference(
@@ -176,28 +178,30 @@ class InitializationHandler:
         # Quick check if all styles are cached
         all_cached = True
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{style_file}"
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}"
             if not self.tts_model.is_style_cached(style_path):
                 all_cached = False
                 break
 
         if all_cached:
             # Just load and return neutral style without computation
-            return self.tts_model.get_cached_style("asset/ref_sound/neutral.wav")
+            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            return self.tts_model.get_cached_style(neutral_path)
 
         # If not all cached, compute missing styles
         style_start = time.time()
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{style_file}"
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}"
             if not self.tts_model.is_style_cached(style_path):
                 self.tts_model.compute_style(style_path)
 
         self.results["style_computation"] = {"time": time.time() - style_start}
-        return self.tts_model.compute_style("asset/ref_sound/neutral.wav")
+        neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+        return self.tts_model.compute_style(neutral_path)
 
     def _init_emotion_classifier(self):
         """Initialize the emotion classifier"""
-        return EmotionHandler()
+        return EmotionHandler(model_name=self.model_name)
 
     def create_ollama_handler(self, gui=None):
         """Create and return an OllamaHandler instance"""

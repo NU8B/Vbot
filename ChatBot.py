@@ -13,8 +13,11 @@ from utils.initialization_utils import InitializationHandler
 # Suppress all warnings
 warnings.filterwarnings("ignore")
 
-# Initialize all components
-init_handler = InitializationHandler()
+# Model selection - can be changed to "Eveland" or "Amelia"
+MODEL_NAME = "Amelia"  # Default model
+
+# Initialize all components with selected model
+init_handler = InitializationHandler(model_name=MODEL_NAME)
 components = init_handler.initialize_all()
 
 # Initialize tkinter root

@@ -6,9 +6,10 @@ from .emotion_utils import EMOTION_CONFIG, DIFFUSION_STEPS
 
 
 class InferenceHandler:
-    def __init__(self, tts_model, emotion_handler):
+    def __init__(self, tts_model, emotion_handler, model_name="Amelia"):
         self.tts_model = tts_model
         self.emotion_handler = emotion_handler
+        self.model_name = model_name
         self.timings = {}
         self.last_style = None
 
@@ -27,7 +28,7 @@ class InferenceHandler:
 
         # Get style file and parameters for emotion
         emotion_params = EMOTION_CONFIG[detected_emotion]
-        style_path = f"asset/ref_sound/{emotion_params['file']}"
+        style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
 
         # Get cached style
         current_ref_style = self.tts_model.get_cached_style(style_path)
@@ -41,6 +42,7 @@ class InferenceHandler:
             beta=emotion_params["beta"],
             diffusion_steps=DIFFUSION_STEPS,
             embedding_scale=emotion_params["embedding_scale"],
+            speed=emotion_params["speed"],
         )
         self.timings["tts"] = time.time() - tts_start
 

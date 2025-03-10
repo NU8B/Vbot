@@ -20,25 +20,22 @@ from pathlib import Path
 # Suppress warnings
 warnings.filterwarnings("ignore")
 
-# List of models to test (repo IDs)
-MODELS_TO_TEST = [
-    "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2",
-    # "nonoJDWAOIDAWKDA/new_ft_StyleTTS2",
-]
+# List of models to test
+MODELS_TO_TEST = ["Amelia", "Eveland"]
 
 # Base output directory
 BASE_OUTPUT_DIR = Path("asset/outputs")
 
 
-def clear_style_cache():
-    """Clear all style cache directories"""
-    cache_dir = Path("cache/style")
+def clear_model_style_cache(model_name):
+    """Clear style cache for a specific model"""
+    cache_dir = Path("cache/style") / model_name
     if cache_dir.exists():
-        print("Clearing style cache...")
+        print(f"Clearing style cache for {model_name}...")
         shutil.rmtree(cache_dir)
-        print("Style cache cleared.")
+        print(f"Style cache cleared for {model_name}.")
     else:
-        print("No style cache found.")
+        print(f"No style cache found for {model_name}.")
 
 
 def ensure_output_directory(path):
@@ -69,24 +66,27 @@ CORE_EMOTIONS = ["joy", "sadness", "anger", "surprise", "neutral"]
 GENERIC_TEST_TEXT = "This is a test sentence to compare different models and emotions."
 
 
-def test_model(repo_id):
-    print(f"\nTesting model: {repo_id}")
+def test_model(model_name):
+    print(f"\nTesting model: {model_name}")
     print("=" * 80)
 
     # Create model-specific output directory
-    model_name = repo_id.split("/")[-1]
     output_dir = BASE_OUTPUT_DIR / model_name
     ensure_output_directory(output_dir)
     print(f"Output directory: {output_dir}")
 
-    # Initialize models
+    # Clear model-specific cache before testing
+    clear_model_style_cache(model_name)
+
+    # Initialize models with model name
     print("Initializing models...")
-    emotion_handler = EmotionHandler()
-    tts = StyleTTS2Inference(repo_id=repo_id)
+    emotion_handler = EmotionHandler(model_name=model_name)
+    tts = StyleTTS2Inference(model_name=model_name)
 
     # Load neutral style as default
     print("\nLoading neutral style...")
-    default_style = tts.compute_style("asset/ref_sound/neutral.wav")
+    neutral_path = f"asset/ref_sound/{EMOTION_CONFIG['neutral']['file'][model_name]}"
+    default_style = tts.compute_style(neutral_path)
 
     # Warm up inference
     print("\nWarming up inference...")
@@ -114,15 +114,17 @@ def test_model(repo_id):
         start = time.time()
         print("Generating speech...")
 
+        ref_path = f"asset/ref_sound/{EMOTION_CONFIG[emotion]['file'][model_name]}"
+        # Compute style for each inference to avoid cross-model contamination
+        ref_style = tts.compute_style(ref_path)
         audio = tts.inference(
             text=text,
-            ref_s=tts.compute_style(
-                f"asset/ref_sound/{EMOTION_CONFIG[emotion]['file']}"
-            ),
+            ref_s=ref_style,
             alpha=EMOTION_CONFIG[emotion]["alpha"],
             beta=EMOTION_CONFIG[emotion]["beta"],
             diffusion_steps=DIFFUSION_STEPS,
             embedding_scale=EMOTION_CONFIG[emotion]["embedding_scale"],
+            speed=EMOTION_CONFIG[emotion]["speed"],
         )
 
         duration = time.time() - start
@@ -147,15 +149,17 @@ def test_model(repo_id):
         start = time.time()
         print("Generating speech...")
 
+        ref_path = f"asset/ref_sound/{EMOTION_CONFIG[emotion]['file'][model_name]}"
+        # Compute style for each inference to avoid cross-model contamination
+        ref_style = tts.compute_style(ref_path)
         audio = tts.inference(
             text=GENERIC_TEST_TEXT,
-            ref_s=tts.compute_style(
-                f"asset/ref_sound/{EMOTION_CONFIG[emotion]['file']}"
-            ),
+            ref_s=ref_style,
             alpha=EMOTION_CONFIG[emotion]["alpha"],
             beta=EMOTION_CONFIG[emotion]["beta"],
             diffusion_steps=DIFFUSION_STEPS,
             embedding_scale=EMOTION_CONFIG[emotion]["embedding_scale"],
+            speed=EMOTION_CONFIG[emotion]["speed"],
         )
 
         duration = time.time() - start
@@ -169,53 +173,23 @@ def test_model(repo_id):
         else:
             print(f"Failed to save to: {output_path}")
 
-    # Test 3: Custom text with neutral voice
-    print("\nTesting custom text with custom reference voice:")
-    print("-" * 80)
-
-    custom_text = "I really like our new original song tho. Every single day I wake up and it's stuck in my head."
-    print(f"Text: {custom_text}")
-
-    start = time.time()
-    print("Generating speech...")
-
-    audio = tts.inference(
-        text=custom_text,
-        ref_s=tts.compute_style("asset/ref_sound/custom.wav"),
-        alpha=0.3,
-        beta=0.7,
-        diffusion_steps=DIFFUSION_STEPS,
-        embedding_scale=1,
-    )
-
-    duration = time.time() - start
-    print(f"Time taken: {duration:.2f}s")
-
-    # Save audio
-    output_path = output_dir / "custom_reference.wav"
-    sf.write(str(output_path), audio, 24000)
-    if output_path.exists():
-        print(f"Successfully saved to: {output_path}")
-    else:
-        print(f"Failed to save to: {output_path}")
+    # Clear the model's cache after testing to free memory
+    clear_model_style_cache(model_name)
 
 
 def main():
     print("Starting multiple model inference test")
     print("=" * 80)
 
-    # Clear all style cache before starting tests
-    clear_style_cache()
-
     # Ensure base output directory exists
     ensure_output_directory(BASE_OUTPUT_DIR)
     print(f"Base output directory: {BASE_OUTPUT_DIR}")
 
-    for repo_id in MODELS_TO_TEST:
+    for model_name in MODELS_TO_TEST:
         try:
-            test_model(repo_id)
+            test_model(model_name)
         except Exception as e:
-            print(f"Error testing model {repo_id}: {str(e)}")
+            print(f"Error testing model {model_name}: {str(e)}")
             continue
 
     print("\nTesting completed!")

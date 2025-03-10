@@ -1,0 +1,2234 @@
+[
+  {
+    "naturalness": [
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_11_excitement.wav",
+        "score": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_11_excitement.wav",
+        "score": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 4.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_14_curiosity.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_13_confusion.wav",
+        "score": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_12_sadness.wav",
+        "score": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_12_sadness.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_14_curiosity.wav",
+        "score": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_13_confusion.wav",
+        "score": 4.5
+      }
+    ],
+    "emotion": [
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "anger",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 1.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "surprise",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 4.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 2
+      }
+    ],
+    "timestamp": "2025-02-15T12:16:35.466357",
+    "remote_ip": "10.0.5.105"
+  },
+  {
+    "naturalness": [
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 3
+      }
+    ],
+    "emotion": [
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 1.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "neutral",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "joy",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "joy",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3.5
+      }
+    ],
+    "timestamp": "2025-02-15T12:35:04.443144",
+    "remote_ip": "10.0.5.105"
+  },
+  {
+    "naturalness": [
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_13_confusion.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_12_sadness.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_11_excitement.wav",
+        "score": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_11_excitement.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_13_confusion.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_14_curiosity.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_14_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_12_sadness.wav",
+        "score": 4
+      }
+    ],
+    "emotion": [
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "joy",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "anger",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "anger",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "joy",
+        "confidence": 4.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "anger",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      }
+    ],
+    "timestamp": "2025-02-15T14:24:53.505663",
+    "remote_ip": "10.0.5.105"
+  },
+  {
+    "naturalness": [
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_11_excitement.wav",
+        "score": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_11_excitement.wav",
+        "score": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 4.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_1_excitement.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_14_curiosity.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_4_curiosity.wav",
+        "score": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_13_confusion.wav",
+        "score": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_3_approval.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_2_curiosity.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_12_sadness.wav",
+        "score": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_6_admiration.wav",
+        "score": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_10_admiration.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_7_neutral.wav",
+        "score": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_8_neutral.wav",
+        "score": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_12_sadness.wav",
+        "score": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "dynamic_14_curiosity.wav",
+        "score": 3.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_9_fear.wav",
+        "score": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_5_neutral.wav",
+        "score": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "dynamic_13_confusion.wav",
+        "score": 4.5
+      }
+    ],
+    "emotion": [
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 2
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_4.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 4
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_4.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_3.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "neutral",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "anger",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 2.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 1.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_sadness_1.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "surprise",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_3.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_1.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 4.5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "neutral",
+        "confidence": 1
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_2.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_3.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 2
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_2.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 4
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_4.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_surprise_1.wav",
+        "true_emotion": "surprise",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "generic_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_1.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_sadness_2.wav",
+        "true_emotion": "sadness",
+        "selected_emotion": "sadness",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "joy",
+        "confidence": 1
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_anger_1.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 5
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "specific_neutral_3.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 4.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_neutral_4.wav",
+        "true_emotion": "neutral",
+        "selected_emotion": "neutral",
+        "confidence": 5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_4.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "anger",
+        "confidence": 1.5
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_joy_3.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "sadness",
+        "confidence": 3
+      },
+      {
+        "model": "new_ft_StyleTTS2",
+        "file": "specific_anger_2.wav",
+        "true_emotion": "anger",
+        "selected_emotion": "surprise",
+        "confidence": 3
+      },
+      {
+        "model": "Amelia10_ft_StyleTTS2",
+        "file": "generic_joy_2.wav",
+        "true_emotion": "joy",
+        "selected_emotion": "neutral",
+        "confidence": 2
+      }
+    ],
+    "timestamp": "2025-02-15T12:16:35.466357",
+    "remote_ip": "10.0.5.105"
+  }
+]

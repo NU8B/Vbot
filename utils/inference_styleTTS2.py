@@ -53,14 +53,20 @@ from StyleTTS2.text_utils import TextCleaner
 
 
 class StyleTTS2Inference:
-    def __init__(self, repo_id="nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2", device=None):
+    def __init__(self, model_name="Amelia", repo_id=None, device=None):
+        # Map model names to their HuggingFace repo IDs
+        self.model_configs = {
+            "Amelia": "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2",
+            "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
+        }
 
-        self.repo_id = repo_id
+        self.model_name = model_name
+        self.repo_id = repo_id if repo_id else self.model_configs[model_name]
         self.device = (
             device if device else ("cuda" if torch.cuda.is_available() else "cpu")
         )
-        # Extract model name from repo_id for cache directory
-        model_name = repo_id.split("/")[-1]
+
+        # Create cache directory based on model name
         self.cache_dir = Path("cache/style") / model_name
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
