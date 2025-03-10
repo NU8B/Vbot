@@ -2,7 +2,7 @@ import threading
 import time
 import soundfile as sf
 from pathlib import Path
-from .emotion_utils import EMOTION_CONFIG, DIFFUSION_STEPS
+from .emotion_utils import DIFFUSION_STEPS, create_emotion_config
 
 
 class InferenceHandler:
@@ -12,6 +12,9 @@ class InferenceHandler:
         self.model_name = model_name
         self.timings = {}
         self.last_style = None
+
+        # Create model-specific emotion config
+        self.emotion_config = create_emotion_config(model_name)
 
         # Create outputs directory if it doesn't exist
         self.output_dir = Path("asset/outputs")
@@ -27,7 +30,7 @@ class InferenceHandler:
         self.timings["emotion"] = time.time() - emotion_start
 
         # Get style file and parameters for emotion
-        emotion_params = EMOTION_CONFIG[detected_emotion]
+        emotion_params = self.emotion_config[detected_emotion]
         style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
 
         # Get cached style

@@ -6,239 +6,278 @@ EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
 
 DIFFUSION_STEPS = 10  # Adjust this to trade off quality vs speed
 
-
-ALPHA = 0.3
-BETA = 0.7
-EMBEDDING_SCALE = 0.7
-
-ANGRY_ALPHA = 0.2
-ANGRY_BETA = 0.7
-ANGRY_EMBEDDING_SCALE = 1
-
-HAPPY_ALPHA = 0.3
-HAPPY_BETA = 0.7
-HAPPY_EMBEDDING_SCALE = 1
-
-SAD_ALPHA = 0.2
-SAD_BETA = 0.7
-SAD_EMBEDDING_SCALE = 1
-
-SURPRISE_ALPHA = 0.3
-SURPRISE_BETA = 0.7
-SURPRISE_EMBEDDING_SCALE = 1
-
-# Speed settings for different emotion types
-NEUTRAL_SPEED = 1.05  # Normal speed
-ANGRY_SPEED = 1.3  # 25% faster
-HAPPY_SPEED = 1.15  # 15% faster
-SAD_SPEED = 1
-SURPRISE_SPEED = 1.4  # 20% faster
-
-# Emotion to voice style mapping with inference parameters
-EMOTION_CONFIG = {
-    # Format: "emotion": {"file": {"model_name": "file.wav"}, "alpha": float, "beta": float, "embedding_scale": float, "speed": float}
-    # Neutral emotions
-    "neutral": {
-        "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
-        "alpha": ALPHA,
-        "beta": BETA,
-        "embedding_scale": EMBEDDING_SCALE,
-        "speed": NEUTRAL_SPEED,
+# Model-specific parameters
+MODEL_PARAMS = {
+    "Amelia": {
+        "ALPHA": 0.3,
+        "BETA": 0.7,
+        "EMBEDDING_SCALE": 0.5,
+        "ANGRY_ALPHA": 0.3,
+        "ANGRY_BETA": 0.7,
+        "ANGRY_EMBEDDING_SCALE": 1,
+        "HAPPY_ALPHA": 0.3,
+        "HAPPY_BETA": 0.7,
+        "HAPPY_EMBEDDING_SCALE": 1,
+        "SAD_ALPHA": 0.2,
+        "SAD_BETA": 0.2,
+        "SAD_EMBEDDING_SCALE": 1,
+        "SURPRISE_ALPHA": 0.3,
+        "SURPRISE_BETA": 0.6,
+        "SURPRISE_EMBEDDING_SCALE": 1,
+        "NEUTRAL_SPEED": 1.05,
+        "ANGRY_SPEED": 1.3,
+        "HAPPY_SPEED": 1.15,
+        "SAD_SPEED": 0.9,
+        "SURPRISE_SPEED": 1.4,
     },
-    "confusion": {
-        "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
-        "alpha": ALPHA,
-        "beta": BETA,
-        "embedding_scale": EMBEDDING_SCALE,
-        "speed": NEUTRAL_SPEED,
-    },
-    "caring": {
-        "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
-        "alpha": ALPHA,
-        "beta": BETA,
-        "embedding_scale": EMBEDDING_SCALE,
-        "speed": NEUTRAL_SPEED,
-    },
-    "curiosity": {
-        "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
-        "alpha": ALPHA,
-        "beta": BETA,
-        "embedding_scale": EMBEDDING_SCALE,
-        "speed": NEUTRAL_SPEED,
-    },
-    "desire": {
-        "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
-        "alpha": ALPHA,
-        "beta": BETA,
-        "embedding_scale": EMBEDDING_SCALE,
-        "speed": NEUTRAL_SPEED,
-    },
-    "relief": {
-        "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
-        "alpha": ALPHA,
-        "beta": BETA,
-        "embedding_scale": EMBEDDING_SCALE,
-        "speed": NEUTRAL_SPEED,
-    },
-    # Happy emotions
-    "admiration": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "amusement": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "approval": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "excitement": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "gratitude": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "joy": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "love": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "optimism": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    "pride": {
-        "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
-        "alpha": HAPPY_ALPHA,
-        "beta": HAPPY_BETA,
-        "embedding_scale": HAPPY_EMBEDDING_SCALE,
-        "speed": HAPPY_SPEED,
-    },
-    # Sad emotions
-    "disappointment": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    "embarrassment": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    "fear": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    "grief": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    "nervousness": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    "remorse": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    "sadness": {
-        "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
-        "alpha": SAD_ALPHA,
-        "beta": SAD_BETA,
-        "embedding_scale": SAD_EMBEDDING_SCALE,
-        "speed": SAD_SPEED,
-    },
-    # Angry emotions
-    "disapproval": {
-        "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
-        "alpha": ANGRY_ALPHA,
-        "beta": ANGRY_BETA,
-        "embedding_scale": ANGRY_EMBEDDING_SCALE,
-        "speed": ANGRY_SPEED,
-    },
-    "disgust": {
-        "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
-        "alpha": ANGRY_ALPHA,
-        "beta": ANGRY_BETA,
-        "embedding_scale": ANGRY_EMBEDDING_SCALE,
-        "speed": ANGRY_SPEED,
-    },
-    "anger": {
-        "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
-        "alpha": ANGRY_ALPHA,
-        "beta": ANGRY_BETA,
-        "embedding_scale": ANGRY_EMBEDDING_SCALE,
-        "speed": ANGRY_SPEED,
-    },
-    "annoyance": {
-        "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
-        "alpha": ANGRY_ALPHA,
-        "beta": ANGRY_BETA,
-        "embedding_scale": ANGRY_EMBEDDING_SCALE,
-        "speed": ANGRY_SPEED,
-    },
-    # Surprised emotions
-    "realization": {
-        "file": {"Amelia": "Amelia/surprised.wav", "Eveland": "Eveland/surprised.wav"},
-        "alpha": SURPRISE_ALPHA,
-        "beta": SURPRISE_BETA,
-        "embedding_scale": SURPRISE_EMBEDDING_SCALE,
-        "speed": SURPRISE_SPEED,
-    },
-    "surprise": {
-        "file": {"Amelia": "Amelia/surprised.wav", "Eveland": "Eveland/surprised.wav"},
-        "alpha": SURPRISE_ALPHA,
-        "beta": SURPRISE_BETA,
-        "embedding_scale": SURPRISE_EMBEDDING_SCALE,
-        "speed": SURPRISE_SPEED,
+    "Eveland": {
+        "ALPHA": 0.3,
+        "BETA": 0.7,
+        "EMBEDDING_SCALE": 0.5,
+        "ANGRY_ALPHA": 0.3,
+        "ANGRY_BETA": 0.7,
+        "ANGRY_EMBEDDING_SCALE": 1,
+        "HAPPY_ALPHA": 0.3,
+        "HAPPY_BETA": 0.7,
+        "HAPPY_EMBEDDING_SCALE": 1,
+        "SAD_ALPHA": 0.7,
+        "SAD_BETA": 0.9,
+        "SAD_EMBEDDING_SCALE": 1,
+        "SURPRISE_ALPHA": 0.3,
+        "SURPRISE_BETA": 0.6,
+        "SURPRISE_EMBEDDING_SCALE": 1,
+        "NEUTRAL_SPEED": 1.05,
+        "ANGRY_SPEED": 1.3,
+        "HAPPY_SPEED": 1.15,
+        "SAD_SPEED": 1,
+        "SURPRISE_SPEED": 1.4,
     },
 }
+
+
+# Helper function to get model-specific parameters
+def get_model_params(model_name="Amelia"):
+    return MODEL_PARAMS[model_name]
+
+
+# Emotion to voice style mapping with inference parameters
+def create_emotion_config(model_name="Amelia"):
+    params = get_model_params(model_name)
+
+    return {
+        # Format: "emotion": {"file": {"model_name": "file.wav"}, "alpha": float, "beta": float, "embedding_scale": float, "speed": float}
+        # Neutral emotions
+        "neutral": {
+            "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
+            "alpha": params["ALPHA"],
+            "beta": params["BETA"],
+            "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": params["NEUTRAL_SPEED"],
+        },
+        "confusion": {
+            "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
+            "alpha": params["ALPHA"],
+            "beta": params["BETA"],
+            "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": params["NEUTRAL_SPEED"],
+        },
+        "caring": {
+            "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
+            "alpha": params["ALPHA"],
+            "beta": params["BETA"],
+            "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": params["NEUTRAL_SPEED"],
+        },
+        "curiosity": {
+            "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
+            "alpha": params["ALPHA"],
+            "beta": params["BETA"],
+            "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": params["NEUTRAL_SPEED"],
+        },
+        "desire": {
+            "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
+            "alpha": params["ALPHA"],
+            "beta": params["BETA"],
+            "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": params["NEUTRAL_SPEED"],
+        },
+        "relief": {
+            "file": {"Amelia": "Amelia/neutral.wav", "Eveland": "Eveland/neutral.wav"},
+            "alpha": params["ALPHA"],
+            "beta": params["BETA"],
+            "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": params["NEUTRAL_SPEED"],
+        },
+        # Happy emotions
+        "admiration": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "amusement": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "approval": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "excitement": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "gratitude": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "joy": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "love": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "optimism": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        "pride": {
+            "file": {"Amelia": "Amelia/happy.wav", "Eveland": "Eveland/happy.wav"},
+            "alpha": params["HAPPY_ALPHA"],
+            "beta": params["HAPPY_BETA"],
+            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": params["HAPPY_SPEED"],
+        },
+        # Sad emotions
+        "disappointment": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        "embarrassment": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        "fear": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        "grief": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        "nervousness": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        "remorse": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        "sadness": {
+            "file": {"Amelia": "Amelia/sad.wav", "Eveland": "Eveland/sad.wav"},
+            "alpha": params["SAD_ALPHA"],
+            "beta": params["SAD_BETA"],
+            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": params["SAD_SPEED"],
+        },
+        # Angry emotions
+        "disapproval": {
+            "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
+            "alpha": params["ANGRY_ALPHA"],
+            "beta": params["ANGRY_BETA"],
+            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": params["ANGRY_SPEED"],
+        },
+        "disgust": {
+            "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
+            "alpha": params["ANGRY_ALPHA"],
+            "beta": params["ANGRY_BETA"],
+            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": params["ANGRY_SPEED"],
+        },
+        "anger": {
+            "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
+            "alpha": params["ANGRY_ALPHA"],
+            "beta": params["ANGRY_BETA"],
+            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": params["ANGRY_SPEED"],
+        },
+        "annoyance": {
+            "file": {"Amelia": "Amelia/angry.wav", "Eveland": "Eveland/angry.wav"},
+            "alpha": params["ANGRY_ALPHA"],
+            "beta": params["ANGRY_BETA"],
+            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": params["ANGRY_SPEED"],
+        },
+        # Surprised emotions
+        "realization": {
+            "file": {
+                "Amelia": "Amelia/surprised.wav",
+                "Eveland": "Eveland/surprised.wav",
+            },
+            "alpha": params["SURPRISE_ALPHA"],
+            "beta": params["SURPRISE_BETA"],
+            "embedding_scale": params["SURPRISE_EMBEDDING_SCALE"],
+            "speed": params["SURPRISE_SPEED"],
+        },
+        "surprise": {
+            "file": {
+                "Amelia": "Amelia/surprised.wav",
+                "Eveland": "Eveland/surprised.wav",
+            },
+            "alpha": params["SURPRISE_ALPHA"],
+            "beta": params["SURPRISE_BETA"],
+            "embedding_scale": params["SURPRISE_EMBEDDING_SCALE"],
+            "speed": params["SURPRISE_SPEED"],
+        },
+    }
+
+
+# Initialize EMOTION_CONFIG with default model (Amelia)
+EMOTION_CONFIG = create_emotion_config("Amelia")
 
 
 # For backward compatibility - now requires model name
@@ -264,6 +303,9 @@ class EmotionHandler:
             },
         )
 
+        # Create model-specific emotion config
+        self.emotion_config = create_emotion_config(model_name)
+
         # Warm up classifier silently
         self.classify_emotion("Test message for warmup.")
 
@@ -284,7 +326,7 @@ class EmotionHandler:
 
     def get_style_for_emotion(self, emotion):
         """Get the corresponding voice style file for an emotion."""
-        return get_emotion_file(emotion, self.model_name)
+        return self.emotion_config[emotion]["file"][self.model_name]
 
     def get_last_confidence(self):
         """Return the confidence score of the last emotion classification"""

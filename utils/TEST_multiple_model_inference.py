@@ -8,11 +8,9 @@ import warnings
 from utils.inference_styleTTS2 import StyleTTS2Inference
 from utils.emotion_utils import (
     EmotionHandler,
-    EMOTION_CONFIG,
     DIFFUSION_STEPS,
-    ALPHA,
-    BETA,
-    EMBEDDING_SCALE,
+    get_model_params,
+    create_emotion_config,
 )
 import time
 from pathlib import Path
@@ -83,9 +81,13 @@ def test_model(model_name):
     emotion_handler = EmotionHandler(model_name=model_name)
     tts = StyleTTS2Inference(model_name=model_name)
 
+    # Get model-specific parameters and config
+    params = get_model_params(model_name)
+    emotion_config = create_emotion_config(model_name)
+
     # Load neutral style as default
     print("\nLoading neutral style...")
-    neutral_path = f"asset/ref_sound/{EMOTION_CONFIG['neutral']['file'][model_name]}"
+    neutral_path = f"asset/ref_sound/{emotion_config['neutral']['file'][model_name]}"
     default_style = tts.compute_style(neutral_path)
 
     # Warm up inference
@@ -95,10 +97,10 @@ def test_model(model_name):
     _ = tts.inference(
         text=warmup_text,
         ref_s=default_style,
-        alpha=ALPHA,
-        beta=BETA,
+        alpha=params["ALPHA"],
+        beta=params["BETA"],
         diffusion_steps=DIFFUSION_STEPS,
-        embedding_scale=EMBEDDING_SCALE,
+        embedding_scale=params["EMBEDDING_SCALE"],
     )
     print(f"Warm-up took {time.time() - warmup_start:.2f}s")
 
@@ -110,21 +112,21 @@ def test_model(model_name):
         print(f"\nTesting {emotion} with optimized prompt:")
         print(f"Text: {text}")
 
-        # Generate speech using parameters from EMOTION_CONFIG
+        # Generate speech using parameters from emotion_config
         start = time.time()
         print("Generating speech...")
 
-        ref_path = f"asset/ref_sound/{EMOTION_CONFIG[emotion]['file'][model_name]}"
+        ref_path = f"asset/ref_sound/{emotion_config[emotion]['file'][model_name]}"
         # Compute style for each inference to avoid cross-model contamination
         ref_style = tts.compute_style(ref_path)
         audio = tts.inference(
             text=text,
             ref_s=ref_style,
-            alpha=EMOTION_CONFIG[emotion]["alpha"],
-            beta=EMOTION_CONFIG[emotion]["beta"],
+            alpha=emotion_config[emotion]["alpha"],
+            beta=emotion_config[emotion]["beta"],
             diffusion_steps=DIFFUSION_STEPS,
-            embedding_scale=EMOTION_CONFIG[emotion]["embedding_scale"],
-            speed=EMOTION_CONFIG[emotion]["speed"],
+            embedding_scale=emotion_config[emotion]["embedding_scale"],
+            speed=emotion_config[emotion]["speed"],
         )
 
         duration = time.time() - start
@@ -149,17 +151,17 @@ def test_model(model_name):
         start = time.time()
         print("Generating speech...")
 
-        ref_path = f"asset/ref_sound/{EMOTION_CONFIG[emotion]['file'][model_name]}"
+        ref_path = f"asset/ref_sound/{emotion_config[emotion]['file'][model_name]}"
         # Compute style for each inference to avoid cross-model contamination
         ref_style = tts.compute_style(ref_path)
         audio = tts.inference(
             text=GENERIC_TEST_TEXT,
             ref_s=ref_style,
-            alpha=EMOTION_CONFIG[emotion]["alpha"],
-            beta=EMOTION_CONFIG[emotion]["beta"],
+            alpha=emotion_config[emotion]["alpha"],
+            beta=emotion_config[emotion]["beta"],
             diffusion_steps=DIFFUSION_STEPS,
-            embedding_scale=EMOTION_CONFIG[emotion]["embedding_scale"],
-            speed=EMOTION_CONFIG[emotion]["speed"],
+            embedding_scale=emotion_config[emotion]["embedding_scale"],
+            speed=emotion_config[emotion]["speed"],
         )
 
         duration = time.time() - start
