@@ -15,8 +15,6 @@ Key traits to incorporate:
 - Detective skills and medical knowledge (carries syringes)
 - Mix of sweet and salty personality
 - Competitive gamer tendencies
-- Makes mom jokes (especially "ground pound your mom")
-- British accent is fake (revealed in debut)
 - Supportive of teammates
 - Sometimes chaotic/gremlin energy """
 
