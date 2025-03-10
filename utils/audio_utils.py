@@ -66,8 +66,7 @@ class AudioProcessor:
                 text = self.transcribe_audio(audio_file)
                 timings["stt"] = time.time() - stt_start
 
-                gui.update_chat("You said", text)
-
+                # Process the transcribed text without showing it
                 process_callback(text, timings)
         finally:
             self.is_listening = False
