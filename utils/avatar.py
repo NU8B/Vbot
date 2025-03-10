@@ -4,6 +4,7 @@ import time
 import math
 import random
 import threading
+import os
 from pathlib import Path
 from typing import Optional, Dict
 
@@ -22,14 +23,32 @@ from tha4.app.animations.surprise_animation import SurpriseAnimation
 class AnimatedCharacter:
     IMAGE_SIZE = 512
 
-    def __init__(self, parent_window, width: int, height: int, device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    def __init__(self, parent_window, width: int, height: int, device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu"), model_path=None):
         self.device = device
         self.width = width
         self.height = height
+        self.model_name = os.getenv('VOICE_TYPE', 'Amelia')  # Changed from 'ame' to 'Amelia'
         
-        # Create wx panel
+        # Get background color from bg_color.txt
+        bg_color_path = Path(f"asset/model/{self.model_name}/bg_color.txt")
+        try:
+            with open(bg_color_path, 'r') as f:
+                self.bg_color = f.read().strip()
+        except:
+            self.bg_color = "#ffd05c"  # Default background color
+        
+        # Update model path to match the new structure
+        self.model_path = model_path or Path(f"asset/model/{self.model_name}/character_model/character_model.yaml")
+        
+        print(f"Looking for model at: {self.model_path.absolute()}")
+        print(f"Using background color: {self.bg_color}")
+        
+        # Create panel in the parent window
         self.panel = wx.Panel(parent_window, size=(width, height))
         self.panel.SetBackgroundStyle(wx.BG_STYLE_PAINT)
+        
+        # Set background color
+        self.panel.SetBackgroundColour(self.bg_color)
         
         # Bind paint event
         self.panel.Bind(wx.EVT_PAINT, self.on_paint)
@@ -74,14 +93,13 @@ class AnimatedCharacter:
     def load_character_model(self):
         """Load the character model from YAML config"""
         try:
-            model_path = Path("asset/model/ame/character_model/character_model.yaml")
-            print(f"Loading character model from: {model_path.absolute()}")
+            print(f"Loading character model from: {self.model_path.absolute()}")
             
-            if not model_path.exists():
-                print(f"Error: Model file not found at {model_path.absolute()}")
+            if not self.model_path.exists():
+                print(f"Error: Model file not found at {self.model_path.absolute()}")
                 return
                 
-            self.character_model = CharacterModel.load(model_path)
+            self.character_model = CharacterModel.load(self.model_path)
             print("Character model loaded")
             
             # Cache the character image in memory

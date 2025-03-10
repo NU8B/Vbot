@@ -26,7 +26,7 @@ MODEL_PARAMS = {
         "SURPRISE_EMBEDDING_SCALE": 1,
         "NEUTRAL_SPEED": 1.05,
         "ANGRY_SPEED": 1.3,
-        "HAPPY_SPEED": 1.15,
+        "HAPPY_SPEED": 1.05,
         "SAD_SPEED": 0.9,
         "SURPRISE_SPEED": 1.4,
     },
@@ -371,3 +371,28 @@ class EmotionHandler:
             if emotion in variants:
                 return base
         return "neutral"
+
+# Emotion mapping dictionary - maps emotions to style file names (without .wav extension)
+EMOTION_MAPPING = {
+    # Core emotions
+    'joy': 'happy',
+    'happy': 'happy',
+    'sadness': 'sad',
+    'sad': 'sad',
+    'anger': 'angry',
+    'angry': 'angry',
+    'surprise': 'surprised',
+    'surprised': 'surprised',
+    'neutral': 'neutral',
+    
+    # Additional emotion mappings
+    'fear': 'surprised',
+    'disgust': 'angry',
+    'confused': 'surprised',
+    'excited': 'happy',
+    'frustrated': 'angry',
+    'worried': 'sad',
+    'annoyed': 'angry',
+    'pleased': 'happy',
+    'disappointed': 'sad'
+}

@@ -7,6 +7,7 @@ from faster_whisper import WhisperModel
 import torch
 from pathlib import Path
 import threading
+import os
 
 
 class AudioProcessor:
@@ -17,6 +18,10 @@ class AudioProcessor:
         # Create outputs directory if it doesn't exist
         self.output_dir = Path("asset/outputs")
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Use correct path for neutral.wav
+        model_name = os.getenv('VOICE_TYPE', 'amelia_watson')
+        self.ref_audio_path = f"asset/ref_sound/{model_name}/neutral.wav"
 
         self.whisper_model = WhisperModel(
             "small",
@@ -30,8 +35,8 @@ class AudioProcessor:
         self.is_listening = False
 
         # Pre-warm the model silently
-        if torch.cuda.is_available():
-            self.transcribe_audio("asset/ref_sound/neutral.wav")
+        if torch.cuda.is_available() and Path(self.ref_audio_path).exists():
+            self.transcribe_audio(self.ref_audio_path)
             torch.cuda.empty_cache()
 
     def toggle_listening(self, gui, process_callback, is_processing):

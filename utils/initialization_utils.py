@@ -100,7 +100,7 @@ class InitializationHandler:
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}"
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
             if not self.tts_model.is_style_cached(style_path):
                 self.styles_were_cached = False
                 break
@@ -178,7 +178,8 @@ class InitializationHandler:
         # Quick check if all styles are cached
         all_cached = True
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}"
+            # Add .wav extension to the style file
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
             if not self.tts_model.is_style_cached(style_path):
                 all_cached = False
                 break
@@ -191,7 +192,8 @@ class InitializationHandler:
         # If not all cached, compute missing styles
         style_start = time.time()
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}"
+            # Add .wav extension to the style file
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
             if not self.tts_model.is_style_cached(style_path):
                 self.tts_model.compute_style(style_path)
 

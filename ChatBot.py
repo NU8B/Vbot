@@ -2,6 +2,7 @@ import os
 import sys
 import tkinter as tk
 import warnings
+from pathlib import Path
 
 # Add the project root directory to Python path
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -14,7 +15,17 @@ from utils.initialization_utils import InitializationHandler
 warnings.filterwarnings("ignore")
 
 # Model selection - can be changed to "Eveland" or "Amelia"
-MODEL_NAME = "Amelia"  # Default model
+MODEL_NAME = os.getenv('VOICE_TYPE', 'Amelia') 
+
+# Verify model directory exists
+model_dir = Path(f"asset/model/{MODEL_NAME}")
+if not model_dir.exists():
+    print(f"Error: Model directory not found: {model_dir}")
+    print("Available models:")
+    for model in Path("asset/model").glob("*"):
+        if model.is_dir():
+            print(f"- {model.name}")
+    sys.exit(1)
 
 # Initialize all components with selected model
 init_handler = InitializationHandler(model_name=MODEL_NAME)
