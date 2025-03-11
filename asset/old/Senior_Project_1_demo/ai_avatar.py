@@ -1,3 +1,4 @@
+# pip install speechrecognition pyttsx3
 import speech_recognition as sr
 import pyttsx3
 from transformers import AutoTokenizer, AutoModelForCausalLM
