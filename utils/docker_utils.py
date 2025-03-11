@@ -53,12 +53,24 @@ class DockerHandler:
             container = self.client.containers.get("ollama")
             result = container.exec_run("ollama list")
             if "stheno" not in result.output.decode():
-                print("Stheno model not found. Pulling model...")
-                pull_result = container.exec_run("ollama pull stheno")
-                if pull_result.exit_code != 0:
-                    print(f"Error pulling model: {pull_result.output.decode()}")
-                    raise Exception("Failed to pull Stheno model")
-                print("Stheno model pulled successfully")
+                print("Stheno model not found. Setting up...")
+                # Pull the model from Hugging Face
+                print("Pulling model from Hugging Face...")
+                container.exec_run(
+                    "ollama pull hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf"
+                )
+
+                # Copy to Stheno
+                print("Setting up as Stheno...")
+                container.exec_run(
+                    "ollama cp hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf stheno"
+                )
+
+                # Clean up
+                container.exec_run(
+                    'ollama rm "hf.co/featherless-ai-quants/bluuwhale-L3-SthenoMaidBlackroot-8B-V1-GGUF:bluuwhale-L3-SthenoMaidBlackroot-8B-V1-Q4_K_M.gguf"'
+                )
+                print("Stheno model setup complete")
 
             return time.time() - setup_start
 
