@@ -19,8 +19,12 @@ class AnimatedAvatar:
         self.height = height
 
         # Load avatar images (you'll need to create these)
-        self.mouth_closed = Image.open("./asset/pic-close.png")
-        self.mouth_open = Image.open("./asset/pic-open.png")
+        self.mouth_closed = Image.open(
+            "./asset/old/Senior_Project_1_demo/asset/pic-close.png"
+        )
+        self.mouth_open = Image.open(
+            "./asset/old/Senior_Project_1_demo/asset/pic-open.png"
+        )
 
         # Resize images
         self.mouth_closed = self.mouth_closed.resize((width, height))
