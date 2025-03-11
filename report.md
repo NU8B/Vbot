@@ -18,6 +18,7 @@ This report details the development process, methodological approaches, current 
   - [2.1 Virtual Character Animation](#21-virtual-character-animation)
   - [2.2 Text-to-Speech Systems](#22-text-to-speech-systems)
   - [2.3 Conversational AI](#23-conversational-ai)
+  - [2.4 Commercial AI Character Platforms](#24-commercial-ai-character-platforms)
 - [Chapter 3: Proposed Methodology](#chapter-3-proposed-methodology)
   - [3.1 Data Collection](#31-data-collection)
   - [3.2 Data Processing](#32-data-processing)
@@ -26,7 +27,11 @@ This report details the development process, methodological approaches, current 
     - [3.3.2 Architecture Details](#332-architecture-details)
   - [3.4 Training Approach](#34-training-approach)
     - [3.4.1 TTS Model Fine-tuning](#341-tts-model-fine-tuning)
-    - [3.4.2 Avatar Integration](#342-avatar-integration)
+    - [3.4.2 Avatar Implementation](#342-avatar-implementation)
+      - [3.4.2.1 THA4-Based Approach](#3421-tha4-based-approach)
+      - [3.4.2.2 Live2D Approach](#3422-live2d-approach)
+      - [3.4.2.3 Approach Comparison](#3423-approach-comparison)
+    - [3.4.3 Avatar Integration](#343-avatar-integration)
 - [Chapter 4: Design of The System](#chapter-4-design-of-the-system)
   - [4.1 System Design](#41-system-design)
   - [4.2 Future Improvement](#42-future-improvement)
@@ -143,6 +148,30 @@ Recent developments in this field include:
 4. **Context Management**: Methods for tracking conversation history to provide coherent, contextually appropriate responses.
 
 The Vbot system leverages these advancements to create conversational experiences that feel authentic to the target VTuber's personality, using techniques from these areas to maintain the character's voice while providing engaging interactions.
+
+### 2.4 Commercial AI Character Platforms
+
+In recent years, several commercial platforms have emerged offering AI-powered character interactions, most notably Character.ai. This platform allows users to create and interact with AI characters based on fictional personas, historical figures, or original creations.
+
+Character.ai represents a significant competitor in the space of AI-driven character simulation with several key features:
+
+1. **Web-Based Interface**: Providing easy access through browsers without requiring local computation.
+
+2. **Character Creation**: Tools for users to create their own AI characters with customizable personalities.
+
+3. **Multi-Turn Conversations**: Support for extended dialogues with memory of previous interactions.
+
+4. **Text-Only Interaction**: Focus on text-based communication without voice or animation components.
+
+While Character.ai offers impressive conversational capabilities, it differs from the Vbot project in several important ways:
+
+1. **Multimedia Experience**: Character.ai lacks the voice synthesis and avatar animation that give Vbot a more immersive, VTuber-like experience.
+
+2. **VTuber-Specific Focus**: Unlike Character.ai's general-purpose approach, Vbot specifically aims to recreate existing VTuber personalities with their unique visual and vocal characteristics.
+
+3. **Local Computation**: Vbot processes all interactions locally, offering potential privacy benefits and customization options not available in web-based services.
+
+These differences highlight Vbot's unique position in addressing the specific needs of VTuber fans seeking more immersive interactions with their favorite virtual personalities.
 
 ## Chapter 3: Proposed Methodology
 
@@ -320,7 +349,80 @@ TTS model training represents one of the most resource-intensive aspects of the 
 
 The training process includes regular evaluation on the validation set, checking both objective metrics (mel-cepstral distortion, F0 RMSE) and subjective quality through manual review of generated samples.
 
-#### 3.4.2 Avatar Integration
+#### 3.4.2 Avatar Implementation
+
+The development of the avatar component for Vbot involved evaluating and testing two distinct approaches: a deep learning-based approach using Talking Head Anime 4 (THA4) and a traditional animation approach using Live2D. Both methods were thoroughly investigated to determine the optimal solution for the system's requirements.
+
+#### 3.4.2.1 THA4-Based Approach
+
+The THA4-based approach utilizes the "Talking Head Anime from a Single Image 4" framework developed by Pramook Khungurn. This method offers several significant advantages:
+
+**Implementation Process:**
+1. **Reference Image Preparation**: The process begins with a single 512×512 RGBA image of the target VTuber character.
+2. **Model Training**: The THA4 distillation process trains a specialized neural network that can animate this specific character.
+3. **Parameter Mapping**: The system maps various control parameters to facial features and body movements, creating a fully controllable avatar.
+
+**Training Details:**
+The training process for the THA4 model required significant computational resources:
+- Approximately 4 days of continuous processing on dedicated hardware
+- NVIDIA GPU with at least 8GB VRAM
+- Training on a dataset of pose parameters to create diverse animation capabilities
+
+**Animation Control:**
+Once trained, the model accepts 45 different parameters that control:
+- Facial expressions (39 parameters)
+- Head and body rotation (6 parameters)
+
+The team implemented additional enhancements to the base THA4 system:
+- **Emotion Presets**: Development of parameter combinations for specific emotions (happy, sad, angry, surprised)
+- **Dynamic Animation**: Rather than simple 0-1 parameter transitions, the system uses sophisticated interpolation to create natural movement
+- **Idle Animation**: Implementation of subtle movements during inactive periods to maintain liveliness
+- **Lip Synchronization**: Custom algorithms to map phonemes to mouth shapes for accurate speech animation
+
+**Technical Integration:**
+The integration involved reverse engineering aspects of the THA4 system to:
+- Extract and modify the animation loop
+- Develop a wxPython-based rendering pipeline
+- Create transparent overlay capabilities for seamless UI integration
+- Optimize the model for real-time performance
+
+#### 3.4.2.2 Live2D Approach
+
+As an alternative, the project also explored using Live2D, an industry-standard tool for creating 2D animations often used in commercial VTuber productions.
+
+**Implementation Process:**
+1. **Layer Preparation**: Decomposing character images into separate layers (eyes, mouth, hair, body parts)
+2. **Rigging**: Creating a skeletal structure to control movement relationships between layers
+3. **Parameter Setup**: Defining movement ranges and deformation properties
+4. **Animation Creation**: Programming specific animations for different emotional states and speech patterns
+
+**Challenges Encountered:**
+The Live2D approach presented several significant challenges:
+- **Artist Skill Requirements**: Creating effective Live2D models required specialized artistic skills not readily available within the team
+- **Time Investment**: Each character required extensive manual work for layer separation and rigging
+- **Quality Consistency**: The resulting animations varied significantly in quality based on the complexity of the character design
+- **Technical Limitations**: Integrating Live2D with the rest of the system required additional middleware development
+
+#### 3.4.2.3 Approach Comparison
+
+After thorough testing and evaluation, the THA4-based approach was selected as the primary avatar system for Vbot based on several key considerations:
+
+**Decisive Factors:**
+1. **Scalability**: THA4 requires only a single reference image and can be automated, making it significantly more scalable for multiple characters
+2. **Quality Consistency**: The neural network approach provided more consistent animation quality across different character designs
+3. **Resource Efficiency**: Despite the initial training cost, the resulting models were efficient for real-time animation
+4. **Technical Integration**: The THA4 models integrated more seamlessly with the system architecture
+5. **Animation Range**: The THA4 approach offered sufficient expressivity for the intended application
+
+**Limitations Accepted:**
+While the THA4 approach was selected, the team acknowledged certain limitations:
+- Less precise control over specific animation details compared to hand-crafted Live2D
+- Occasional artifacts in extreme expressions or movements
+- Limited body movement beyond the head and upper torso
+
+The selection of THA4 represents a strategic trade-off between animation quality, development efficiency, and scalability that aligns with the project's core objectives of creating accessible and convincing VTuber clones.
+
+#### 3.4.3 Avatar Integration
 
 The avatar component of Vbot builds on the THA4 system, with specific adaptations for real-time interaction:
 
