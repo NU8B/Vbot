@@ -59,6 +59,29 @@ self.cycle = (self.cycle + delta_time * speed) % (math.pi * 2)
 
 This creates a continuous loop where the cycle variable increases with time, but always wraps back to 0 once it reaches 2π, creating a seamless loop.
 
+#### Why Use 2π as the Cycle Length?
+
+The choice to use 2π (approximately 6.28) as the cycle length rather than 1.0 or another value is deliberate and mathematically significant:
+
+1. **Mathematical Convention**: In trigonometry, sine and cosine functions naturally complete one full cycle when their input changes by 2π radians (360 degrees). This is the fundamental period of these functions in their standard form.
+
+2. **Direct Angular Mapping**: Using 2π allows the cycle variable to directly represent an angle in radians, making the code more intuitive for those familiar with circular mathematics. When cycle = π/2, we know we're exactly at the peak of the sine wave without needing any conversion.
+
+3. **Computational Precision**: While we could normalize to a 0-1 range, using 2π avoids additional multiplication operations when calculating sine values and preserves numerical precision, especially for complex animations that require precise phase relationships.
+
+4. **Phase Relationships**: When combining multiple oscillators, having them all operate in the same 0-2π domain makes it easier to understand and manipulate their relative phases. For example, setting one cycle at π/4 ahead of another is immediately clear when both use the same scale.
+
+If we had used a 0-1 range instead, every sine calculation would require an additional multiplication:
+```python
+# Using 0-2π range
+value = math.sin(cycle)
+
+# Using 0-1 range would require
+value = math.sin(cycle * (math.pi * 2))
+```
+
+This approach also makes it more intuitive to implement techniques like phase shifting and frequency modulation, which are common in complex animation systems.
+
 ### Range Transformation
 
 A critical mathematical transformation used throughout the animation system is mapping the sine wave's output range from [-1, 1] to [0, 1]:
