@@ -148,6 +148,50 @@ breathing_value = math.sin(self.breathing_cycle) * 0.5 + 0.5
 
 The `* 0.5 + 0.5` transformation maps the sine output from [-1, 1] to [0, 1], which is more suitable for the breathing parameter.
 
+#### Detailed Formula Breakdown
+
+Let's analyze the breathing animation mathematics in detail:
+
+1. **Cycle Update**:
+   ```python
+   self.breathing_cycle = (self.breathing_cycle + delta_time * self.breathing_speed) % (math.pi * 2)
+   ```
+   - `delta_time`: Time elapsed since last frame (typically 0.033s at 30 FPS)
+   - `self.breathing_speed`: Controls breathing frequency (e.g., 0.5 means one complete breath cycle every 12.6 seconds)
+   - `% (math.pi * 2)`: Ensures the cycle loops between 0 and 2π radians
+
+2. **Value Calculation**:
+   ```python
+   breathing_value = math.sin(self.breathing_cycle) * 0.5 + 0.5
+   ```
+   - `math.sin(self.breathing_cycle)`: Produces a value between -1 and 1
+   - `* 0.5`: Reduces amplitude to oscillate between -0.5 and 0.5
+   - `+ 0.5`: Shifts the range to [0, 1], ensuring all values are positive
+
+3. **Respiratory Cycle Simulation**:
+   This transformation creates a pattern where:
+   - At cycle = 0: breathing_value = 0.5 (neutral position)
+   - At cycle = π/2: breathing_value = 1.0 (full inhale)
+   - At cycle = π: breathing_value = 0.5 (neutral position)
+   - At cycle = 3π/2: breathing_value = 0.0 (full exhale)
+   - At cycle = 2π: breathing_value = 0.5 (back to neutral)
+
+4. **Physiological Basis**:
+   The breathing speed parameter is typically set between 0.5-1.0, creating a breathing rate of:
+   - At speed = 0.5: One breath every 12.6 seconds (4.8 breaths per minute)
+   - At speed = 0.8: One breath every 7.9 seconds (7.6 breaths per minute)
+   - At speed = 1.0: One breath every 6.3 seconds (9.5 breaths per minute)
+
+   For comparison, typical adult resting breathing rates range from 12-20 breaths per minute, but animated characters often use slightly slower rates for a calmer appearance.
+
+5. **Animation Impact**:
+   This breathing function controls multiple visual elements:
+   - Slight vertical movement of the head and body
+   - Subtle scaling of the chest/torso
+   - Minor forward/backward motion to simulate chest expansion
+
+The sinusoidal pattern creates the natural acceleration and deceleration seen in human breathing, where inhalation and exhalation aren't linear but gradually speed up and slow down. This approach avoids the mechanical look of linear interpolation while maintaining a physiologically plausible breathing pattern.
+
 ### Head Movement
 
 Three-dimensional head movement involves separate sine waves for each axis:
