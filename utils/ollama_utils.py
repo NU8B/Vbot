@@ -8,6 +8,7 @@ from utils.emotion_utils import EmotionHandler
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
+MAX_LENGTH = 50  # Maximum length of response in tokens
 
 # Define prompts for different models
 MODEL_PROMPTS = {
@@ -156,6 +157,9 @@ class OllamaHandler:
                     "model": "stheno",
                     "messages": messages,
                     "stream": False,
+                    "options": {
+                        "num_predict": MAX_LENGTH,  # Limit response length
+                    },
                 },
                 timeout=OLLAMA_TIMEOUT,
             )
