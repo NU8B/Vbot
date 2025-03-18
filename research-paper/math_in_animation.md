@@ -21,6 +21,34 @@ This pattern appears throughout the codebase for various animation parameters:
 - Body sway
 - Facial expressions
 
+#### Sine Wave Visualization
+
+A sine wave oscillates between -1 and 1 in a smooth, continuous pattern. This is how it appears visually:
+
+```
+          /\          /\          /\
+         /  \        /  \        /  \
+   ---- /    \ ---- /    \ ---- /    \ ---- Time →
+        \    /      \    /      \    /
+         \  /        \  /        \  /
+          \/          \/          \/
+```
+
+Over time, this produces a sequence of values that might look like:
+```
+t=0.00s: value = 0.0
+t=0.25s: value = 0.5
+t=0.50s: value = 1.0
+t=0.75s: value = 0.5
+t=1.00s: value = 0.0
+t=1.25s: value = -0.5
+t=1.50s: value = -1.0
+t=1.75s: value = -0.5
+t=2.00s: value = 0.0
+```
+
+These values directly control animation parameters, creating smooth transitions between positions.
+
 ### Cycle Management
 
 Cycles are typically managed using the modulo operator to keep them within the range of `[0, 2π]`:
@@ -30,6 +58,59 @@ self.cycle = (self.cycle + delta_time * speed) % (math.pi * 2)
 ```
 
 This creates a continuous loop where the cycle variable increases with time, but always wraps back to 0 once it reaches 2π, creating a seamless loop.
+
+### Range Transformation
+
+A critical mathematical transformation used throughout the animation system is mapping the sine wave's output range from [-1, 1] to [0, 1]:
+
+```python
+transformed_value = math.sin(cycle) * 0.5 + 0.5
+```
+
+This transformation is essential for parameters that should only have positive values, such as:
+- Mouth opening (0 = closed, 1 = open)
+- Eye opening (0 = closed, 1 = open)
+- Breathing expansion (0 = contracted, 1 = expanded)
+
+Visually, this transformation changes the sine wave from:
+
+```
+Original sine wave [-1 to 1]:
+-1      0      +1
+ |------|------|
+   \    |    /
+    \   |   /
+     \  |  /
+      \ | /
+       \|/
+        V
+
+Transformed sine wave [0 to 1]:
+ 0     0.5      1
+ |------|------|
+       / \
+      /   \
+     /     \
+    /       \
+   /         \
+```
+
+#### Why `* 0.5 + 0.5` Cannot Be Replaced with `* 1.0`
+
+The transformation `* 0.5 + 0.5` performs two critical operations:
+1. **Amplitude Scaling**: `* 0.5` reduces the amplitude from ±1 to ±0.5
+2. **Vertical Shift**: `+ 0.5` shifts the entire wave upward by 0.5 units
+
+This is fundamentally different from simply using `* 1.0`, which would preserve the original range of -1 to +1. The following table shows actual values at different points in the sine cycle:
+
+| Cycle | Raw sine | `* 1.0` | `* 0.5 + 0.5` |
+|-------|----------|---------|---------------|
+| 0°    | 0.0      | 0.0     | 0.5           |
+| 90°   | 1.0      | 1.0     | 1.0           |
+| 180°  | 0.0      | 0.0     | 0.5           |
+| 270°  | -1.0     | -1.0    | 0.0           |
+
+For animation parameters that must remain positive (like mouth opening), negative values would cause incorrect rendering or behavior. The `* 0.5 + 0.5` transformation ensures all values remain valid while preserving the smooth, continuous quality of the sine wave.
 
 ## Animation Parameters
 
@@ -59,6 +140,33 @@ neck_z = math.sin(self.neck_z_cycle) * self.head_movement_amount * 0.5
 ```
 
 Note how different cycle speeds (`* 0.7` and `* 0.5`) create more natural, asynchronous movement rather than mechanical synchronization.
+
+#### Detailed Formula Breakdown
+
+Let's break down the head movement calculation in detail:
+
+1. **Cycle Update**:
+   ```python
+   self.head_x_cycle = (self.head_x_cycle + delta_time * self.head_movement_speed) % (math.pi * 2)
+   ```
+   - `delta_time`: Time since last frame (e.g., 0.033s at 30 FPS)
+   - `self.head_movement_speed`: Controls cycle speed (e.g., 0.5 = one complete cycle every 2π/0.5 ≈ 12.6 seconds)
+   - `% (math.pi * 2)`: Ensures the cycle loops between 0 and 2π
+
+2. **Value Calculation**:
+   ```python
+   head_x = math.sin(self.head_x_cycle) * self.head_movement_amount
+   ```
+   - `math.sin(self.head_x_cycle)`: Produces a value between -1 and 1
+   - `* self.head_movement_amount`: Scales the output (e.g., 0.4 limits movement to ±0.4 units)
+
+3. **Combined Effects**:
+   For the happy animation, additional effects are added:
+   ```python
+   head_y = (math.sin(self.head_cycle) * self.head_amount + bounce) * 0.5
+   ```
+   - `bounce = math.sin(self.bounce_cycle) * self.bounce_amount`: Secondary bounce effect
+   - `* 0.5`: Final scaling to ensure appropriate range
 
 ### Blinking
 
@@ -92,6 +200,27 @@ bounce = math.sin(self.bounce_cycle) * self.bounce_amount
 
 The happy animation uses faster cycles (`bounce_speed = 3.0`) compared to idle animation.
 
+### Complex Parameter Combinations
+
+A key aspect of emotion-specific animations is the combination of multiple parameters. For example, in the happy animation:
+
+```python
+bounce = math.sin(self.bounce_cycle) * self.bounce_amount
+head_x = (math.sin(self.head_cycle * 1.3) * self.head_amount) * 0.5
+head_y = (math.sin(self.head_cycle) * self.head_amount + bounce) * 0.5
+head_z = (math.sin(self.head_cycle * 0.7) * (self.head_amount * 0.5)) * 0.5
+eye_sparkle = (math.sin(self.eye_sparkle_cycle) * 0.5 + 0.5) * self.eye_sparkle_amount
+mouth_open = (math.sin(self.mouth_open_cycle) * 0.5 + 0.5) * self.mouth_open_amount
+```
+
+Each parameter uses different:
+- **Frequencies**: `head_cycle * 1.3` vs `head_cycle * 0.7`
+- **Amplitudes**: Full `head_amount` vs `head_amount * 0.5`
+- **Compound effects**: `+ bounce` adds a secondary motion
+- **Range transformations**: `* 0.5 + 0.5` for parameters needing [0,1] range
+
+This creates complex, layered movement that feels natural rather than mechanical.
+
 ## Coordinate Transformations
 
 The image_util.py file contains mathematical transformations for image processing:
@@ -103,6 +232,51 @@ angle_image = hsv(((torch.atan2(
 ```
 
 This uses `atan2` to calculate angles and then normalizes them from [-π, π] to [0, 1] using the transformation `(angle + π)/(2π)`.
+
+## Sine Waves vs. Binary Animation
+
+### Binary Movement Limitations
+
+Using binary values (0 or 1) for animation parameters would create unnatural, robotic movement:
+
+```
+Binary movement (0 or 1):
+
+Position
+   1 |          ████████          ████████
+     |          █      █          █      █
+   0 |████████  █      █████████  █      █████
+     +-----------------------------------------> Time
+       (jumps instantly between positions)
+```
+
+With this approach, animations would:
+- Jump instantly between positions
+- Have no in-between states
+- Look mechanical and unnatural
+- Lack the gradual acceleration and deceleration of natural movement
+
+### Sine Wave Advantages
+
+Sine waves create smooth, natural-looking movement:
+
+```
+Sine wave movement:
+
+Position
+   1 |       /\          /\          /\
+     |      /  \        /  \        /  \
+   0 |     /    \      /    \      /    \
+     +-----------------------------------------> Time
+       (smoothly transitions between positions)
+```
+
+This approach provides:
+- Smooth transitions between all positions
+- Natural acceleration and deceleration
+- Infinite intermediate values
+- Motion that mimics physical systems (pendulums, springs)
+- Realistic timing and rhythm
 
 ## Design Rationale Behind Animation Mathematics
 
@@ -191,4 +365,4 @@ The animation system uses periodic mathematical functions (primarily sine waves)
 4. Transforming output ranges to fit parameter requirements
 5. Layering multiple sine waves for complex movements
 
-This mathematical approach creates animations that feel organic rather than robotic, with coordinated yet slightly varied movements across all parts of the character model. 
+This mathematical approach creates animations that feel organic rather than robotic, with coordinated yet slightly varied movements across all parts of the character model. By avoiding binary movement and embracing continuous functions, we achieve characters that appear alive and responsive rather than mechanical and programmed. 
