@@ -1,41 +1,99 @@
 # developed on python=3.10
-# pip install torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-# StyleTTS2 requirements.txt as well
-# espeak = https://www.youtube.com/watch?v=BBlivx6o0WM
+# IMPORTANT: Install PyTorch separately with this command:
+# pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+# 
+# Other installation notes:
+# espeak = https://www.youtube.com/watch?v=BBlivx6o0WM (in case of error)
 # view docker setup instuctions in asset\docker_setup_instructions.md
-numpy>=1.26.0,<2.0.0
+
+# Core Dependencies
+numpy==1.26.0
 scipy==1.14.1
 pandas==2.2.3
+matplotlib==3.10.0
+pyyaml>=6.0 
+
+# AI/ML Dependencies
+# torch==2.5.1  # Install via command above instead
+# torchaudio==2.5.1  # Install via command above instead
+# torchvision==0.20.1  # Install via command above instead
 accelerate==1.1.1
-tensorboard==2.18.0
-huggingface-hub==0.26.2
-transformers==4.46.3
 bitsandbytes==0.44.1
+transformers==4.46.3
+huggingface-hub==0.26.2
+tensorboard==2.18.0
+safetensors==0.5.2
+sentencepiece==0.2.0
+tokenizers==0.20.3
+einops==0.8.1
+einops-exts>=0.0.4 
+
+# Audio Processing
 soundfile==0.12.1
 librosa==0.10.2.post1
 sounddevice==0.5.1
 pyaudio==0.2.14
-speechbrain==1.0.2
-faster-whisper==1.0.3
-phonemizer==3.3.0
-nltk==3.9.1
-munch==4.0.0
-num2words==0.5.13
-requests==2.32.3
-pillow==11.0.0
-resemblyzer==0.1.4
-tqdm==4.67.0
+audioread==3.0.1
+webrtcvad==2.0.10
+av==14.1.0
+pydub==0.25.1
+soxr==0.5.0.post1
 pesq==0.0.4
+pystoi==0.4.1
+asteroid-filterbanks==0.4.0
+julius==0.2.7
+torch-audiomentations==0.12.0
+torch-pitch-shift==1.2.5
+
+# Speech-related
+speechbrain==1.0.2
+faster-whisper==1.1.0
+whisperx==3.3.1
+phonemizer==3.3.0
+resemblyzer==0.1.4
+
+# NLP and Text Processing
+nltk==3.9.1
+num2words==0.5.13
+regex==2024.11.6
+
+# Evaluation and Metrics
+evaluate==0.4.3
 bert_score==0.3.13
 rouge_score==0.1.2
-evaluate==0.4.3
-docker==7.1.0
-pystoi==0.4.1
 mir_eval==0.7
-pysrt
-git+https://github.com/m-bain/whisperx.git
-wxPython==4.2.2
-matplotlib==3.9.2
-einops==0.8.0
+pyannote-metrics==3.2.1
+
+# Data Handling
+fsspec==2024.6.1
+pyarrow==19.0.0
+xxhash==3.5.0
+dill==0.3.8
+multiprocess==0.70.16
+
+# Utilities and Configuration
+munch==4.0.0
 omegaconf==2.3.0
+einops==0.8.1
+tqdm==4.67.0
+rich==13.9.4
+typer==0.15.1
+requests==2.32.3
+docker==7.1.0
 monotonic_align @ git+https://github.com/resemble-ai/monotonic_align.git@78b985be210a03d08bc3acc01c4df0442105366f
+typing-extensions>=4.5.0 
+
+# UI and Visualization
+pillow==11.0.0
+wxPython==4.2.2
+pyqt5==5.15.11
+customtkinter==5.2.2
+
+# Other Dependencies
+datasets==3.3.0
+aiohttp==3.11.12
+pycparser==2.22
+psutil==7.0.0
+packaging==24.2
+sympy==1.13.1
+pywin32==308
