@@ -4,6 +4,7 @@ import tkinter as tk
 import warnings
 from pathlib import Path
 import wx
+from datetime import datetime
 
 # Add the project root directory to Python path
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -235,34 +236,66 @@ class ModernChatGUI(ChatGUI):
         if self.history_window is None or not self.history_window.winfo_exists():
             self.history_window = tk.Toplevel(self.root)
             self.history_window.title("Chat History")
-            self.history_window.geometry("400x600")
-            self.history_window.configure(bg='#2b2b3b')
+            self.history_window.geometry("500x700")
+            self.history_window.configure(bg='#1e1e2d')
             
-            # Create text widget for history
+            # Create a frame to hold the text widget and scrollbar
+            history_frame = tk.Frame(self.history_window, bg='#1e1e2d')
+            history_frame.pack(expand=True, fill=tk.BOTH, padx=15, pady=15)
+            
+            # Add scrollbar
+            scrollbar = tk.Scrollbar(history_frame)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Create text widget for history with improved styles
             history_text = tk.Text(
-                self.history_window,
+                history_frame,
                 bg='#1e1e2d',
                 fg='white',
                 font=('Arial', 12),
                 wrap=tk.WORD,
-                relief=tk.FLAT
+                relief=tk.FLAT,
+                padx=15,
+                pady=15,
+                spacing1=10,  # Add space before each line
+                spacing3=10,  # Add space after each line
+                yscrollcommand=scrollbar.set
             )
-            history_text.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+            history_text.pack(expand=True, fill=tk.BOTH)
+            scrollbar.config(command=history_text.yview)
             
-            # Display chat history
+            # Configure tags for different message types
+            history_text.tag_configure("user", foreground="#4CAF50", font=('Arial', 12, 'bold'))
+            history_text.tag_configure("ai", foreground="#2196F3", font=('Arial', 12, 'bold'))
+            history_text.tag_configure("timestamp", foreground="#9E9E9E", font=('Arial', 10, 'italic'))
+            history_text.tag_configure("message", foreground="white", font=('Arial', 12))
+            
+            # Display chat history with improved formatting
             for message in self.chat_history:
-                history_text.insert(tk.END, message + "\n")
+                if isinstance(message, str):  # Handle old format messages
+                    speaker, content = message.split(": ", 1)
+                    history_text.insert(tk.END, f"{speaker}: ", "user" if speaker == "You" else "ai")
+                    history_text.insert(tk.END, f"{content}\n\n", "message")
+                else:  # Handle new format messages with timestamp
+                    speaker, content, timestamp = message
+                    history_text.insert(tk.END, f"{timestamp}\n", "timestamp")
+                    history_text.insert(tk.END, f"{speaker}: ", "user" if speaker == "You" else "ai")
+                    history_text.insert(tk.END, f"{content}\n\n", "message")
+            
             history_text.configure(state='disabled')
 
     def update_chat(self, speaker, message):
         """Update chat history and show subtitle for AI responses"""
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%I:%M %p")  # 12-hour format with AM/PM
+        
         # Clean up the speaker name
         if speaker in ["AI", "Assistant"]:
             speaker = self.model_name
-            self.chat_history.append(f"{speaker}: {message}")
+            self.chat_history.append((speaker, message, timestamp))
             self.show_subtitle(message)
         elif speaker == "You":  # Only add user messages to chat history
-            self.chat_history.append(f"{speaker}: {message}")
+            self.chat_history.append((speaker, message, timestamp))
         # Ignore "You said" messages completely
 
     def clear_input(self):
