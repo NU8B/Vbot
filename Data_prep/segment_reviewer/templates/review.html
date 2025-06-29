@@ -124,16 +124,6 @@
             background: #5a6268;
             transform: translateY(-2px);
         }
-        .notes-area {
-            width: 100%;
-            min-height: 80px;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-family: inherit;
-            resize: vertical;
-        }
         .transcription-edit {
             width: 100%;
             padding: 12px;
@@ -338,12 +328,7 @@
         <div class="controls-panel">
             <h2>✅ Review Decision</h2>
             
-            <div style="margin: 20px 0;">
-                <label for="notes" style="display: block; margin-bottom: 10px; font-weight: bold;">
-                    📋 Review Notes (Optional):
-                </label>
-                <textarea id="notes" class="notes-area" placeholder="Add any notes about this segment..."></textarea>
-            </div>
+
 
             <div class="action-buttons">
                 <button class="btn btn-approve" onclick="reviewSegment('approve')">
@@ -385,7 +370,6 @@
 
     <script>
         const audioPlayer = document.getElementById('audioPlayer');
-        const notesField = document.getElementById('notes');
         
         // Auto-play audio when page loads
         audioPlayer.addEventListener('loadeddata', () => {
@@ -393,7 +377,6 @@
         });
         
         function reviewSegment(action) {
-            const notes = notesField.value.trim();
             const editedText = document.getElementById('transcriptionField').value.trim();
             
             fetch('/review', {
@@ -404,7 +387,6 @@
                 body: JSON.stringify({
                     filename: '{{ segment.filename }}',
                     action: action,
-                    notes: notes,
                     edited_text: editedText
                 })
             })

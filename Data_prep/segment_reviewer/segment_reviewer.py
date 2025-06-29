@@ -128,7 +128,7 @@ class SegmentReviewer:
 
         return segments[current_index]
 
-    def review_segment(self, filename, action, notes="", edited_text=None):
+    def review_segment(self, filename, action, edited_text=None):
         """Record review decision for a segment"""
         segment_path = self.passed_dir / filename
 
@@ -170,12 +170,6 @@ class SegmentReviewer:
         try:
             dest_path = dest_dir / filename
             shutil.move(str(segment_path), str(dest_path))
-
-            # Save review notes if provided
-            if notes:
-                notes_file = dest_path.with_suffix(".review_notes.txt")
-                with open(notes_file, "w", encoding="utf-8") as f:
-                    f.write(notes)
 
             # Move to next segment
             self.review_state["current_index"] += 1
@@ -343,10 +337,9 @@ def review():
     data = request.json
     filename = data.get("filename")
     action = data.get("action")
-    notes = data.get("notes", "")
     edited_text = data.get("edited_text", "")
 
-    if reviewer.review_segment(filename, action, notes, edited_text):
+    if reviewer.review_segment(filename, action, edited_text):
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "error": "Failed to process review"})
