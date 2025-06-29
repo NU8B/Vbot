@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Segment Reviewer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s ease;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .segment-panel, .controls-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .audio-container {
+            margin: 20px 0;
+        }
+        audio {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .transcription {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            margin: 15px 0;
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .metric-label {
+            font-weight: bold;
+            color: #495057;
+            font-size: 0.9em;
+        }
+        .metric-value {
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        .metric-good { color: #28a745; }
+        .metric-warning { color: #ffc107; }
+        .metric-bad { color: #dc3545; }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+        .btn-approve:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-reject:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        .btn-skip {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-skip:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .notes-area {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .transcription-edit {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.4;
+            resize: vertical;
+            background-color: #f8f9fa;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+        .transcription-edit:focus {
+            outline: none;
+            border-color: #0056b3;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .transcription-edit:hover {
+            border-color: #0056b3;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .nav-btn:hover {
+            background: #0056b3;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .quality-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+        .filename {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 Audio Segment Reviewer</h1>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.remaining }}</div>
+                <div class="stat-label">Remaining</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.approved }}</div>
+                <div class="stat-label">Approved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.rejected }}</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.skipped }}</div>
+                <div class="stat-label">Skipped</div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ stats.progress_percent }}%"></div>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+            {{ "%.1f"|format(stats.progress_percent) }}% Complete
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="/previous" class="nav-btn">← Previous</a>
+        <span class="filename">{{ segment.filename }}</span>
+        <a href="/skip" class="nav-btn">Skip →</a>
+    </div>
+
+    <div class="main-content">
+        <div class="segment-panel">
+            <h2>🎧 Audio Segment</h2>
+            
+            <div class="audio-container">
+                <audio controls preload="auto" id="audioPlayer">
+                    <source src="/audio/{{ segment.filename }}" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+
+            <h3>📝 Transcription 
+                {% if segment.metadata.transcription_edited %}
+                    <span style="font-size: 0.8em; color: #ffc107; margin-left: 10px;">✏️ Previously edited</span>
+                {% endif %}
+            </h3>
+            <div style="margin: 15px 0;">
+                <div style="margin-bottom: 10px;">
+                    <label for="transcriptionField" style="font-weight: bold; color: #495057;">
+                        Edit transcription if needed:
+                    </label>
+                </div>
+                <textarea 
+                    id="transcriptionField" 
+                    class="transcription-edit"
+                    placeholder="Edit the transcription here..."
+                    rows="3">{{ segment.metadata.text or '' }}</textarea>
+                <div style="margin-top: 5px; font-size: 0.9em; color: #6c757d;">
+                    💡 Make corrections directly in the text above. Changes will be saved automatically.
+                    {% if segment.metadata.transcription_edited %}
+                        <br><span style="color: #ffc107;">⚠️ Original: "{{ segment.metadata.original_text or 'Not available' }}"</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h3>📊 Quality Metrics</h3>
+            <div class="metrics-grid">
+                {% if segment.metadata.quality_metrics %}
+                    {% set metrics = segment.metadata.quality_metrics %}
+                    <div class="metric-card">
+                        <div class="metric-label">Speech Intelligibility (STOI)</div>
+                        <div class="metric-value metric-{{ 'good' if metrics.stoi > 0.95 else 'warning' if metrics.stoi > 0.90 else 'bad' }}">
+                            {{ "%.3f"|format(metrics.stoi) }}
+                            <span class="quality-indicator" style="background-color: {{ '#28a745' if metrics.stoi > 0.95 else '#ffc107' if metrics.stoi > 0.90 else '#dc3545' }}"></span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Speech Quality (PESQ)</div>
+                        <div class="metric-value metric-{{ 'good' if metrics.pesq > 4.0 else 'warning' if metrics.pesq > 3.5 else 'bad' }}">
+                            {{ "%.2f"|format(metrics.pesq) }}
+                            <span class="quality-indicator" style="background-color: {{ '#28a745' if metrics.pesq > 4.0 else '#ffc107' if metrics.pesq > 3.5 else '#dc3545' }}"></span>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Duration</div>
+                        <div class="metric-value">{{ "%.2f"|format(segment.metadata.duration) }}s</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">RMS Energy</div>
+                        <div class="metric-value metric-{{ 'good' if 0.05 < metrics.rms_energy < 0.95 else 'warning' }}">
+                            {{ "%.3f"|format(metrics.rms_energy) }}
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Spectral Centroid</div>
+                        <div class="metric-value">{{ "%.0f"|format(metrics.spec_cent) }} Hz</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Peak Ratio</div>
+                        <div class="metric-value metric-{{ 'good' if metrics.peak_ratio < 8 else 'warning' if metrics.peak_ratio < 15 else 'bad' }}">
+                            {{ "%.2f"|format(metrics.peak_ratio) }}
+                        </div>
+                    </div>
+                {% else %}
+                    <p>No quality metrics available</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <h2>✅ Review Decision</h2>
+            
+            <div style="margin: 20px 0;">
+                <label for="notes" style="display: block; margin-bottom: 10px; font-weight: bold;">
+                    📋 Review Notes (Optional):
+                </label>
+                <textarea id="notes" class="notes-area" placeholder="Add any notes about this segment..."></textarea>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-approve" onclick="reviewSegment('approve')">
+                    ✅ Approve<br>
+                    <small>Good for training</small>
+                </button>
+                <button class="btn btn-reject" onclick="reviewSegment('reject')">
+                    ❌ Reject<br>
+                    <small>Not suitable</small>
+                </button>
+                <button class="btn btn-skip" onclick="reviewSegment('skip')">
+                    ⏭️ Skip<br>
+                    <small>Review later</small>
+                </button>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+                <h3>🎯 Quick Guidelines</h3>
+                <ul style="line-height: 1.6;">
+                    <li><strong>Approve</strong> if: Clear speech, good quality, accurate transcription</li>
+                    <li><strong>Reject</strong> if: Poor audio quality, wrong transcription, background noise</li>
+                    <li><strong>Skip</strong> if: Unsure, want to review later</li>
+                </ul>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>⌨️ Keyboard Shortcuts</h3>
+                <ul style="line-height: 1.6; font-family: monospace;">
+                    <li><strong>Space</strong> - Play/Pause audio</li>
+                    <li><strong>A</strong> - Approve segment</li>
+                    <li><strong>R</strong> - Reject segment</li>
+                    <li><strong>S</strong> - Skip segment</li>
+                    <li><strong>←</strong> - Previous segment</li>
+                    <li><strong>→</strong> - Skip to next</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const notesField = document.getElementById('notes');
+        
+        // Auto-play audio when page loads
+        audioPlayer.addEventListener('loadeddata', () => {
+            audioPlayer.play().catch(e => console.log('Auto-play prevented:', e));
+        });
+        
+        function reviewSegment(action) {
+            const notes = notesField.value.trim();
+            const editedText = document.getElementById('transcriptionField').value.trim();
+            
+            fetch('/review', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: '{{ segment.filename }}',
+                    action: action,
+                    notes: notes,
+                    edited_text: editedText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting review');
+            });
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Don't trigger shortcuts when typing in text area or transcription field
+            if (event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            switch(event.code) {
+                case 'Space':
+                    event.preventDefault();
+                    if (audioPlayer.paused) {
+                        audioPlayer.play();
+                    } else {
+                        audioPlayer.pause();
+                    }
+                    break;
+                case 'KeyA':
+                    event.preventDefault();
+                    reviewSegment('approve');
+                    break;
+                case 'KeyR':
+                    event.preventDefault();
+                    reviewSegment('reject');
+                    break;
+                case 'KeyS':
+                    event.preventDefault();
+                    reviewSegment('skip');
+                    break;
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    window.location.href = '/previous';
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    window.location.href = '/skip';
+                    break;
+            }
+        });
+        
+        // Add transcription change indicator
+        const transcriptionField = document.getElementById('transcriptionField');
+        const originalText = transcriptionField.value;
+        
+        transcriptionField.addEventListener('input', function() {
+            if (this.value !== originalText) {
+                this.style.borderColor = '#ffc107';
+                this.style.backgroundColor = '#fff3cd';
+            } else {
+                this.style.borderColor = '#007bff';
+                this.style.backgroundColor = '#f8f9fa';
+            }
+        });
+        
+        // Focus on transcription field for quick editing
+        transcriptionField.focus();
+        transcriptionField.select();
+    </script>
+</body>
+</html> 

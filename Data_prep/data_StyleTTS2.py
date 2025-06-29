@@ -94,13 +94,22 @@ def find_segments_dir():
     ]
 
     for path in possible_paths:
-        if (path / "metadata.json").exists() and (path / "passed_segments").exists():
-            # Only return the parent directory that contains metadata.json
-            return path
+        if (path / "metadata.json").exists():
+            # Check if we have reviewed segments or original passed segments
+            if (path / "reviewed_approved").exists() and list(
+                (path / "reviewed_approved").glob("*.wav")
+            ):
+                print(f"Found reviewed segments in: {path}")
+                return path
+            elif (path / "passed_segments").exists() and list(
+                (path / "passed_segments").glob("*.wav")
+            ):
+                print(f"Found unreviewed segments in: {path}")
+                return path
 
     raise FileNotFoundError(
-        "Could not find segments directory with metadata.json and passed_segments folder. "
-        "Please specify the input directory manually with --input"
+        "Could not find segments directory with metadata.json and segments. "
+        "Please run the audio segmenter first, or complete the review process."
     )
 
 
@@ -113,11 +122,33 @@ def prepare_data(
     # Find input directory if not specified
     if data_dir is None:
         segments_dir = find_segments_dir()
-        data_dir = segments_dir / "passed_segments"  # This is the input directory
+
+        # Check if we have reviewed approved segments
+        approved_dir = segments_dir / "reviewed_approved"
+        passed_dir = segments_dir / "passed_segments"
+
+        if approved_dir.exists() and list(approved_dir.glob("*.wav")):
+            data_dir = approved_dir
+            print(f"Using reviewed approved segments: {approved_dir}")
+
+            # Check if we have approved segments metadata
+            approved_metadata_file = segments_dir / "approved_segments_metadata.json"
+            if approved_metadata_file.exists():
+                metadata_path = approved_metadata_file
+                print("Using approved segments metadata")
+            else:
+                metadata_path = segments_dir / "metadata.json"
+                print("Using original metadata (filtering for approved files)")
+        else:
+            data_dir = passed_dir
+            metadata_path = segments_dir / "metadata.json"
+            print(f"Using unreviewed passed segments: {passed_dir}")
+
         print(f"Found segments directory: {segments_dir}")
     else:
         data_dir = Path(data_dir)
         segments_dir = data_dir.parent
+        metadata_path = segments_dir / "metadata.json"
 
     # Use default output directory if not specified
     if output_dir is None:
@@ -135,7 +166,6 @@ def prepare_data(
     wavs_dir.mkdir(parents=True, exist_ok=True)
 
     # Load metadata from segmentation
-    metadata_path = segments_dir / "metadata.json"
     if not metadata_path.exists():
         raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
 
@@ -144,8 +174,39 @@ def prepare_data(
 
     print(f"Loaded metadata with {len(metadata_list)} segments")
 
+    # If using reviewed approved segments, filter metadata to only include files that exist
+    if "reviewed_approved" in str(data_dir):
+        available_files = {f.name for f in data_dir.glob("*.wav")}
+        original_count = len(metadata_list)
+        metadata_list = [
+            item for item in metadata_list if item["filename"] in available_files
+        ]
+        print(
+            f"Filtered to {len(metadata_list)} approved segments (from {original_count} total)"
+        )
+
     # Get all wav files and their corresponding texts
     audio_files = [(item["filename"], item["text"]) for item in metadata_list]
+
+    # Verify that audio files exist
+    missing_files = []
+    for filename, _ in audio_files:
+        if not (data_dir / filename).exists():
+            missing_files.append(filename)
+
+    if missing_files:
+        print(f"Warning: {len(missing_files)} audio files not found:")
+        for f in missing_files[:5]:  # Show first 5
+            print(f"  - {f}")
+        if len(missing_files) > 5:
+            print(f"  ... and {len(missing_files) - 5} more")
+
+        # Filter out missing files
+        audio_files = [(f, t) for f, t in audio_files if f not in missing_files]
+        print(f"Proceeding with {len(audio_files)} available files")
+
+    if not audio_files:
+        raise ValueError("No audio files found to process!")
 
     # Prefetch audio files in parallel
     print("\nPrefetching audio files...")
@@ -248,6 +309,20 @@ def prepare_data(
         f.write("\n".join(train_list))
     with open(os.path.join(output_dir, "val_list.txt"), "w", encoding="utf-8") as f:
         f.write("\n".join(val_list))
+
+    print(f"\nStyleTTS2 dataset prepared successfully!")
+    print(f"Output directory: {output_dir}")
+    print(f"Training samples: {len(train_list)}")
+    print(f"Validation samples: {len(val_list)}")
+
+    # If we used reviewed segments, provide feedback about the review process
+    if "reviewed_approved" in str(data_dir):
+        print(f"\n✅ Used manually reviewed and approved segments")
+        print(f"   This should result in higher quality training data!")
+    else:
+        print(f"\n⚠️  Using unreviewed segments")
+        print(f"   Consider using the segment reviewer for better quality:")
+        print(f"   python Data_prep/segment_reviewer/segment_reviewer.py")
 
 
 if __name__ == "__main__":
