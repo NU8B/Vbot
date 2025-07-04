@@ -21,6 +21,7 @@ DEFAULT_SEGMENTS_DIR = SCRIPT_DIR / "raw_data" / "segments"
 DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "Data"
 DEFAULT_SR = 24000
 DEFAULT_MAX_TOKENS = 377
+DEFAULT_MAX_DURATION = 7.7  # Maximum audio duration in seconds
 
 
 def clean_text(text):
@@ -29,9 +30,199 @@ def clean_text(text):
     return "".join(c for c in text if c in allowed_chars)
 
 
+def normalize_text_for_tts(text):
+    """Simple text normalization for TTS training - appropriate for Whisper transcriptions"""
+    import re
+
+    # Step 1: Basic cleanup
+    text = re.sub(r"\s+", " ", text.strip())  # Normalize whitespace
+
+    # Step 2: Handle ellipsis and excessive punctuation
+    text = re.sub(r"\.{2,}", ".", text)  # Multiple dots to single dot
+    text = re.sub(r"[!]{2,}", "!", text)  # Multiple exclamations to single
+    text = re.sub(r"[?]{2,}", "?", text)  # Multiple questions to single
+
+    # Step 3: Handle contractions that might confuse phonemization
+    contractions = {
+        r"\bcan't\b": "cannot",
+        r"\bwon't\b": "will not",
+        r"\bshan't\b": "shall not",
+        r"\bn't\b": " not",  # Generic n't handling
+        r"\b'm\b": " am",
+        r"\b're\b": " are",
+        r"\b've\b": " have",
+        r"\b'll\b": " will",
+        r"\b'd\b": " would",  # or "had" - context dependent
+        r"\bo'clock\b": "o clock",
+    }
+
+    for contraction, expansion in contractions.items():
+        text = re.sub(contraction, expansion, text, flags=re.IGNORECASE)
+
+    # Step 4: Convert numbers to words (simple cases only)
+    # Only handle standalone numbers that are clearly meant to be read as words
+    def simple_number_replacer(match):
+        num = int(match.group())
+        # Only convert reasonable numbers (0-9999)
+        if 0 <= num <= 9999:
+            return num_to_words(num)
+        else:
+            return match.group()  # Keep very large numbers as-is
+
+    text = re.sub(r"\b\d{1,4}\b", simple_number_replacer, text)
+
+    # Step 5: Handle quotation marks and parentheses content
+    # Remove content in parentheses that might be pronunciation guides or transcription artifacts
+    text = re.sub(r"\([^)]*\)", "", text)
+
+    # Clean up quotation marks
+    text = re.sub(r'["""' "`]", "", text)
+
+    # Step 6: Normalize dashes and quotes
+    text = re.sub(r"[–—]", "-", text)  # Em/en dashes to hyphens
+    text = re.sub(r"[''']", "'", text)  # Smart quotes to regular quotes
+
+    # Step 7: Remove or replace characters that aren't in StyleTTS2's symbol set
+    # Keep only: letters, IPA phonemes, basic punctuation, spaces, and hyphens
+    # Remove: most symbols, special characters, currency symbols
+    text = re.sub(r"[&@#%=+*/<>©®™§¶\\$£€¥¢]", " ", text)
+
+    # Step 8: Final cleanup - remove extra spaces and normalize
+    text = re.sub(r"\s+", " ", text.strip())
+
+    # Remove leading/trailing punctuation that might cause issues
+    text = re.sub(r"^[^\w\s]+|[^\w\s]+$", "", text).strip()
+
+    return text
+
+
+def num_to_words(num):
+    """Convert number to words (simple implementation)"""
+    if num == 0:
+        return "zero"
+
+    ones = [
+        "",
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+    ]
+
+    tens = [
+        "",
+        "",
+        "twenty",
+        "thirty",
+        "forty",
+        "fifty",
+        "sixty",
+        "seventy",
+        "eighty",
+        "ninety",
+    ]
+
+    if num < 20:
+        return ones[num]
+    elif num < 100:
+        return tens[num // 10] + ("" if num % 10 == 0 else " " + ones[num % 10])
+    elif num < 1000:
+        return (
+            ones[num // 100]
+            + " hundred"
+            + ("" if num % 100 == 0 else " " + num_to_words(num % 100))
+        )
+    elif num < 1000000:
+        return (
+            num_to_words(num // 1000)
+            + " thousand"
+            + ("" if num % 1000 == 0 else " " + num_to_words(num % 1000))
+        )
+    elif num < 1000000000:
+        return (
+            num_to_words(num // 1000000)
+            + " million"
+            + ("" if num % 1000000 == 0 else " " + num_to_words(num % 1000000))
+        )
+    else:
+        return str(num)  # Fallback for very large numbers
+
+
+def ordinal_to_words(num):
+    """Convert number to ordinal words (1st -> first, 2nd -> second, etc.)"""
+    ordinals = {
+        1: "first",
+        2: "second",
+        3: "third",
+        4: "fourth",
+        5: "fifth",
+        6: "sixth",
+        7: "seventh",
+        8: "eighth",
+        9: "ninth",
+        10: "tenth",
+        11: "eleventh",
+        12: "twelfth",
+        13: "thirteenth",
+        14: "fourteenth",
+        15: "fifteenth",
+        16: "sixteenth",
+        17: "seventeenth",
+        18: "eighteenth",
+        19: "nineteenth",
+        20: "twentieth",
+        21: "twenty first",
+        22: "twenty second",
+        23: "twenty third",
+        24: "twenty fourth",
+        25: "twenty fifth",
+        26: "twenty sixth",
+        27: "twenty seventh",
+        28: "twenty eighth",
+        29: "twenty ninth",
+        30: "thirtieth",
+        31: "thirty first",
+    }
+
+    if num in ordinals:
+        return ordinals[num]
+    elif num < 100:
+        tens_digit = (num // 10) * 10
+        ones_digit = num % 10
+        if tens_digit in [20, 30, 40, 50, 60, 70, 80, 90] and ones_digit > 0:
+            tens_word = num_to_words(tens_digit)[:-1] + "ieth"  # twenty -> twentieth
+            return (
+                tens_word.replace("ieth", "y")
+                + " "
+                + ordinals.get(ones_digit, num_to_words(ones_digit) + "th")
+            )
+        else:
+            return num_to_words(num) + "th"
+    else:
+        return num_to_words(num) + "th"
+
+
 def phonemize_text(text):
     """Convert text to phonemes using espeak with stress marks"""
     try:
+        # Apply comprehensive text normalization before phonemization
+        text = normalize_text_for_tts(text)
+
         # Initialize backend directly for more control
         backend = EspeakBackend(
             "en-us", with_stress=True, punctuation_marks=';:,.!?¡¿—…"«»"" '
@@ -114,7 +305,11 @@ def find_segments_dir():
 
 
 def prepare_data(
-    data_dir=None, output_dir=None, sr=DEFAULT_SR, max_tokens=DEFAULT_MAX_TOKENS
+    data_dir=None,
+    output_dir=None,
+    sr=DEFAULT_SR,
+    max_tokens=DEFAULT_MAX_TOKENS,
+    max_duration=DEFAULT_MAX_DURATION,
 ):
     """Prepare data for StyleTTS2 training"""
     print("\nInitializing StyleTTS2 data preparation...")
@@ -221,6 +416,7 @@ def prepare_data(
     val_list = []
     skipped_count = 0
     token_skipped = 0
+    duration_skipped = 0
 
     print("\nProcessing results...")
     for i, ((audio_file, _), phonemes) in enumerate(zip(audio_files, phonemes_list)):
@@ -237,15 +433,26 @@ def prepare_data(
                 skipped_count += 1
                 continue
 
-            # Check minimum duration (0.5 seconds)
+            # Check duration bounds (0.5 to max_duration seconds)
             min_samples = int(0.5 * sr)
+            max_samples = int(max_duration * sr)
+            duration_seconds = wav.size(1) / sr
+
             if wav.size(1) < min_samples:
                 if wav.size(1) < min_samples * 0.5:  # If less than 0.25 seconds
-                    print(f"\nSkipping {audio_file} - too short")
+                    print(
+                        f"\nSkipping {audio_file} - too short ({duration_seconds:.2f}s)"
+                    )
                     skipped_count += 1
                     continue
                 padding = min_samples - wav.size(1)
                 wav = torch.nn.functional.pad(wav, (0, padding))
+            elif wav.size(1) > max_samples:
+                print(
+                    f"\nSkipping {audio_file} - too long ({duration_seconds:.2f}s > {max_duration}s)"
+                )
+                duration_skipped += 1
+                continue
 
             # Verify with TextCleaner
             try:
@@ -291,18 +498,45 @@ def prepare_data(
     print(f"\nProcessing complete:")
     print(f"Total files processed: {len(audio_files)}")
     print(f"Files skipped due to token length: {token_skipped}")
+    print(f"Files skipped due to duration (too long): {duration_skipped}")
     print(f"Total files skipped: {skipped_count}")
     print(f"Files included: {len(train_list) + len(val_list)}")
 
-    # Print length statistics using direct tokenization
+    # Print length and duration statistics
     if train_list:
-        print("\nLength statistics for included files:")
+        print("\nStatistics for included files:")
+
+        # Token length statistics
         direct_lengths = [
             len(tokenizer.encode(entry.split("|")[1], add_special_tokens=True))
             for entry in train_list
         ]
         print(f"Max direct token length: {max(direct_lengths)}")
         print(f"Average token length: {sum(direct_lengths)/len(direct_lengths):.2f}")
+
+        # Audio duration statistics
+        durations = []
+        for entry in train_list + val_list:
+            filename = entry.split("|")[0]
+            wav_path = os.path.join(output_dir, "wavs", filename)
+            try:
+                wav, _ = torchaudio.load(wav_path)
+                duration_seconds = wav.size(1) / sr
+                durations.append(duration_seconds)
+            except Exception as e:
+                print(
+                    f"Warning: Could not load {filename} for duration calculation: {e}"
+                )
+
+        if durations:
+            print(
+                f"Average audio duration: {sum(durations)/len(durations):.2f} seconds"
+            )
+            print(
+                f"Total audio duration: {sum(durations):.2f} seconds ({sum(durations)/60:.2f} minutes)"
+            )
+            print(f"Min audio duration: {min(durations):.2f} seconds")
+            print(f"Max audio duration: {max(durations):.2f} seconds")
 
     # Save metadata files
     with open(os.path.join(output_dir, "train_list.txt"), "w", encoding="utf-8") as f:
@@ -349,10 +583,18 @@ if __name__ == "__main__":
         default=DEFAULT_MAX_TOKENS,
         help=f"Maximum number of tokens per sample (default: {DEFAULT_MAX_TOKENS})",
     )
+    parser.add_argument(
+        "--max-duration",
+        type=float,
+        default=DEFAULT_MAX_DURATION,
+        help=f"Maximum audio duration in seconds (default: {DEFAULT_MAX_DURATION})",
+    )
     args = parser.parse_args()
 
     try:
-        prepare_data(args.input, args.output, args.sr, args.max_tokens)
+        prepare_data(
+            args.input, args.output, args.sr, args.max_tokens, args.max_duration
+        )
     except KeyboardInterrupt:
         print("\nProcess interrupted by user")
     except Exception as e:
