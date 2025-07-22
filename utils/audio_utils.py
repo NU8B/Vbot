@@ -149,3 +149,42 @@ class AudioProcessor:
         sd.play(speech, samplerate=sample_rate)
         time.sleep(duration + 0.5)
         sd.stop()
+
+    def play_audio_continuous(self, speech, sample_rate=24000):
+        """Play audio continuously without blocking for anime-style playback"""
+        sd.play(speech, samplerate=sample_rate)
+        # Return immediately without blocking - caller manages timing
+        return len(speech) / sample_rate
+
+    def play_audio_continuous_improved(self, speech, sample_rate=24000):
+        """Improved continuous audio playback with better session management"""
+        # Stop any existing audio first
+        sd.stop()
+        
+        # Start playback with proper configuration
+        duration = len(speech) / sample_rate
+        
+        # Use blocking=False for non-blocking playback but ensure it stays active
+        sd.play(speech, samplerate=sample_rate, blocking=False)
+        
+        print(f"Started audio playback: {duration:.2f}s, samples: {len(speech)}")
+        
+        return duration
+
+    def is_audio_playing(self):
+        """Check if audio is currently playing"""
+        return sd.query_devices() is not None and hasattr(sd, '_last_callback') and sd._last_callback is not None
+
+    def wait_for_audio_completion(self, duration):
+        """Wait for audio to complete with proper monitoring"""
+        import time
+        start_time = time.time()
+        
+        while time.time() - start_time < duration + 0.5:  # Small buffer
+            if not sd.get_stream().active:
+                break
+            time.sleep(0.1)
+
+    def stop_audio(self):
+        """Stop any currently playing audio"""
+        sd.stop()

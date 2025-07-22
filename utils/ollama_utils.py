@@ -4,7 +4,12 @@ import time
 from pathlib import Path
 import json
 import os
-from utils.emotion_utils import EmotionHandler
+import re
+from queue import Queue
+from utils.emotion_utils import EmotionHandler, create_emotion_config
+from utils.TTS_utils import InferenceHandler
+import numpy as np
+import soundfile as sf
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
@@ -65,6 +70,19 @@ class OllamaHandler:
         self.warmup_time = None
         self.model_name = model_name  # Store current model name
 
+        # Create queue for streaming audio chunks
+        self.audio_chunk_queue = Queue()
+        
+        # Load emotion config for the current model
+        self.emotion_config = create_emotion_config(model_name)
+        
+        # This is a bit of a workaround to get the TTS handler instance
+        self.inference_handler = (
+            InferenceHandler(tts_model, EmotionHandler(), model_name=model_name)
+            if tts_model
+            else None
+        )
+
         # Create outputs directory if it doesn't exist
         self.output_dir = Path("asset/outputs")
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -78,6 +96,13 @@ class OllamaHandler:
             self.message_history = (
                 []
             )  # Clear conversation history when switching models
+            
+            # Re-initialize the TTS handler with the new model name
+            if self.tts_model:
+                self.inference_handler = InferenceHandler(
+                    self.tts_model, EmotionHandler(), model_name=model_name
+                )
+
             return True
         return False
 
@@ -136,62 +161,218 @@ class OllamaHandler:
             print(f"Error initializing Ollama: {str(e)}")
             return False
 
+    def _playback_consumer(self):
+        """Consumer thread that plays audio chunks from a queue."""
+        while True:
+            try:
+                chunk_data = self.audio_chunk_queue.get()
+                if chunk_data is None:  # Sentinel value indicates end of stream
+                    self.gui.hide_subtitle()
+                    break
+
+                text_chunk, speech_chunk, duration_chunk = chunk_data
+                
+                # Update GUI with the current text chunk
+                self.gui.show_subtitle(text_chunk)
+                
+                # Play the audio chunk (this is a blocking call)
+                self.audio_processor.play_audio(speech_chunk, duration=duration_chunk)
+
+            except Exception as e:
+                print(f"Error in playback consumer: {str(e)}")
+                break
+        
+        # Once playback is finished, re-enable controls
+        self.is_speaking = False
+        self.is_processing = False
+        self.gui.enable_input_controls()
+
+    def _playback_consumer_anime_style(self):
+        """Anime-style consumer thread that plays continuous audio with fast subtitle updates."""
+        sentences_data = []
+        cumulative_audio = []
+        first_sentence_ready = False
+        
+        # Start immediately when first sentence is ready
+        def collect_and_start():
+            nonlocal first_sentence_ready
+            
+            # Get the first sentence
+            try:
+                chunk_data = self.audio_chunk_queue.get(timeout=5.0)  # Longer timeout for first sentence
+                if chunk_data is None:
+                    return False
+                
+                text_chunk, speech_chunk, duration_chunk = chunk_data
+                sentences_data.append({
+                    'text': text_chunk,
+                    'speech': speech_chunk,
+                    'duration': duration_chunk
+                })
+                cumulative_audio.append(speech_chunk)
+                first_sentence_ready = True
+                
+                # Show first subtitle immediately!
+                self.gui.show_subtitle_anime_style(text_chunk)
+                print(f"First subtitle: {text_chunk}")
+                
+            except:
+                return False
+            
+            # Collect remaining sentences with shorter timeout
+            while True:
+                try:
+                    chunk_data = self.audio_chunk_queue.get(timeout=0.05)  # Very short timeout now
+                    if chunk_data is None:  # End of stream
+                        break
+                    
+                    text_chunk, speech_chunk, duration_chunk = chunk_data
+                    sentences_data.append({
+                        'text': text_chunk,
+                        'speech': speech_chunk,
+                        'duration': duration_chunk
+                    })
+                    cumulative_audio.append(speech_chunk)
+                    
+                except:
+                    # Small delay then check again - this allows streaming
+                    import time
+                    time.sleep(0.01)
+                    try:
+                        chunk_data = self.audio_chunk_queue.get_nowait()
+                        if chunk_data is None:
+                            break
+                        text_chunk, speech_chunk, duration_chunk = chunk_data
+                        sentences_data.append({
+                            'text': text_chunk,
+                            'speech': speech_chunk,
+                            'duration': duration_chunk
+                        })
+                        cumulative_audio.append(speech_chunk)
+                    except:
+                        break
+            
+            return True
+        
+        # Collect sentences
+        if not collect_and_start():
+            # No audio to play
+            self.is_speaking = False
+            self.is_processing = False
+            self.gui.enable_input_controls()
+            return
+        
+        # Combine all audio into one continuous stream
+        combined_audio = np.concatenate(cumulative_audio)
+        
+        # Calculate timing for each sentence
+        current_time = 0
+        for sentence_data in sentences_data:
+            sentence_data['start_time'] = current_time
+            sentence_data['end_time'] = current_time + sentence_data['duration']
+            current_time += sentence_data['duration']
+        
+        # Start avatar speaking animation
+        avatar = self.gui.get_avatar()
+        if avatar:
+            avatar.start_speaking()
+        
+        # Start continuous audio playback with better management
+        total_duration = self.audio_processor.play_audio_continuous_improved(combined_audio)
+        
+        # Start timing-based subtitle updates
+        start_time = time.time()
+        current_sentence_index = 0
+        
+        print(f"Starting anime-style playback for {len(sentences_data)} sentences, total duration: {total_duration:.2f}s")
+        
+        # Rapid subtitle update loop with improved timing
+        while True:
+            elapsed_time = time.time() - start_time
+            
+            # Check if playback is complete with buffer
+            if elapsed_time >= total_duration + 0.1:  # Small buffer
+                break
+            
+            # Monitor audio playback and restart if needed
+            try:
+                import sounddevice as sd
+                if not sd.get_stream().active and elapsed_time < total_duration - 0.5:
+                    print("Audio stream interrupted, restarting...")
+                    # Restart from current position
+                    remaining_audio = combined_audio[int(elapsed_time * 24000):]
+                    if len(remaining_audio) > 1000:  # Only restart if significant audio remains
+                        sd.play(remaining_audio, samplerate=24000, blocking=False)
+            except:
+                pass  # Continue even if monitoring fails
+            
+            # Find current sentence based on timing
+            for i, sentence_data in enumerate(sentences_data):
+                if sentence_data['start_time'] <= elapsed_time < sentence_data['end_time']:
+                    if i != current_sentence_index:
+                        # Fast subtitle transition!
+                        current_sentence_index = i
+                        self.gui.show_subtitle_anime_style(sentence_data['text'])
+                        print(f"Subtitle: {sentence_data['text']}")
+                    break
+            
+            # Update every 20ms for ultra-smooth anime-style transitions
+            time.sleep(0.02)
+        
+        # Hide subtitle and clean up
+        self.gui.hide_subtitle()
+        
+        if avatar:
+            avatar.stop_speaking()
+            avatar.set_emotion("neutral")
+        
+        # Re-enable controls
+        self.is_speaking = False
+        self.is_processing = False
+        self.gui.enable_input_controls()
+        
+        print("Anime-style playback completed!")
+
     @staticmethod
-    def call_ollama_static(prompt, message_history, max_history, system_prompt):
-        """Static version of call_ollama for initialization"""
+    def call_ollama_stream(prompt, message_history, max_history, system_prompt):
+        """Calls Ollama API and streams the response."""
         try:
             # Prepare conversation history
             messages = [{"role": "system", "content": system_prompt}]
-
-            # Add message history
             if message_history:
                 messages.extend(message_history[-max_history:])
-
-            # Add current prompt
             messages.append({"role": "user", "content": prompt})
 
-            # Make API call with increased timeout
+            # Make streaming API call
             response = requests.post(
                 f"{OLLAMA_HOST}/api/chat",
                 json={
                     "model": "stheno",
                     "messages": messages,
-                    "stream": False,
+                    "stream": True,
                     "options": {
-                        "num_predict": MAX_LENGTH,  # Limit response length
+                        "num_predict": MAX_LENGTH,
                     },
                 },
+                stream=True,
                 timeout=OLLAMA_TIMEOUT,
             )
 
             if response.status_code == 200:
-                try:
-                    response_data = response.json()
-                    response_content = response_data["message"]["content"]
-                    message_history.append(
-                        {"role": "assistant", "content": response_content}
-                    )
-                    return response_content
-                except (KeyError, json.JSONDecodeError) as e:
-                    print(f"Error parsing response: {str(e)}")
-                    print(f"Raw response: {response.text}")
-                    return None
+                for line in response.iter_lines():
+                    if line:
+                        try:
+                            decoded_line = line.decode('utf-8')
+                            json_chunk = json.loads(decoded_line)
+                            yield json_chunk
+                        except (json.JSONDecodeError, KeyError) as e:
+                            print(f"Error parsing streaming chunk: {e} - Line: {line}")
             else:
-                print(f"Error: {response.status_code}")
+                print(f"Error from Ollama stream: {response.status_code}")
                 print(f"Response: {response.text}")
-                return None
 
-        except requests.Timeout:
-            print(f"Request timed out after {OLLAMA_TIMEOUT} seconds")
-            return None
-        except requests.ConnectionError:
-            print(
-                "Connection error - check if Ollama service is running and accessible"
-            )
-            return None
-        except Exception as e:
-            print(f"Error calling Ollama: {str(e)}")
-            return None
+        except requests.RequestException as e:
+            print(f"Error calling Ollama stream: {e}")
 
     def handle_text_input(self, text):
         """Handle text input from GUI"""
@@ -204,18 +385,98 @@ class OllamaHandler:
             self.timings = {"processing_start": time.time()}
 
             self.gui.update_chat("You", text)
+
+            # Start the main processing in a new thread
             threading.Thread(
-                target=self._process_text, args=(text,), daemon=True
+                target=self._process_text_streaming, args=(text,), daemon=True
+            ).start()
+            
+            # Start the ANIME-STYLE audio playback consumer thread
+            threading.Thread(
+                target=self._playback_consumer_anime_style, daemon=True
             ).start()
 
         except Exception as e:
             print(f"Error in text handling: {str(e)}")
             import traceback
-
             traceback.print_exc()
 
+    def _process_text_streaming(self, text):
+        """Processes text by streaming LLM, TTS, and audio playback."""
+        try:
+            print("\n=== Starting stream processing ===")
+            avatar = self.gui.get_avatar()
+            
+            # Set initial emotion based on user input
+            user_emotion = self.emotion_handler.classify_emotion(text)
+            if avatar:
+                avatar.set_emotion(user_emotion)
+
+            # Get system prompt for the current model
+            system_prompt = self.get_current_prompt()
+
+            sentence_buffer = ""
+            full_response = ""
+
+            # Stream response from Ollama
+            for chunk in self.call_ollama_stream(text, self.message_history, MAX_HISTORY, system_prompt):
+                token = chunk.get("message", {}).get("content", "")
+                if not token:
+                    continue
+
+                sentence_buffer += token
+                full_response += token
+                
+                # Check for sentence completion
+                if re.search(r'[.!?]', sentence_buffer):
+                    # Process the complete sentence
+                    sentence_to_process = sentence_buffer.strip()
+                    sentence_buffer = ""
+
+                    if sentence_to_process:
+                        # Get emotion for the sentence
+                        ai_emotion = self.emotion_handler.classify_emotion(sentence_to_process)
+                        if avatar:
+                            avatar.set_emotion(ai_emotion)
+
+                        # Synthesize audio for the sentence
+                        speech, _, _ = self.inference_handler.process_text(
+                            "", sentence_to_process
+                        )
+                        
+                        duration = len(speech) / 24000
+
+                        # Add the processed chunk to the queue
+                        self.audio_chunk_queue.put((sentence_to_process, speech, duration))
+
+            # Process any remaining text in the buffer
+            if sentence_buffer.strip():
+                ai_emotion = self.emotion_handler.classify_emotion(sentence_buffer.strip())
+                if avatar:
+                    avatar.set_emotion(ai_emotion)
+                
+                speech, _, _ = self.inference_handler.process_text(
+                    "", sentence_buffer.strip()
+                )
+                
+                duration = len(speech) / 24000
+                self.audio_chunk_queue.put((sentence_buffer.strip(), speech, duration))
+
+            # Update the main chat history with the full response
+            self.gui.update_chat(self.model_name, full_response)
+            self.message_history.append({"role": "assistant", "content": full_response})
+
+        except Exception as e:
+            print(f"Error in streaming process: {str(e)}")
+            import traceback
+            traceback.print_exc()
+        finally:
+            # Signal the end of the stream to the consumer
+            self.audio_chunk_queue.put(None)
+            print("=== Stream processing complete ===")
+
     def _process_text(self, text):
-        """Process text input and generate a response"""
+        """Legacy function for non-streaming processing - to be deprecated."""
         try:
             print("\n=== Starting text processing ===")
             self.timings = {"processing_start": time.time()}

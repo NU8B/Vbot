@@ -5,6 +5,7 @@ import warnings
 from pathlib import Path
 import wx
 from datetime import datetime
+import re
 
 # Add the project root directory to Python path
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +17,8 @@ from utils.avatar import AnimatedCharacter
 
 # Suppress all warnings
 warnings.filterwarnings("ignore")
+
+AVATAR_SIZE = 800  # Define avatar size as a constant
 
 class ModernChatGUI(ChatGUI):
     def __init__(self, root, on_send_callback, on_voice_toggle_callback):
@@ -49,38 +52,41 @@ class ModernChatGUI(ChatGUI):
         self.main_container.pack(expand=True, fill=tk.BOTH)
         
         # Avatar container - match character's background
-        self.avatar_container = tk.Frame(self.main_container, bg=self.bg_color, width=512, height=512)
-        self.avatar_container.pack(expand=True, padx=20, pady=(20, 0))
+        self.avatar_container = tk.Frame(self.main_container, bg=self.bg_color, width=AVATAR_SIZE, height=AVATAR_SIZE)
+        self.avatar_container.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         self.avatar_container.pack_propagate(False)
         
-        # Subtitle label (transparent background)
-        self.subtitle_frame = tk.Frame(self.main_container, bg='#000000')
-        self.subtitle_frame.pack(fill=tk.X, padx=20, pady=(0, 20))
-        
+        # Subtitle window for custom rendering and transparency
+        self.subtitle_window = tk.Toplevel(self.root)
+        self.subtitle_window.overrideredirect(True)  # Borderless
+        self.subtitle_window.attributes('-alpha', 0.75)  # Semi-transparent
+        self.subtitle_window.configure(bg='black')
+        self.subtitle_window.withdraw()  # Initially hidden
+
         self.subtitle_label = tk.Label(
-            self.subtitle_frame,
+            self.subtitle_window,
             text="",
-            font=('Arial', 16, 'bold'),
+            font=('Arial', 18, 'bold'),
             fg='white',
-            bg='#000000',
-            wraplength=800  # Allow text to wrap
+            bg='black',
+            justify='center'
         )
-        self.subtitle_label.pack(expand=True)
-        
-        # Initially hide the subtitle
-        self.subtitle_frame.pack_forget()
+        self.subtitle_label.pack(expand=True, fill=tk.BOTH, padx=15, pady=10)
+
+        # Bind subtitle positioning to main window changes
+        self.root.bind("<Configure>", self._position_subtitle_window)
         
         # Create and initialize avatar
         print("Creating avatar frame...")
         self.wx_frame = wx.Frame(
             None,
             style=wx.BORDER_NONE | wx.FRAME_NO_TASKBAR,  # Remove window decorations and taskbar entry
-            size=(512, 512)
+            size=(AVATAR_SIZE, AVATAR_SIZE)
         )
         self.wx_frame.SetBackgroundColour('#2b2b3b')
         
         print("Initializing avatar...")
-        self.avatar = AnimatedCharacter(self.wx_frame, 512, 512)
+        self.avatar = AnimatedCharacter(self.wx_frame, AVATAR_SIZE, AVATAR_SIZE)
         self.wx_window_id = self.wx_frame.GetHandle()
         
         # Create a tkinter window to embed the wx.Frame
@@ -213,7 +219,7 @@ class ModernChatGUI(ChatGUI):
                 self.wx_window_id,
                 win32con.HWND_TOP,
                 0, 0,
-                512, 512,
+                AVATAR_SIZE, AVATAR_SIZE,
                 win32con.SWP_SHOWWINDOW | win32con.SWP_FRAMECHANGED  # Add SWP_FRAMECHANGED to apply style changes
             )
             
@@ -331,34 +337,50 @@ class ModernChatGUI(ChatGUI):
         if not self.is_processing:
             self.on_voice_toggle_callback()
 
+    def _position_subtitle_window(self, event=None):
+        """Keep the subtitle window positioned relative to the main window."""
+        if self.subtitle_window.winfo_ismapped():
+            main_win_width = self.root.winfo_width()
+            main_win_height = self.root.winfo_height()
+            x = self.root.winfo_x() + (main_win_width - int(main_win_width * 0.9)) // 2
+            y = self.root.winfo_y() + main_win_height - 120 - 90  # height and y-offset
+
+            width = int(main_win_width * 0.9)
+            height = 120
+            
+            self.subtitle_window.geometry(f"{width}x{height}+{x}+{y}")
+            self.subtitle_label.configure(wraplength=width - 30)
+
     def show_subtitle(self, text):
-        """Show subtitle with specified text"""
-        # Make the subtitle background semi-transparent black
-        self.subtitle_frame.configure(bg='#000000')
-        self.subtitle_label.configure(
-            text=text,
-            bg='#000000',
-            fg='white',
-            font=('Arial', 16, 'bold')
-        )
-        self.subtitle_frame.pack(fill=tk.X, padx=20, pady=(0, 20))
+        """Show subtitle with specified text using a custom transparent window."""
+        self.subtitle_label.configure(text=text)
+        if not self.subtitle_window.winfo_ismapped():
+            self.subtitle_window.deiconify()
+        self._position_subtitle_window()
         self.root.update_idletasks()
+
+    def show_subtitle_anime_style(self, text):
+        """Show subtitle with anime-style fast updates and visual effects."""
+        # Quick update without heavy operations for anime-style speed
+        self.subtitle_label.configure(text=text)
+        if not self.subtitle_window.winfo_ismapped():
+            self.subtitle_window.deiconify()
+            self._position_subtitle_window()
+        # Use update() instead of update_idletasks() for immediate visual refresh
+        self.subtitle_window.update()
 
     def hide_subtitle(self):
         """Hide the subtitle"""
-        self.subtitle_frame.pack_forget()
+        self.subtitle_window.withdraw()
         self.root.update_idletasks()
 
     def update_subtitle(self, text):
         """Update subtitle text and ensure it's visible"""
-        self.subtitle_label.configure(text=text)
-        if not self.subtitle_frame.winfo_ismapped():
-            self.subtitle_frame.pack(fill=tk.X, padx=20, pady=(0, 20))
-        self.root.update_idletasks()
+        self.show_subtitle(text)
 
-    def set_subtitle_duration(self, duration_ms):
-        """Set a timer to hide the subtitle after the specified duration"""
-        self.root.after(duration_ms, self.hide_subtitle)
+    def update_subtitle_anime_style(self, text):
+        """Update subtitle with anime-style timing - ultra-fast updates"""
+        self.show_subtitle_anime_style(text)
 
     def _handle_model_switch(self):
         """Handle model switch button click"""
@@ -405,7 +427,7 @@ class ModernChatGUI(ChatGUI):
             
             # Create new avatar instance
             print(f"Reinitializing avatar for {new_model}...")
-            self.avatar = AnimatedCharacter(self.wx_frame, 512, 512)
+            self.avatar = AnimatedCharacter(self.wx_frame, AVATAR_SIZE, AVATAR_SIZE)
             
             # Show frame and start animation
             self.wx_frame.Show()
@@ -497,16 +519,6 @@ def main():
         
         # Update window title
         root.title(f"Vbot - {new_model}")
-        
-        # Override the inference handler's play_audio method to handle subtitle timing
-        original_play_audio = components["inference_handler"].play_audio
-        def play_audio_with_subtitle(speech, duration, avatar, audio_processor):
-            subtitle_duration = int(duration * 1000) + 1000
-            gui.set_subtitle_duration(subtitle_duration)
-            original_play_audio(speech, duration, avatar, audio_processor)
-        
-        # Replace the play_audio method with our new version
-        components["inference_handler"].play_audio = play_audio_with_subtitle
         
         # Update GUI's voice toggle callback with new audio processor
         gui.on_voice_toggle_callback = lambda: components["audio_processor"].toggle_listening(

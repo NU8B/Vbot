@@ -311,10 +311,14 @@ class StyleTTS2Inference:
         # Clean text minimally
         text = self.clean_text(text)
 
-        # Phonemize text - let it handle most of the normalization
-        ps = self.global_phonemizer.phonemize([text])
+        if text == "":
+            return np.zeros(0), 0.0
 
-        # Tokenize the phonemized text
+        ps = self.global_phonemizer.phonemize([text])
+        if not ps or not ps[0]:
+            print(f"Warning: Phonemizer returned empty for text: '{text}'")
+            return np.zeros(0, dtype=np.float32), 0.0
+
         ps = word_tokenize(ps[0])
         ps = " ".join(ps)
 
