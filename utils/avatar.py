@@ -5,6 +5,7 @@ import math
 import random
 import threading
 import os
+import numpy as np
 from pathlib import Path
 from typing import Optional, Dict
 
@@ -18,6 +19,14 @@ from tha4.app.animations.angry_animation import AngryAnimation
 from tha4.app.animations.idle_animation import IdleAnimation
 from tha4.app.animations.base_animation import BaseAnimation
 from tha4.app.animations.surprise_animation import SurpriseAnimation
+
+# Import AI upscaler
+try:
+    from .ai_upscaler import AIUpscaler
+    AI_UPSCALER_AVAILABLE = True
+except ImportError:
+    AI_UPSCALER_AVAILABLE = False
+    print("AI Upscaler not available, using fallback scaling")
 
 
 class AnimatedCharacter:
@@ -43,6 +52,11 @@ class AnimatedCharacter:
         
         print(f"Looking for model at: {self.model_path.absolute()}")
         print(f"Using background color: {self.bg_color}")
+        
+        # Initialize AI upscaler
+        self.ai_upscaler = None
+        self.upscaling_enabled = True
+        self._initialize_ai_upscaler()
         
         # Create panel in the parent window with transparent background
         self.panel = wx.Panel(parent_window, size=(width, height))
@@ -79,6 +93,7 @@ class AnimatedCharacter:
         
         # Store last update time
         self.last_update_time = time.time()
+        self.last_stats_report_time = time.time()  # For AI upscaling stats reporting
         
         # Memory optimization flags
         self.frame_count = 0
@@ -87,7 +102,29 @@ class AnimatedCharacter:
         # Start animation timer (30 FPS)
         self.timer = wx.Timer(self.panel)
         self.panel.Bind(wx.EVT_TIMER, self.update_animation)
-        self.timer.Start(67)  
+        self.timer.Start(67)
+
+    def _initialize_ai_upscaler(self):
+        """Initialize the AI upscaler for high-quality avatar rendering."""
+        if not AI_UPSCALER_AVAILABLE:
+            print("AI upscaling not available, using standard scaling")
+            return
+        
+        try:
+            # Initialize with anime model for VTuber avatars
+            self.ai_upscaler = AIUpscaler(device="auto", model_type="anime")
+            
+            if self.ai_upscaler.is_available():
+                print(f"✅ AI upscaler initialized successfully")
+                print(f"   Device: {self.ai_upscaler.device}")
+                print(f"   Model: {self.ai_upscaler.model_type}")
+            else:
+                print("⚠️ AI upscaler initialized but Real-ESRGAN not available, using enhanced fallback")
+                
+        except Exception as e:
+            print(f"❌ Failed to initialize AI upscaler: {e}")
+            print("   Falling back to standard scaling")
+            self.ai_upscaler = None
 
     def load_character_model(self):
         """Load the character model from YAML config"""
@@ -464,15 +501,49 @@ class AnimatedCharacter:
             output_image = output_image[0].detach().cpu()
             output_image = convert_output_image_from_torch_to_numpy(output_image)
             
-            # Convert to bitmap
+            # Convert to bitmap with AI upscaling
             if len(output_image.shape) == 3 and output_image.shape[2] == 4:
                 output_image = output_image.copy(order='C')
-                wx_image = wx.Image(output_image.shape[1], output_image.shape[0])
-                wx_image.SetData(output_image[:,:,:3].tobytes())
-                wx_image.SetAlpha(output_image[:,:,3].tobytes())  # Preserve alpha channel
                 
-                if output_image.shape[1] != self.width or output_image.shape[0] != self.height:
-                    wx_image = wx_image.Scale(self.width, self.height, wx.IMAGE_QUALITY_HIGH)
+                # Check if we need to upscale
+                needs_upscaling = (output_image.shape[1] != self.width or 
+                                 output_image.shape[0] != self.height)
+                
+                if needs_upscaling and self.ai_upscaler is not None and self.upscaling_enabled:
+                    # Use AI upscaling for superior quality
+                    try:
+                        target_size = (self.height, self.width)  # (height, width)
+                        upscaled_image = self.ai_upscaler.upscale(output_image, target_size)
+                        
+                        # Apply brightness correction to fix darker AI upscaled images
+                        upscaled_image = self._apply_brightness_correction(upscaled_image)
+                        
+                        # Convert AI upscaled numpy array to wx.Image
+                        wx_image = wx.Image(upscaled_image.shape[1], upscaled_image.shape[0])
+                        wx_image.SetData(upscaled_image[:,:,:3].tobytes())
+                        wx_image.SetAlpha(upscaled_image[:,:,3].tobytes())
+                        
+                        # Log performance every 1 second instead of every 100 frames
+                        current_time = time.time()
+                        if current_time - self.last_stats_report_time >= 1.0 and self.ai_upscaler:
+                            stats = self.ai_upscaler.get_performance_stats()
+                            print(f"🎨 AI Upscaling Stats: {stats['avg_fps']:.1f} FPS, "
+                                  f"Last: {stats['last_process_time']*1000:.1f}ms")
+                            self.last_stats_report_time = current_time
+                        
+                    except Exception as e:
+                        print(f"AI upscaling failed, using fallback: {e}")
+                        # Fallback to enhanced standard scaling
+                        wx_image = self._fallback_upscale_wx(output_image)
+                else:
+                    # Use standard scaling or no scaling needed
+                    if needs_upscaling:
+                        wx_image = self._fallback_upscale_wx(output_image)
+                    else:
+                        # No scaling needed
+                        wx_image = wx.Image(output_image.shape[1], output_image.shape[0])
+                        wx_image.SetData(output_image[:,:,:3].tobytes())
+                        wx_image.SetAlpha(output_image[:,:,3].tobytes())
                 
                 self.result_bitmap = wx.Bitmap(wx_image)
                 
@@ -488,6 +559,76 @@ class AnimatedCharacter:
                 self.panel.Refresh()
             else:
                 print(f"Error: Invalid image format - shape: {output_image.shape}")
+
+    def _fallback_upscale_wx(self, output_image):
+        """Enhanced fallback upscaling using wx with better quality settings."""
+        # Create wx.Image from numpy array
+        wx_image = wx.Image(output_image.shape[1], output_image.shape[0])
+        wx_image.SetData(output_image[:,:,:3].tobytes())
+        wx_image.SetAlpha(output_image[:,:,3].tobytes())
+        
+        # Use highest quality scaling available in wx
+        # Note: wx.IMAGE_QUALITY_BICUBIC is higher quality than wx.IMAGE_QUALITY_HIGH
+        if hasattr(wx, 'IMAGE_QUALITY_BICUBIC'):
+            quality = wx.IMAGE_QUALITY_BICUBIC
+        else:
+            quality = wx.IMAGE_QUALITY_HIGH
+            
+        wx_image = wx_image.Scale(self.width, self.height, quality)
+        
+        return wx_image
+
+    def _apply_brightness_correction(self, image: np.ndarray, gamma: float = 1.1, brightness: float = 1.05) -> np.ndarray:
+        """
+        Apply brightness and gamma correction to fix darker AI upscaled images.
+        
+        Args:
+            image: RGBA image array (H, W, 4)
+            gamma: Gamma correction value (>1 brightens, <1 darkens)
+            brightness: Brightness multiplier (>1 brightens, <1 darkens)
+        
+        Returns:
+            Brightness-corrected image
+        """
+        # Work on a copy to avoid modifying the original
+        corrected = image.copy().astype(np.float32)
+        
+        # Separate RGB and alpha channels
+        rgb = corrected[:, :, :3] / 255.0  # Normalize to [0, 1]
+        alpha = corrected[:, :, 3]  # Keep alpha as-is
+        
+        # Apply gamma correction to RGB channels
+        rgb = np.power(rgb, 1.0/gamma)
+        
+        # Apply brightness adjustment
+        rgb = rgb * brightness
+        
+        # Clamp values to [0, 1]
+        rgb = np.clip(rgb, 0.0, 1.0)
+        
+        # Convert back to [0, 255] and combine with alpha
+        rgb = (rgb * 255.0).astype(np.uint8)
+        corrected[:, :, :3] = rgb
+        corrected[:, :, 3] = alpha
+        
+        return corrected.astype(np.uint8)
+
+    def get_upscaler_info(self):
+        """Get information about the current upscaling system."""
+        if self.ai_upscaler:
+            return self.ai_upscaler.get_info()
+        else:
+            return {
+                "ai_upscaling": False,
+                "fallback_method": "wx.IMAGE_QUALITY_HIGH",
+                "device": "cpu"
+            }
+
+    def toggle_ai_upscaling(self, enabled: bool):
+        """Enable or disable AI upscaling."""
+        self.upscaling_enabled = enabled
+        method = "AI upscaling" if enabled and self.ai_upscaler else "Standard scaling"
+        print(f"Avatar upscaling method: {method}")
 
     def set_lip_sync(self, phonemes, durations):
         """Set lip sync data for TTS audio"""
