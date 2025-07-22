@@ -1,3 +1,5 @@
+# import nltk
+# nltk.download()
 import os
 import sys
 import shutil

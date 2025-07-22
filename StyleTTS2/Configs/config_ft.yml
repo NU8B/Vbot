@@ -3,8 +3,8 @@ save_freq: 5
 log_interval: 10
 device: "cuda"
 epochs: 50 # number of finetuning epoch (1 hour of data)
-batch_size: 8
-max_len: 400 # maximum number of frames
+batch_size: 4
+max_len: 350 # maximum number of frames
 pretrained_model: "Models/LibriTTS/epochs_2nd_00020.pth"
 second_stage_load_pretrained: true # set to true if the pre-trained model is for 2nd stage
 load_only_params: true # set to true if do not want to load epoch numbers and optimizer parameters
@@ -101,9 +101,9 @@ optimizer_params:
   ft_lr: 0.0001 # learning rate for acoustic modules
   
 slmadv_params:
-  min_len: 400 # minimum length of samples
-  max_len: 500 # maximum length of samples
-  batch_percentage: 0.5 # to prevent out of memory, only use half of the original batch size
+  min_len: 350 # minimum length of samples
+  max_len: 450 # maximum length of samples
+  batch_percentage: 0.3 # to prevent out of memory, only use 30% of the original batch size
   iter: 10 # update the discriminator every this iterations of generator update
   thresh: 5 # gradient norm above which the gradient is scaled
   scale: 0.01 # gradient scaling factor for predictors from SLM discriminators

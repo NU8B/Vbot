@@ -14,12 +14,8 @@ from pystoi import stoi
 import librosa
 from pydub import effects
 import re
-import unicodedata
 from scipy import signal
 from tqdm import tqdm
-import subprocess
-import whisper
-import datasets
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 
@@ -34,6 +30,7 @@ DISCARD_THRESHOLD = 1.0  # Discard segments shorter than 1 second
 MIN_DURATION = 3.0  # Minimum segment duration in seconds
 MAX_DURATION = 7.5  # Maximum segment duration in seconds
 COMBINE_SILENCE_GAP = 1.0  # Silence duration between combined segments in seconds
+SKIP_CHECK = True  # Set to True to skip quality checks and accept all segments
 
 # Audio segmentation settings
 SEGMENT_SETTINGS = {
@@ -577,7 +574,10 @@ def process_segments(input_dir, output_dir):
                         gc.collect()
 
             # PHASE 3: Quality Checks and Organization
-            logger.info("\nPhase 3: Quality Checks and Organization")
+            if SKIP_CHECK:
+                logger.info("\nPhase 3: Organization (Quality checks SKIPPED)")
+            else:
+                logger.info("\nPhase 3: Quality Checks and Organization")
             final_segments = []
             metric_failures = {}
             passed_durations = []  # Track durations of passed segments
@@ -598,45 +598,49 @@ def process_segments(input_dir, output_dir):
                 with open(txt_path, "r", encoding="utf-8") as f:
                     text = f.read().strip()
 
-                # Check quality metrics
-                quality_metrics = evaluate_audio_quality(
-                    segment_info["samples"], segment_info["audio"].frame_rate
-                )
+                # Initialize quality_metrics for metadata
+                quality_metrics = None
 
-                is_acceptable, failed_metrics = is_audio_quality_acceptable(
-                    quality_metrics, metric_failures
-                )
-
-                if not is_acceptable:
-                    save_failed_segment(
-                        segment_info["audio"],
-                        segment_path.name,
-                        text,
-                        "\n".join(failed_metrics),
-                        quality_metrics,
-                        failed_dir,
-                    )
-                    continue
-
-                # Check for untranscribed sounds
-                if text:
-                    has_untranscribed, details = detect_untranscribed_sounds(
-                        segment_info["samples"],
-                        segment_info["audio"].frame_rate,
-                        text,
+                # Check quality metrics only if SKIP_CHECK is False
+                if not SKIP_CHECK:
+                    quality_metrics = evaluate_audio_quality(
+                        segment_info["samples"], segment_info["audio"].frame_rate
                     )
 
-                    if has_untranscribed:
-                        failure_reason = f"Contains untranscribed sounds: {details}"
+                    is_acceptable, failed_metrics = is_audio_quality_acceptable(
+                        quality_metrics, metric_failures
+                    )
+
+                    if not is_acceptable:
                         save_failed_segment(
                             segment_info["audio"],
                             segment_path.name,
                             text,
-                            failure_reason,
+                            "\n".join(failed_metrics),
                             quality_metrics,
                             failed_dir,
                         )
                         continue
+
+                    # Check for untranscribed sounds
+                    if text:
+                        has_untranscribed, details = detect_untranscribed_sounds(
+                            segment_info["samples"],
+                            segment_info["audio"].frame_rate,
+                            text,
+                        )
+
+                        if has_untranscribed:
+                            failure_reason = f"Contains untranscribed sounds: {details}"
+                            save_failed_segment(
+                                segment_info["audio"],
+                                segment_path.name,
+                                text,
+                                failure_reason,
+                                quality_metrics,
+                                failed_dir,
+                            )
+                            continue
 
                 # If all checks pass:
                 # 1. Move to passed directory
@@ -695,10 +699,15 @@ def process_segments(input_dir, output_dir):
 
             logger.info("\n=== Processing Summary ===")
             logger.info(f"Total segments processed: {len(existing_segments)}")
-            logger.info(f"Segments passed quality checks: {len(final_segments)}")
-            logger.info(
-                f"Segments failed quality checks: {len(existing_segments) - len(final_segments)}"
-            )
+            if SKIP_CHECK:
+                logger.info(
+                    f"Segments processed (quality checks skipped): {len(final_segments)}"
+                )
+            else:
+                logger.info(f"Segments passed quality checks: {len(final_segments)}")
+                logger.info(
+                    f"Segments failed quality checks: {len(existing_segments) - len(final_segments)}"
+                )
             logger.info(f"\nPassed segments saved to: {passed_dir}")
             logger.info(f"Failed segments saved to: {failed_dir}")
             logger.info(f"Transcriptions saved to: {srt_dir}")

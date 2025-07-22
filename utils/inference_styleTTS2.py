@@ -56,7 +56,7 @@ class StyleTTS2Inference:
     def __init__(self, model_name="Amelia", repo_id=None, device=None):
         # Map model names to their HuggingFace repo IDs
         self.model_configs = {
-            "Amelia": "nonoJDWAOIDAWKDA/Amelia10_ft_StyleTTS2",
+            "Amelia": "nonoJDWAOIDAWKDA/Amelia_reviewed1_ft_StyleTTS2",
             "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
         }
 
@@ -269,16 +269,9 @@ class StyleTTS2Inference:
         return result
 
     def clean_text(self, text):
-        """Clean text before phonemization"""
-        # Basic cleanup only - let phonemizer handle the rest
-        text = re.sub(r"\s+", " ", text.strip())  # normalize whitespace
-        text = (
-            text.replace('"', "").replace("~", "").replace("—", "-")
-        )  # remove quotes, tilde and normalize dashes
-
-        # Remove content inside parentheses, brackets, curly braces, and double asterisks
-        text = re.sub(r"\(.*?\)|\{.*?\}|\[.*?\]|\*.*?\*", "", text)
-
+        """Clean text before phonemization - minimal cleaning like official implementation"""
+        text = text.strip()
+        text = text.replace('"', "")  # Remove quotes only
         return text
 
     def inference(
@@ -362,7 +355,9 @@ class StyleTTS2Inference:
             x, _ = self.model.predictor.lstm(d)
             duration = self.model.predictor.duration_proj(x)
 
-            duration = torch.sigmoid(duration).sum(axis=-1) / speed
+            duration = torch.sigmoid(duration).sum(axis=-1)
+            if speed != 1.0:
+                duration = duration / speed
             pred_dur = torch.round(duration.squeeze()).clamp(min=1)
 
             # Precompute pred_aln_trg tensor on the device
