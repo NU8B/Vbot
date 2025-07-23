@@ -40,18 +40,16 @@ class AIUpscaler:
         
         self.model_configs = {
             "anime": {
-                "name": "RealESRGAN_x2plus_anime",
-                "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x2plus.pth",
-                "file": "RealESRGAN_x2plus_anime.pth",
-                "scale": 2,
-                "hash": "58c5d9e9d8b4f6b47d2b9c6f8e3a4d5f"  # Example hash
+                "name": "RealESRGAN_x4plus_anime_6B",
+                "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pth",
+                "file": "RealESRGAN_x4plus_anime_6B.pth",
+                "scale": 4,
             },
             "general": {
                 "name": "RealESRGAN_x2plus",
-                "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x2plus.pth",
+                "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth",
                 "file": "RealESRGAN_x2plus.pth",
                 "scale": 2,
-                "hash": "78c5d9e9d8b4f6b47d2b9c6f8e3a4d5f"  # Example hash
             }
         }
         
@@ -114,25 +112,22 @@ class AIUpscaler:
             config = self.model_configs[self.model_type]
             model_path = self._download_model(config)
             
-            # Initialize Real-ESRGAN model
-            model = RRDBNet(
-                num_in_ch=3,
-                num_out_ch=3,
-                num_feat=64,
-                num_block=23,
-                num_grow_ch=32,
-                scale=config["scale"]
-            )
-            
+            # The 'anime' model uses a different architecture (6 blocks vs 23)
+            if self.model_type == 'anime':
+                model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=6, num_grow_ch=32, scale=4)
+            else:
+                # Assuming the 'general' model uses the original 23 blocks
+                model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=config["scale"])
+
             # Create the upscaler
             self.upscaler = RealESRGANer(
                 scale=config["scale"],
                 model_path=str(model_path),
                 model=model,
-                tile=256,  # Tile size for memory efficiency
+                tile=0,
                 tile_pad=10,
                 pre_pad=0,
-                half=True if self.device.type == "cuda" else False,  # FP16 for speed
+                half=True if self.device.type == "cuda" else False,
                 device=self.device
             )
             
@@ -202,7 +197,7 @@ class AIUpscaler:
     
     def upscale(self, image: np.ndarray, target_size: Tuple[int, int]) -> np.ndarray:
         """
-        Upscale an image to the target size.
+        Upscale an image to the target size. (AI upscaling is currently disabled).
         
         Args:
             image: Input image as numpy array (H, W, C) or (H, W, 4) for RGBA
@@ -211,52 +206,8 @@ class AIUpscaler:
         Returns:
             Upscaled image as numpy array
         """
-        start_time = time.time()
-        
-        try:
-            # Preprocess image
-            rgb_image, alpha = self._preprocess_image(image)
-            
-            # Try Real-ESRGAN first
-            if self.upscaler is not None:
-                try:
-                    # Real-ESRGAN expects BGR format
-                    bgr_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2BGR)
-                    
-                    # Perform upscaling
-                    upscaled_bgr, _ = self.upscaler.enhance(bgr_image, outscale=None)
-                    
-                    # Convert back to RGB
-                    upscaled_rgb = cv2.cvtColor(upscaled_bgr, cv2.COLOR_BGR2RGB)
-                    
-                    # Resize to exact target size if needed
-                    if upscaled_rgb.shape[:2] != target_size:
-                        upscaled_rgb = cv2.resize(
-                            upscaled_rgb, 
-                            (target_size[1], target_size[0]), 
-                            interpolation=cv2.INTER_LANCZOS4
-                        )
-                    
-                except Exception as e:
-                    logging.warning(f"Real-ESRGAN failed, using fallback: {e}")
-                    upscaled_rgb = self._fallback_upscale(rgb_image, target_size)
-            else:
-                # Use fallback method
-                upscaled_rgb = self._fallback_upscale(rgb_image, target_size)
-            
-            # Postprocess and recombine with alpha
-            result = self._postprocess_image(upscaled_rgb, alpha, target_size)
-            
-            # Update performance stats
-            process_time = time.time() - start_time
-            self._update_stats(process_time)
-            
-            return result
-            
-        except Exception as e:
-            logging.error(f"Upscaling failed: {e}")
-            # Emergency fallback: simple resize
-            return cv2.resize(image, (target_size[1], target_size[0]))
+        # AI upscaling is disabled, perform a simple high-quality resize.
+        return cv2.resize(image, (target_size[1], target_size[0]), interpolation=cv2.INTER_LANCZOS4)
     
     def _update_stats(self, process_time: float):
         """Update performance statistics."""

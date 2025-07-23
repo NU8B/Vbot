@@ -515,9 +515,6 @@ class AnimatedCharacter:
                         target_size = (self.height, self.width)  # (height, width)
                         upscaled_image = self.ai_upscaler.upscale(output_image, target_size)
                         
-                        # Apply brightness correction to fix darker AI upscaled images
-                        upscaled_image = self._apply_brightness_correction(upscaled_image)
-                        
                         # Convert AI upscaled numpy array to wx.Image
                         wx_image = wx.Image(upscaled_image.shape[1], upscaled_image.shape[0])
                         wx_image.SetData(upscaled_image[:,:,:3].tobytes())
@@ -577,41 +574,6 @@ class AnimatedCharacter:
         wx_image = wx_image.Scale(self.width, self.height, quality)
         
         return wx_image
-
-    def _apply_brightness_correction(self, image: np.ndarray, gamma: float = 1.1, brightness: float = 1.05) -> np.ndarray:
-        """
-        Apply brightness and gamma correction to fix darker AI upscaled images.
-        
-        Args:
-            image: RGBA image array (H, W, 4)
-            gamma: Gamma correction value (>1 brightens, <1 darkens)
-            brightness: Brightness multiplier (>1 brightens, <1 darkens)
-        
-        Returns:
-            Brightness-corrected image
-        """
-        # Work on a copy to avoid modifying the original
-        corrected = image.copy().astype(np.float32)
-        
-        # Separate RGB and alpha channels
-        rgb = corrected[:, :, :3] / 255.0  # Normalize to [0, 1]
-        alpha = corrected[:, :, 3]  # Keep alpha as-is
-        
-        # Apply gamma correction to RGB channels
-        rgb = np.power(rgb, 1.0/gamma)
-        
-        # Apply brightness adjustment
-        rgb = rgb * brightness
-        
-        # Clamp values to [0, 1]
-        rgb = np.clip(rgb, 0.0, 1.0)
-        
-        # Convert back to [0, 255] and combine with alpha
-        rgb = (rgb * 255.0).astype(np.uint8)
-        corrected[:, :, :3] = rgb
-        corrected[:, :, 3] = alpha
-        
-        return corrected.astype(np.uint8)
 
     def get_upscaler_info(self):
         """Get information about the current upscaling system."""

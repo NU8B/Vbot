@@ -28,14 +28,8 @@ class ModernChatGUI(ChatGUI):
         # Get model name from environment
         self.model_name = os.getenv('VOICE_TYPE', 'Amelia')
         
-        # Get background color from bg_color.txt or use model-specific defaults
-        bg_color_path = Path(f"asset/model/{self.model_name}/bg_color.txt")
-        try:
-            with open(bg_color_path, 'r') as f:
-                self.bg_color = f.read().strip()
-        except:
-            # Default background colors for each model
-            self.bg_color = "#2b2b3b" if self.model_name == "Eveland" else "#ffd05c"
+        # Use a neutral background color
+        self.bg_color = "#2b2b3b"
         
         # Initialize parent class but don't create its widgets
         self.root = root
@@ -299,7 +293,7 @@ class ModernChatGUI(ChatGUI):
         if speaker in ["AI", "Assistant"]:
             speaker = self.model_name
             self.chat_history.append((speaker, message, timestamp))
-            self.show_subtitle(message)
+            # Subtitles are now handled by the playback consumer
         elif speaker == "You":  # Only add user messages to chat history
             self.chat_history.append((speaker, message, timestamp))
         # Ignore "You said" messages completely

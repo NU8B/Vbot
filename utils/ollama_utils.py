@@ -73,6 +73,13 @@ class OllamaHandler:
         # Create queue for streaming audio chunks
         self.audio_chunk_queue = Queue()
         
+        # Create a queue for full responses
+        self.response_queue = Queue()
+        
+        # Start a separate thread to process the response queue
+        self.response_processor_thread = threading.Thread(target=self._process_response_queue, daemon=True)
+        self.response_processor_thread.start()
+
         # Load emotion config for the current model
         self.emotion_config = create_emotion_config(model_name)
         
@@ -191,18 +198,16 @@ class OllamaHandler:
         """Anime-style consumer thread that plays continuous audio with fast subtitle updates."""
         sentences_data = []
         cumulative_audio = []
-        first_sentence_ready = False
-        
-        # Start immediately when first sentence is ready
-        def collect_and_start():
-            nonlocal first_sentence_ready
-            
-            # Get the first sentence
+
+        # 1. Collect all sentences from the queue until the stream ends.
+        # This is now robust and will wait for the producer thread.
+        while True:
             try:
-                chunk_data = self.audio_chunk_queue.get(timeout=5.0)  # Longer timeout for first sentence
-                if chunk_data is None:
-                    return False
-                
+                # Block and wait for an item from the producer thread.
+                chunk_data = self.audio_chunk_queue.get()
+                if chunk_data is None:  # A `None` item is the signal that the stream has ended.
+                    break
+
                 text_chunk, speech_chunk, duration_chunk = chunk_data
                 sentences_data.append({
                     'text': text_chunk,
@@ -210,123 +215,71 @@ class OllamaHandler:
                     'duration': duration_chunk
                 })
                 cumulative_audio.append(speech_chunk)
-                first_sentence_ready = True
                 
-                # Show first subtitle immediately!
-                self.gui.show_subtitle_anime_style(text_chunk)
-                print(f"First subtitle: {text_chunk}")
-                
-            except:
-                return False
-            
-            # Collect remaining sentences with shorter timeout
-            while True:
-                try:
-                    chunk_data = self.audio_chunk_queue.get(timeout=0.05)  # Very short timeout now
-                    if chunk_data is None:  # End of stream
-                        break
-                    
-                    text_chunk, speech_chunk, duration_chunk = chunk_data
-                    sentences_data.append({
-                        'text': text_chunk,
-                        'speech': speech_chunk,
-                        'duration': duration_chunk
-                    })
-                    cumulative_audio.append(speech_chunk)
-                    
-                except:
-                    # Small delay then check again - this allows streaming
-                    import time
-                    time.sleep(0.01)
-                    try:
-                        chunk_data = self.audio_chunk_queue.get_nowait()
-                        if chunk_data is None:
-                            break
-                        text_chunk, speech_chunk, duration_chunk = chunk_data
-                        sentences_data.append({
-                            'text': text_chunk,
-                            'speech': speech_chunk,
-                            'duration': duration_chunk
-                        })
-                        cumulative_audio.append(speech_chunk)
-                    except:
-                        break
-            
-            return True
+                # Show the first subtitle immediately for faster user feedback.
+                if len(sentences_data) == 1:
+                    self.gui.show_subtitle_anime_style(text_chunk)
+                    print(f"First subtitle: {text_chunk}")
+
+            except Exception as e:
+                print(f"Error collecting audio chunks from queue: {e}")
+                break
         
-        # Collect sentences
-        if not collect_and_start():
-            # No audio to play
+        # 2. If no audio data was collected, there's nothing to play.
+        if not sentences_data:
             self.is_speaking = False
             self.is_processing = False
             self.gui.enable_input_controls()
+            self.gui.hide_subtitle()
             return
-        
-        # Combine all audio into one continuous stream
+
+        # 3. Prepare for playback.
         combined_audio = np.concatenate(cumulative_audio)
+        total_duration = len(combined_audio) / 24000.0
         
-        # Calculate timing for each sentence
+        # Calculate start and end times for each subtitle.
         current_time = 0
         for sentence_data in sentences_data:
             sentence_data['start_time'] = current_time
             sentence_data['end_time'] = current_time + sentence_data['duration']
             current_time += sentence_data['duration']
         
-        # Start avatar speaking animation
+        # 4. Start animations and audio playback.
         avatar = self.gui.get_avatar()
         if avatar:
             avatar.start_speaking()
         
-        # Start continuous audio playback with better management
-        total_duration = self.audio_processor.play_audio_continuous_improved(combined_audio)
+        self.audio_processor.play_audio_continuous_improved(combined_audio)
         
-        # Start timing-based subtitle updates
+        # 5. Update subtitles in sync with audio playback.
         start_time = time.time()
         current_sentence_index = 0
         
         print(f"Starting anime-style playback for {len(sentences_data)} sentences, total duration: {total_duration:.2f}s")
         
-        # Rapid subtitle update loop with improved timing
         while True:
             elapsed_time = time.time() - start_time
-            
-            # Check if playback is complete with buffer
-            if elapsed_time >= total_duration + 0.1:  # Small buffer
+            if elapsed_time >= total_duration:
                 break
             
-            # Monitor audio playback and restart if needed
-            try:
-                import sounddevice as sd
-                if not sd.get_stream().active and elapsed_time < total_duration - 0.5:
-                    print("Audio stream interrupted, restarting...")
-                    # Restart from current position
-                    remaining_audio = combined_audio[int(elapsed_time * 24000):]
-                    if len(remaining_audio) > 1000:  # Only restart if significant audio remains
-                        sd.play(remaining_audio, samplerate=24000, blocking=False)
-            except:
-                pass  # Continue even if monitoring fails
-            
-            # Find current sentence based on timing
+            # Find the sentence that corresponds to the current playback time.
             for i, sentence_data in enumerate(sentences_data):
                 if sentence_data['start_time'] <= elapsed_time < sentence_data['end_time']:
                     if i != current_sentence_index:
-                        # Fast subtitle transition!
                         current_sentence_index = i
                         self.gui.show_subtitle_anime_style(sentence_data['text'])
                         print(f"Subtitle: {sentence_data['text']}")
                     break
             
-            # Update every 20ms for ultra-smooth anime-style transitions
-            time.sleep(0.02)
+            time.sleep(0.02) # Update subtitles at ~50Hz.
         
-        # Hide subtitle and clean up
+        # 6. Clean up after playback finishes.
         self.gui.hide_subtitle()
         
         if avatar:
             avatar.stop_speaking()
             avatar.set_emotion("neutral")
         
-        # Re-enable controls
         self.is_speaking = False
         self.is_processing = False
         self.gui.enable_input_controls()
@@ -359,14 +312,27 @@ class OllamaHandler:
             )
 
             if response.status_code == 200:
+                full_response = ""
                 for line in response.iter_lines():
                     if line:
                         try:
                             decoded_line = line.decode('utf-8')
                             json_chunk = json.loads(decoded_line)
-                            yield json_chunk
+                            
+                            # Append the content to the full response
+                            full_response += json_chunk.get("message", {}).get("content", "")
+                            
+                            # Check for response completion
+                            if json_chunk.get("done"):
+                                yield full_response
+                                full_response = ""  # Reset for next response
+                                
                         except (json.JSONDecodeError, KeyError) as e:
                             print(f"Error parsing streaming chunk: {e} - Line: {line}")
+                
+                # Yield any remaining response content
+                if full_response:
+                    yield full_response
             else:
                 print(f"Error from Ollama stream: {response.status_code}")
                 print(f"Response: {response.text}")
@@ -386,20 +352,44 @@ class OllamaHandler:
 
             self.gui.update_chat("You", text)
 
-            # Start the main processing in a new thread
-            threading.Thread(
-                target=self._process_text_streaming, args=(text,), daemon=True
-            ).start()
-            
-            # Start the ANIME-STYLE audio playback consumer thread
-            threading.Thread(
-                target=self._playback_consumer_anime_style, daemon=True
-            ).start()
+            # Put the user's text into the response queue to be processed
+            self.response_queue.put(text)
 
+            # The audio playback consumer is started in _process_response_queue
+            
         except Exception as e:
             print(f"Error in text handling: {str(e)}")
             import traceback
             traceback.print_exc()
+
+    def _process_response_queue(self):
+        """Monitors the response queue and processes text when available."""
+        while True:
+            try:
+                # Wait for a new user input to process
+                text_to_process = self.response_queue.get()
+                if text_to_process is None:
+                    break
+
+                # Start the streaming and playback threads for this specific input
+                processing_thread = threading.Thread(
+                    target=self._process_text_streaming, args=(text_to_process,), daemon=True
+                )
+                playback_thread = threading.Thread(
+                    target=self._playback_consumer_anime_style, daemon=True
+                )
+
+                processing_thread.start()
+                playback_thread.start()
+                
+                # Wait for both threads to complete before processing the next item
+                processing_thread.join()
+                playback_thread.join()
+
+            except Exception as e:
+                print(f"Error in response queue processor: {str(e)}")
+                import traceback
+                traceback.print_exc()
 
     def _process_text_streaming(self, text):
         """Processes text by streaming LLM, TTS, and audio playback."""
@@ -415,56 +405,36 @@ class OllamaHandler:
             # Get system prompt for the current model
             system_prompt = self.get_current_prompt()
 
-            sentence_buffer = ""
             full_response = ""
 
             # Stream response from Ollama
-            for chunk in self.call_ollama_stream(text, self.message_history, MAX_HISTORY, system_prompt):
-                token = chunk.get("message", {}).get("content", "")
-                if not token:
-                    continue
+            for response_chunk in self.call_ollama_stream(text, self.message_history, MAX_HISTORY, system_prompt):
+                full_response = response_chunk  # The stream now yields the full response
 
-                sentence_buffer += token
-                full_response += token
+                # Split the full response into sentences
+                sentences = re.split(r'(?<=[.!?])\s+', full_response)
                 
-                # Check for sentence completion
-                if re.search(r'[.!?]', sentence_buffer):
-                    # Process the complete sentence
-                    sentence_to_process = sentence_buffer.strip()
-                    sentence_buffer = ""
-
-                    if sentence_to_process:
+                for sentence in sentences:
+                    if sentence.strip():
                         # Get emotion for the sentence
-                        ai_emotion = self.emotion_handler.classify_emotion(sentence_to_process)
+                        ai_emotion = self.emotion_handler.classify_emotion(sentence)
                         if avatar:
                             avatar.set_emotion(ai_emotion)
 
                         # Synthesize audio for the sentence
                         speech, _, _ = self.inference_handler.process_text(
-                            "", sentence_to_process
+                            "", sentence
                         )
                         
                         duration = len(speech) / 24000
 
                         # Add the processed chunk to the queue
-                        self.audio_chunk_queue.put((sentence_to_process, speech, duration))
-
-            # Process any remaining text in the buffer
-            if sentence_buffer.strip():
-                ai_emotion = self.emotion_handler.classify_emotion(sentence_buffer.strip())
-                if avatar:
-                    avatar.set_emotion(ai_emotion)
-                
-                speech, _, _ = self.inference_handler.process_text(
-                    "", sentence_buffer.strip()
-                )
-                
-                duration = len(speech) / 24000
-                self.audio_chunk_queue.put((sentence_buffer.strip(), speech, duration))
+                        self.audio_chunk_queue.put((sentence, speech, duration))
 
             # Update the main chat history with the full response
-            self.gui.update_chat(self.model_name, full_response)
-            self.message_history.append({"role": "assistant", "content": full_response})
+            if full_response:
+                self.gui.update_chat(self.model_name, full_response)
+                self.message_history.append({"role": "assistant", "content": full_response})
 
         except Exception as e:
             print(f"Error in streaming process: {str(e)}")
