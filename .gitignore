@@ -60,7 +60,7 @@ nltk_data/
 /asset/outputs
 /Data_prep/audio_preprocessor/temp
 /Data_prep/raw_data/full_audio
-/Data_prep/raw_data
+/Data_prep/raw_data/raw_segments
 /Data_prep/Data/wavs
 Data_prep/Data/train_list.txt
 Data_prep/Data/val_list.txt
@@ -81,7 +81,6 @@ benchmark/resultLLMs/
 /benchmark/results/Amelia10_ft_StyleTTS2
 /benchmark/results
 /mos_evaluation/static/audio
-/Data_prep/raw_data
 AVATAR_UPSCALING_RESEARCH.md
 
 

@@ -1,0 +1,10 @@
+{
+  "processed_segments": 1488,
+  "final_segments": 1484,
+  "metric_failures": {},
+  "duration_stats": {
+    "min": 3.2,
+    "max": 7.7,
+    "avg": 5.264663072776283
+  }
+}
