@@ -41,9 +41,11 @@ def isolate_vocals(input_file, output_file, target_sr=24000):
         torchaudio.save(str(temp_input), wav, sr_orig, format="mp3")
 
         print("Separating vocals...")
-        # Run demucs inference
+        # Run demucs inference using Python module to avoid PATH issues
         subprocess.run(
             [
+                sys.executable,
+                "-m",
                 "demucs",
                 "--two-stems=vocals",  # Only separate vocals
                 "-n",

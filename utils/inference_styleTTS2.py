@@ -56,7 +56,7 @@ class StyleTTS2Inference:
     def __init__(self, model_name="Amelia", repo_id=None, device=None):
         # Map model names to their HuggingFace repo IDs
         self.model_configs = {
-            "Amelia": "nonoJDWAOIDAWKDA/Amelia_reviewed1_ft_StyleTTS2",
+            "Amelia": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",
             "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
         }
 
@@ -274,33 +274,8 @@ class StyleTTS2Inference:
         text = text.replace('"', "")  # Remove quotes only
         return text
 
-    def inference(
-        self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale, speed=None
-    ):
+    def inference(self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale):
         """Generate speech from text"""
-        # Determine speed from reference file if not explicitly provided
-        if speed is None:
-            # Get the reference file name from the style cache keys
-            ref_file = None
-            for path in self._style_cache:
-                if torch.equal(self._style_cache[path], ref_s):
-                    ref_file = Path(path).name
-                    break
-
-            # Find matching emotion config
-            if ref_file:
-                for emotion, config in EMOTION_CONFIG.items():
-                    if config["file"] == ref_file:
-                        speed = config["speed"]
-                        break
-
-            # Default to neutral speed if no match found
-            if speed is None:
-                speed = EMOTION_CONFIG["neutral"]["speed"]
-
-        # Print speed information
-        print(f"Generating speech with speed: {speed:.2f}x")
-
         # Clean text minimally
         text = self.clean_text(text)
 
@@ -356,8 +331,6 @@ class StyleTTS2Inference:
             duration = self.model.predictor.duration_proj(x)
 
             duration = torch.sigmoid(duration).sum(axis=-1)
-            if speed != 1.0:
-                duration = duration / speed
             pred_dur = torch.round(duration.squeeze()).clamp(min=1)
 
             # Precompute pred_aln_trg tensor on the device

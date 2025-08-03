@@ -153,6 +153,7 @@ def install_dependencies():
                 "pip",
                 "install",
                 "yt-dlp",  # For YouTube download
+                "demucs",  # For vocal separation
                 "--upgrade",  # Ensure we have the latest version
             ],
             check=True,
@@ -238,12 +239,8 @@ def download_from_youtube(url, idx):
 if __name__ == "__main__":
     # Example YouTube URLs
     youtube_urls = [
-        "https://www.youtube.com/watch?v=HbsG-0_zA-s",
-        "https://www.youtube.com/watch?v=A6A1Jlb2jZs",
-        "https://www.youtube.com/watch?v=MXrFrkIlE-0",
-        "https://www.youtube.com/watch?v=1KYRDR9rnTw",
-        "https://www.youtube.com/watch?v=Pqox9-28ZD0",
-        "https://www.youtube.com/watch?v=8LwJRk9WO7Y",
+        "https://www.youtube.com/watch?v=l5WIG1onKSk",
+        "https://www.youtube.com/watch?v=86UdOrzFXxQ",
         # Add more URLs as needed
     ]
 

@@ -128,7 +128,6 @@ def test_model(model_name):
             beta=emotion_config[emotion]["beta"],
             diffusion_steps=DIFFUSION_STEPS,
             embedding_scale=emotion_config[emotion]["embedding_scale"],
-            speed=emotion_config[emotion]["speed"],
         )
 
         duration = time.time() - start
@@ -163,7 +162,6 @@ def test_model(model_name):
             beta=emotion_config[emotion]["beta"],
             diffusion_steps=DIFFUSION_STEPS,
             embedding_scale=emotion_config[emotion]["embedding_scale"],
-            speed=emotion_config[emotion]["speed"],
         )
 
         duration = time.time() - start
