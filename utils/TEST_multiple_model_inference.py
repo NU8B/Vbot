@@ -21,7 +21,7 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 
 # List of models to test
-MODELS_TO_TEST = ["Amelia", "Eveland"]
+MODELS_TO_TEST = ["Amelia", "Eveland", "Gura"]
 
 # Base output directory
 BASE_OUTPUT_DIR = Path("asset/outputs")

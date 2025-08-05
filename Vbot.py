@@ -20,170 +20,185 @@ warnings.filterwarnings("ignore")
 
 AVATAR_SIZE = 800  # Define avatar size as a constant
 
+
 class ModernChatGUI(ChatGUI):
     def __init__(self, root, on_send_callback, on_voice_toggle_callback):
         # Initialize wx.App first (needed for avatar)
         self.wx_app = wx.App()
-        
+
         # Get model name from environment
-        self.model_name = os.getenv('VOICE_TYPE', 'Amelia')
-        
+        self.model_name = os.getenv("VOICE_TYPE", "Amelia")
+
         # Use a neutral background color
         self.bg_color = "#2b2b3b"
-        
+
         # Initialize parent class but don't create its widgets
         self.root = root
         self.on_send_callback = on_send_callback
         self.on_voice_toggle_callback = on_voice_toggle_callback
         self.is_processing = False
-        
+
         # Available models
-        self.available_models = ["Amelia", "Eveland"]
-        self.current_model_index = 0 if self.model_name == "Amelia" else 1
-        
+        self.available_models = ["Amelia", "Eveland", "Gura"]
+        # Set current model index based on model name
+        model_index_map = {"Amelia": 0, "Eveland": 1, "Gura": 2}
+        self.current_model_index = model_index_map.get(self.model_name, 0)
+
         # Main container - use character's background color
         self.main_container = tk.Frame(root, bg=self.bg_color)
         self.main_container.pack(expand=True, fill=tk.BOTH)
-        
+
         # Avatar container - match character's background
-        self.avatar_container = tk.Frame(self.main_container, bg=self.bg_color, width=AVATAR_SIZE, height=AVATAR_SIZE)
+        self.avatar_container = tk.Frame(
+            self.main_container, bg=self.bg_color, width=AVATAR_SIZE, height=AVATAR_SIZE
+        )
         self.avatar_container.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         self.avatar_container.pack_propagate(False)
-        
+
         # Subtitle window for custom rendering and transparency
         self.subtitle_window = tk.Toplevel(self.root)
         self.subtitle_window.overrideredirect(True)  # Borderless
-        self.subtitle_window.attributes('-alpha', 0.75)  # Semi-transparent
-        self.subtitle_window.configure(bg='black')
+        self.subtitle_window.attributes("-alpha", 0.75)  # Semi-transparent
+        self.subtitle_window.configure(bg="black")
         self.subtitle_window.withdraw()  # Initially hidden
 
         self.subtitle_label = tk.Label(
             self.subtitle_window,
             text="",
-            font=('Arial', 18, 'bold'),
-            fg='white',
-            bg='black',
-            justify='center'
+            font=("Arial", 18, "bold"),
+            fg="white",
+            bg="black",
+            justify="center",
         )
         self.subtitle_label.pack(expand=True, fill=tk.BOTH, padx=15, pady=10)
 
         # Bind subtitle positioning to main window changes
         self.root.bind("<Configure>", self._position_subtitle_window)
-        
+
         # Create and initialize avatar
         print("Creating avatar frame...")
         self.wx_frame = wx.Frame(
             None,
-            style=wx.BORDER_NONE | wx.FRAME_NO_TASKBAR,  # Remove window decorations and taskbar entry
-            size=(AVATAR_SIZE, AVATAR_SIZE)
+            style=wx.BORDER_NONE
+            | wx.FRAME_NO_TASKBAR,  # Remove window decorations and taskbar entry
+            size=(AVATAR_SIZE, AVATAR_SIZE),
         )
-        self.wx_frame.SetBackgroundColour('#2b2b3b')
-        
+        self.wx_frame.SetBackgroundColour("#2b2b3b")
+
         print("Initializing avatar...")
         self.avatar = AnimatedCharacter(self.wx_frame, AVATAR_SIZE, AVATAR_SIZE)
         self.wx_window_id = self.wx_frame.GetHandle()
-        
+
         # Create a tkinter window to embed the wx.Frame
-        self.avatar_embed = tk.Frame(self.avatar_container, bg='#2b2b3b')
+        self.avatar_embed = tk.Frame(self.avatar_container, bg="#2b2b3b")
         self.avatar_embed.pack(expand=True, fill=tk.BOTH)
-        
+
         # Bottom bar container - darker purple theme
-        self.bottom_bar = tk.Frame(self.main_container, bg='#1a1a2e', height=60)
+        self.bottom_bar = tk.Frame(self.main_container, bg="#1a1a2e", height=60)
         self.bottom_bar.pack(fill=tk.X, side=tk.BOTTOM, padx=20, pady=20)
         self.bottom_bar.pack_propagate(False)
-        
+
         # Input box - darker theme
         self.input_box = tk.Entry(
             self.bottom_bar,
-            bg='#5b5b6b',
-            fg='white',
-            insertbackground='white',
-            font=('Arial', 12),
-            relief=tk.FLAT
+            bg="#5b5b6b",
+            fg="white",
+            insertbackground="white",
+            font=("Arial", 12),
+            relief=tk.FLAT,
         )
-        self.input_box.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=(20, 10), pady=10)
-        
+        self.input_box.pack(
+            side=tk.LEFT, expand=True, fill=tk.BOTH, padx=(20, 10), pady=10
+        )
+
         # Button container - match bottom bar
-        button_container = tk.Frame(self.bottom_bar, bg='#1a1a2e')
+        button_container = tk.Frame(self.bottom_bar, bg="#1a1a2e")
         button_container.pack(side=tk.RIGHT, padx=(0, 20))
-        
+
         # Model switch button - keep model-specific colors
+        model_colors = {"Amelia": "#ffd05c", "Eveland": "#318fc5", "Gura": "#4a90e2"}
         self.switch_btn = tk.Button(
             button_container,
             text="🔄",
-            font=('Arial', 14),
-            bg='#ffd05c' if self.model_name == "Amelia" else '#318fc5',
-            fg='black',
+            font=("Arial", 14),
+            bg=model_colors.get(self.model_name, "#ffd05c"),
+            fg="black",
             relief=tk.FLAT,
-            command=self._handle_model_switch
+            command=self._handle_model_switch,
         )
         self.switch_btn.pack(side=tk.RIGHT, padx=5, pady=10)
-        
+
         # History button - darker purple theme
         self.history_btn = tk.Button(
             button_container,
             text="💭",
-            font=('Arial', 14),
-            bg='#2d2d44',
-            fg='white',
+            font=("Arial", 14),
+            bg="#2d2d44",
+            fg="white",
             relief=tk.FLAT,
-            command=self.show_history
+            command=self.show_history,
         )
         self.history_btn.pack(side=tk.RIGHT, padx=5, pady=10)
-        
+
         # Voice button - darker purple theme
         self.voice_btn = tk.Button(
             button_container,
             text="🎤",
-            font=('Arial', 14),
-            bg='#2d2d44',
-            fg='white',
+            font=("Arial", 14),
+            bg="#2d2d44",
+            fg="white",
             relief=tk.FLAT,
-            command=self._handle_voice
+            command=self._handle_voice,
         )
         self.voice_btn.pack(side=tk.RIGHT, padx=5, pady=10)
-        
+
         # Send button - darker purple theme
         self.send_btn = tk.Button(
             button_container,
             text="➤",
-            font=('Arial', 14),
-            bg='#2d2d44',
-            fg='white',
+            font=("Arial", 14),
+            bg="#2d2d44",
+            fg="white",
             relief=tk.FLAT,
-            command=self._handle_send
+            command=self._handle_send,
         )
         self.send_btn.pack(side=tk.RIGHT, padx=5, pady=10)
-        
+
         # Bind enter key to send
         self.input_box.bind("<Return>", lambda e: self._handle_send())
-        
+
         # Chat history storage
         self.chat_history = []
         self.history_window = None
-        
+
         # Style buttons on hover - darker purple theme
         for btn in [self.send_btn, self.voice_btn, self.history_btn]:
-            btn.bind("<Enter>", lambda e, b=btn: b.configure(bg='#3d3d5c'))
-            btn.bind("<Leave>", lambda e, b=btn: b.configure(bg='#2d2d44'))
-        
+            btn.bind("<Enter>", lambda e, b=btn: b.configure(bg="#3d3d5c"))
+            btn.bind("<Leave>", lambda e, b=btn: b.configure(bg="#2d2d44"))
+
         # Special hover effect for switch button based on current model
         def switch_hover_enter(e):
-            self.switch_btn.configure(
-                bg='#e6bb53' if self.model_name == "Amelia" else '#2b7eb3'
-            )
-        
+            hover_colors = {
+                "Amelia": "#e6bb53",
+                "Eveland": "#2b7eb3",
+                "Gura": "#3578c7",
+            }
+            self.switch_btn.configure(bg=hover_colors.get(self.model_name, "#e6bb53"))
+
         def switch_hover_leave(e):
-            self.switch_btn.configure(
-                bg='#ffd05c' if self.model_name == "Amelia" else '#318fc5'
-            )
-        
+            model_colors = {
+                "Amelia": "#ffd05c",
+                "Eveland": "#318fc5",
+                "Gura": "#4a90e2",
+            }
+            self.switch_btn.configure(bg=model_colors.get(self.model_name, "#ffd05c"))
+
         self.switch_btn.bind("<Enter>", switch_hover_enter)
         self.switch_btn.bind("<Leave>", switch_hover_leave)
-        
+
         # Embed wx.Frame into tkinter with a slight delay
         self.root.after(100, self._embed_wx_frame)
-        
+
         # Start wx update timer
         self.root.after(10, self._update_wx)
 
@@ -193,35 +208,41 @@ class ModernChatGUI(ChatGUI):
             print("Embedding avatar frame...")
             import win32gui
             import win32con
-            
+
             # Get the window handle of the tkinter frame
             tk_handle = self.avatar_embed.winfo_id()
-            
+
             # Set the wx.Frame as a child of the tkinter frame
             win32gui.SetParent(self.wx_window_id, tk_handle)
-            
+
             # Remove window styles that make it look like a separate window
             style = win32gui.GetWindowLong(self.wx_window_id, win32con.GWL_STYLE)
-            style = style & ~(win32con.WS_CAPTION | win32con.WS_THICKFRAME | win32con.WS_SYSMENU)
+            style = style & ~(
+                win32con.WS_CAPTION | win32con.WS_THICKFRAME | win32con.WS_SYSMENU
+            )
             win32gui.SetWindowLong(self.wx_window_id, win32con.GWL_STYLE, style)
-            
+
             # Show the wx.Frame
             self.wx_frame.Show()
-            
+
             # Position the wx.Frame
             win32gui.SetWindowPos(
                 self.wx_window_id,
                 win32con.HWND_TOP,
-                0, 0,
-                AVATAR_SIZE, AVATAR_SIZE,
-                win32con.SWP_SHOWWINDOW | win32con.SWP_FRAMECHANGED  # Add SWP_FRAMECHANGED to apply style changes
+                0,
+                0,
+                AVATAR_SIZE,
+                AVATAR_SIZE,
+                win32con.SWP_SHOWWINDOW
+                | win32con.SWP_FRAMECHANGED,  # Add SWP_FRAMECHANGED to apply style changes
             )
-            
+
             print("Avatar frame embedded successfully")
-            
+
         except Exception as e:
             print(f"Error embedding wx.Frame: {str(e)}")
             import traceback
+
             traceback.print_exc()
 
     def _update_wx(self):
@@ -237,58 +258,71 @@ class ModernChatGUI(ChatGUI):
             self.history_window = tk.Toplevel(self.root)
             self.history_window.title("Chat History")
             self.history_window.geometry("500x700")
-            self.history_window.configure(bg='#1e1e2d')
-            
+            self.history_window.configure(bg="#1e1e2d")
+
             # Create a frame to hold the text widget and scrollbar
-            history_frame = tk.Frame(self.history_window, bg='#1e1e2d')
+            history_frame = tk.Frame(self.history_window, bg="#1e1e2d")
             history_frame.pack(expand=True, fill=tk.BOTH, padx=15, pady=15)
-            
+
             # Add scrollbar
             scrollbar = tk.Scrollbar(history_frame)
             scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Create text widget for history with improved styles
             history_text = tk.Text(
                 history_frame,
-                bg='#1e1e2d',
-                fg='white',
-                font=('Arial', 12),
+                bg="#1e1e2d",
+                fg="white",
+                font=("Arial", 12),
                 wrap=tk.WORD,
                 relief=tk.FLAT,
                 padx=15,
                 pady=15,
                 spacing1=10,  # Add space before each line
                 spacing3=10,  # Add space after each line
-                yscrollcommand=scrollbar.set
+                yscrollcommand=scrollbar.set,
             )
             history_text.pack(expand=True, fill=tk.BOTH)
             scrollbar.config(command=history_text.yview)
-            
+
             # Configure tags for different message types
-            history_text.tag_configure("user", foreground="#4CAF50", font=('Arial', 12, 'bold'))
-            history_text.tag_configure("ai", foreground="#2196F3", font=('Arial', 12, 'bold'))
-            history_text.tag_configure("timestamp", foreground="#9E9E9E", font=('Arial', 10, 'italic'))
-            history_text.tag_configure("message", foreground="white", font=('Arial', 12))
-            
+            history_text.tag_configure(
+                "user", foreground="#4CAF50", font=("Arial", 12, "bold")
+            )
+            history_text.tag_configure(
+                "ai", foreground="#2196F3", font=("Arial", 12, "bold")
+            )
+            history_text.tag_configure(
+                "timestamp", foreground="#9E9E9E", font=("Arial", 10, "italic")
+            )
+            history_text.tag_configure(
+                "message", foreground="white", font=("Arial", 12)
+            )
+
             # Display chat history with improved formatting
             for message in self.chat_history:
                 if isinstance(message, str):  # Handle old format messages
                     speaker, content = message.split(": ", 1)
-                    history_text.insert(tk.END, f"{speaker}: ", "user" if speaker == "You" else "ai")
+                    history_text.insert(
+                        tk.END, f"{speaker}: ", "user" if speaker == "You" else "ai"
+                    )
                     history_text.insert(tk.END, f"{content}\n\n", "message")
                 else:  # Handle new format messages with timestamp
                     speaker, content, timestamp = message
                     history_text.insert(tk.END, f"{timestamp}\n", "timestamp")
-                    history_text.insert(tk.END, f"{speaker}: ", "user" if speaker == "You" else "ai")
+                    history_text.insert(
+                        tk.END, f"{speaker}: ", "user" if speaker == "You" else "ai"
+                    )
                     history_text.insert(tk.END, f"{content}\n\n", "message")
-            
-            history_text.configure(state='disabled')
+
+            history_text.configure(state="disabled")
 
     def update_chat(self, speaker, message):
         """Update chat history and show subtitle for AI responses"""
         from datetime import datetime
+
         timestamp = datetime.now().strftime("%I:%M %p")  # 12-hour format with AM/PM
-        
+
         # Clean up the speaker name
         if speaker in ["AI", "Assistant"]:
             speaker = self.model_name
@@ -302,14 +336,14 @@ class ModernChatGUI(ChatGUI):
         self.input_box.delete(0, tk.END)
 
     def disable_input_controls(self):
-        self.input_box.configure(state='disabled')
-        self.send_btn.configure(state='disabled')
-        self.voice_btn.configure(state='disabled')
+        self.input_box.configure(state="disabled")
+        self.send_btn.configure(state="disabled")
+        self.voice_btn.configure(state="disabled")
 
     def enable_input_controls(self):
-        self.input_box.configure(state='normal')
-        self.send_btn.configure(state='normal')
-        self.voice_btn.configure(state='normal')
+        self.input_box.configure(state="normal")
+        self.send_btn.configure(state="normal")
+        self.voice_btn.configure(state="normal")
 
     def set_voice_button_text(self, text):
         """Update the voice button text"""
@@ -341,7 +375,7 @@ class ModernChatGUI(ChatGUI):
 
             width = int(main_win_width * 0.9)
             height = 120
-            
+
             self.subtitle_window.geometry(f"{width}x{height}+{x}+{y}")
             self.subtitle_label.configure(wraplength=width - 30)
 
@@ -380,68 +414,74 @@ class ModernChatGUI(ChatGUI):
         """Handle model switch button click"""
         if not self.is_processing:
             # Switch to next model
-            self.current_model_index = (self.current_model_index + 1) % len(self.available_models)
+            self.current_model_index = (self.current_model_index + 1) % len(
+                self.available_models
+            )
             new_model = self.available_models[self.current_model_index]
-            
+
             # Update model name and environment variable
             self.model_name = new_model
-            os.environ['VOICE_TYPE'] = new_model
-            
+            os.environ["VOICE_TYPE"] = new_model
+
             # Get new background color
             bg_color_path = Path(f"asset/model/{new_model}/bg_color.txt")
             try:
-                with open(bg_color_path, 'r') as f:
+                with open(bg_color_path, "r") as f:
                     self.bg_color = f.read().strip()
             except:
                 self.bg_color = "#2b2b3b" if new_model == "Eveland" else "#ffd05c"
-            
+
             # Update UI colors
             self.main_container.configure(bg=self.bg_color)
             self.avatar_container.configure(bg=self.bg_color)
             self.avatar_embed.configure(bg=self.bg_color)
-            
+
             # Update switch button color
-            self.switch_btn.configure(
-                bg='#ffd05c' if new_model == "Amelia" else '#318fc5'
-            )
-            
+            model_colors = {
+                "Amelia": "#ffd05c",
+                "Eveland": "#318fc5",
+                "Gura": "#4a90e2",
+            }
+            self.switch_btn.configure(bg=model_colors.get(new_model, "#ffd05c"))
+
             # Notify user of model change
             self.chat_history.append(f"System: Switched to {new_model} model")
-            
+
             # Clean up old avatar
             if self.avatar:
                 self.avatar.cleanup()
                 self.avatar = None
-            
+
             # Update wx frame background color
             self.wx_frame.SetBackgroundColour(self.bg_color)
-            
+
             # Hide the frame temporarily
             self.wx_frame.Hide()
-            
+
             # Create new avatar instance
             print(f"Reinitializing avatar for {new_model}...")
             self.avatar = AnimatedCharacter(self.wx_frame, AVATAR_SIZE, AVATAR_SIZE)
-            
+
             # Show frame and start animation
             self.wx_frame.Show()
             self.avatar.start_animation()
-            
+
             # Force a refresh of both frames
             self.wx_frame.Refresh()
             self.avatar_embed.update()
-            
+
             # Call the model switch callback if provided
-            if hasattr(self, 'on_model_switch'):
+            if hasattr(self, "on_model_switch"):
                 self.on_model_switch(new_model)
 
     def set_model_switch_callback(self, callback):
         """Set callback for model switching"""
         self.on_model_switch = callback
 
+
 def main():
-    MODEL_NAME = os.getenv('VOICE_TYPE', 'Amelia')
-    
+    MODEL_NAME = os.getenv("VOICE_TYPE", "Amelia")
+
     # Verify model directory exists
     model_dir = Path(f"asset/model/{MODEL_NAME}")
     if not model_dir.exists():
@@ -455,16 +495,16 @@ def main():
     # Initialize all components
     init_handler = InitializationHandler(model_name=MODEL_NAME)
     components = init_handler.initialize_all()
-    
+
     # Initialize tkinter root
     root = tk.Tk()
     root.title("Vbot")
     root.geometry("1200x800")
-    root.configure(bg='#2b2b3b')
-    
+    root.configure(bg="#2b2b3b")
+
     # Create Ollama Handler
     ollama_handler = init_handler.create_ollama_handler()
-    
+
     # Create a wrapper for voice input processing
     def handle_voice_input(text, timings):
         # Skip showing the transcribed text as subtitle
@@ -475,65 +515,62 @@ def main():
         root,
         ollama_handler.handle_text_input,
         lambda: components["audio_processor"].toggle_listening(
-            gui,
-            handle_voice_input,
-            ollama_handler.is_processing
-        )
+            gui, handle_voice_input, ollama_handler.is_processing
+        ),
     )
-    
+
     # Set GUI in Ollama Handler and configure audio duration callback
     ollama_handler.gui = gui
-    
+
     # Handle model switching
     def handle_model_switch(new_model):
         if gui.is_processing:
             return
-            
+
         print(f"\n=== Switching to {new_model} model ===")
-        
+
         # Update Ollama handler
         ollama_handler.set_model(new_model)
-        
+
         # Create new initialization handler for the new model
         print(f"Initializing components for {new_model}...")
         init_handler = InitializationHandler(model_name=new_model)
         new_components = init_handler.initialize_all()
-        
+
         # Update all voice-related components
         components["inference_handler"] = new_components["inference_handler"]
         components["audio_processor"] = new_components["audio_processor"]
         components["tts_model"] = new_components["tts_model"]
-        
+
         # Update Ollama handler with new components
         ollama_handler.tts_model = new_components["tts_model"]
         ollama_handler.audio_processor = new_components["audio_processor"]
         ollama_handler.inference_handler = new_components["inference_handler"]
-        
+
         print(f"Components reinitialized for {new_model}")
-        
+
         # Update window title
         root.title(f"Vbot - {new_model}")
-        
+
         # Update GUI's voice toggle callback with new audio processor
-        gui.on_voice_toggle_callback = lambda: components["audio_processor"].toggle_listening(
-            gui,
-            handle_voice_input,
-            ollama_handler.is_processing
-        )
-        
+        gui.on_voice_toggle_callback = lambda: components[
+            "audio_processor"
+        ].toggle_listening(gui, handle_voice_input, ollama_handler.is_processing)
+
         print("=== Model switch complete ===\n")
 
     # Set the model switch callback
     gui.set_model_switch_callback(handle_model_switch)
-    
+
     # Register cleanup on window close
     root.protocol(
         "WM_DELETE_WINDOW",
         lambda: (components["docker_handler"].cleanup(), root.destroy()),
     )
-    
+
     # Start the application
     root.mainloop()
 
+
 if __name__ == "__main__":
-    main() 
+    main()

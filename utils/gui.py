@@ -19,8 +19,8 @@ class ChatGUI:
 
         # Configure style
         style = ttk.Style()
-        style.configure("Custom.TButton", padding=10, font=('Helvetica', 12))
-        style.configure("Mic.TButton", padding=10, font=('Helvetica', 12))
+        style.configure("Custom.TButton", padding=10, font=("Helvetica", 12))
+        style.configure("Mic.TButton", padding=10, font=("Helvetica", 12))
 
         self.on_send = on_send_callback
         self.on_voice_toggle = on_voice_toggle_callback
@@ -42,7 +42,7 @@ class ChatGUI:
         self.wx_app = None
         self.avatar = None
         self.setup_wx()
-        
+
         # Setup chat interface
         self.setup_chat()
 
@@ -51,42 +51,55 @@ class ChatGUI:
         # Create wx.App in the main thread
         if not wx.GetApp():
             self.wx_app = wx.App(False)
-        
+
         # Create a parent frame
-        self.wx_frame = wx.Frame(None, title="Avatar", size=(512, 512),
-                               style=wx.FRAME_NO_TASKBAR | wx.BORDER_NONE)
-        
+        self.wx_frame = wx.Frame(
+            None,
+            title="Avatar",
+            size=(512, 512),
+            style=wx.FRAME_NO_TASKBAR | wx.BORDER_NONE,
+        )
+
         # Get the window handle of the avatar frame
         avatar_hwnd = self.avatar_frame.winfo_id()
-        
+
         # Create the avatar
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.avatar = AnimatedCharacter(self.wx_frame, 512, 512, device)
-        
+
         # Show the frame
         self.wx_frame.Show()
-        
+
         # Embed the wx frame into the tkinter frame
         try:
             # Set the parent window
             win32gui.SetParent(self.wx_frame.GetHandle(), avatar_hwnd)
-            
+
             # Remove window decorations
-            style = win32gui.GetWindowLong(self.wx_frame.GetHandle(), win32con.GWL_STYLE)
+            style = win32gui.GetWindowLong(
+                self.wx_frame.GetHandle(), win32con.GWL_STYLE
+            )
             style = style & ~win32con.WS_CAPTION & ~win32con.WS_THICKFRAME
             win32gui.SetWindowLong(self.wx_frame.GetHandle(), win32con.GWL_STYLE, style)
-            
+
             # Position the window
-            win32gui.SetWindowPos(self.wx_frame.GetHandle(), None, 0, 0, 512, 512,
-                                win32con.SWP_NOMOVE | win32con.SWP_NOZORDER)
+            win32gui.SetWindowPos(
+                self.wx_frame.GetHandle(),
+                None,
+                0,
+                0,
+                512,
+                512,
+                win32con.SWP_NOMOVE | win32con.SWP_NOZORDER,
+            )
         except Exception as e:
             print(f"Error embedding window: {str(e)}")
-        
+
         # Set up a timer to process wx events
         def process_wx_events():
             self.wx_app.ProcessPendingEvents()
             self.root.after(10, process_wx_events)  # Schedule next update
-        
+
         # Start processing wx events
         self.root.after(10, process_wx_events)
 
@@ -97,21 +110,21 @@ class ChatGUI:
             wrap=tk.WORD,
             width=50,
             height=20,
-            font=('Helvetica', 12),
-            bg='#FFFFFF',
+            font=("Helvetica", 12),
+            bg="#FFFFFF",
         )
         self.text_area.pack(expand=True, fill=tk.BOTH)
-        
+
         # Configure tags for different speakers
         self.text_area.tag_configure("user", foreground="#007AFF")  # Blue for user
-        self.text_area.tag_configure("ai", foreground="#FF2D55")    # Pink for AI
+        self.text_area.tag_configure("ai", foreground="#FF2D55")  # Pink for AI
 
         # Input frame
         self.input_frame = ttk.Frame(self.chat_frame)
         self.input_frame.pack(pady=10)
-        
+
         # Input entry with larger font
-        self.input_entry = ttk.Entry(self.input_frame, width=40, font=('Helvetica', 12))
+        self.input_entry = ttk.Entry(self.input_frame, width=40, font=("Helvetica", 12))
         self.input_entry.pack(side=tk.LEFT, padx=5)
 
         # Bind Enter key to send
@@ -122,7 +135,7 @@ class ChatGUI:
             self.input_frame,
             text="Send",
             command=self._on_send_click,
-            style="Custom.TButton"
+            style="Custom.TButton",
         )
         self.send_button.pack(side=tk.LEFT, padx=5)
 
@@ -131,7 +144,7 @@ class ChatGUI:
             self.input_frame,
             text="🎤",
             command=self._on_voice_click,
-            style="Mic.TButton"
+            style="Mic.TButton",
         )
         self.voice_button.pack(side=tk.LEFT, padx=5)
 

@@ -41,6 +41,19 @@ Key traits to incorporate:
 
 You are not to break character under any circumstances. You should speak in first person. KEEP YOUR RESPONSE CONCISE AND UNDER 30 WORDS. Only use string text in your response. NO EMOJIS NO PARENTHESIS.
 """,
+    "Gura": """ You are Gawr Gura, the apex predator shark from hololive English -Myth-. You are playful, energetic, and have a childlike sense of wonder. Despite claiming to be an apex predator, you're actually quite friendly and endearing.
+
+Key traits to incorporate:
+- Shark-themed jokes and references
+- Playful and mischievous personality  
+- Love for rhythm games and singing
+- Can be forgetful but very enthusiastic
+- Small in stature but big in energy
+- Enjoys teasing but is ultimately sweet and caring
+- Sometimes acts tough but is actually quite soft-hearted
+
+You are not to break character under any circumstances. You should speak in first person and make shark references when appropriate. KEEP YOUR RESPONSE CONCISE AND UNDER 30 WORDS. Only use string text in your response. NO EMOJIS NO PARENTHESIS.
+""",
 }
 
 # Get Ollama host from environment or default to localhost
@@ -72,17 +85,19 @@ class OllamaHandler:
 
         # Create queue for streaming audio chunks
         self.audio_chunk_queue = Queue()
-        
+
         # Create a queue for full responses
         self.response_queue = Queue()
-        
+
         # Start a separate thread to process the response queue
-        self.response_processor_thread = threading.Thread(target=self._process_response_queue, daemon=True)
+        self.response_processor_thread = threading.Thread(
+            target=self._process_response_queue, daemon=True
+        )
         self.response_processor_thread.start()
 
         # Load emotion config for the current model
         self.emotion_config = create_emotion_config(model_name)
-        
+
         # This is a bit of a workaround to get the TTS handler instance
         self.inference_handler = (
             InferenceHandler(tts_model, EmotionHandler(), model_name=model_name)
@@ -103,7 +118,7 @@ class OllamaHandler:
             self.message_history = (
                 []
             )  # Clear conversation history when switching models
-            
+
             # Re-initialize the TTS handler with the new model name
             if self.tts_model:
                 self.inference_handler = InferenceHandler(
@@ -178,17 +193,17 @@ class OllamaHandler:
                     break
 
                 text_chunk, speech_chunk, duration_chunk = chunk_data
-                
+
                 # Update GUI with the current text chunk
                 self.gui.show_subtitle(text_chunk)
-                
+
                 # Play the audio chunk (this is a blocking call)
                 self.audio_processor.play_audio(speech_chunk, duration=duration_chunk)
 
             except Exception as e:
                 print(f"Error in playback consumer: {str(e)}")
                 break
-        
+
         # Once playback is finished, re-enable controls
         self.is_speaking = False
         self.is_processing = False
@@ -205,17 +220,21 @@ class OllamaHandler:
             try:
                 # Block and wait for an item from the producer thread.
                 chunk_data = self.audio_chunk_queue.get()
-                if chunk_data is None:  # A `None` item is the signal that the stream has ended.
+                if (
+                    chunk_data is None
+                ):  # A `None` item is the signal that the stream has ended.
                     break
 
                 text_chunk, speech_chunk, duration_chunk = chunk_data
-                sentences_data.append({
-                    'text': text_chunk,
-                    'speech': speech_chunk,
-                    'duration': duration_chunk
-                })
+                sentences_data.append(
+                    {
+                        "text": text_chunk,
+                        "speech": speech_chunk,
+                        "duration": duration_chunk,
+                    }
+                )
                 cumulative_audio.append(speech_chunk)
-                
+
                 # Show the first subtitle immediately for faster user feedback.
                 if len(sentences_data) == 1:
                     self.gui.show_subtitle_anime_style(text_chunk)
@@ -224,7 +243,7 @@ class OllamaHandler:
             except Exception as e:
                 print(f"Error collecting audio chunks from queue: {e}")
                 break
-        
+
         # 2. If no audio data was collected, there's nothing to play.
         if not sentences_data:
             self.is_speaking = False
@@ -236,54 +255,60 @@ class OllamaHandler:
         # 3. Prepare for playback.
         combined_audio = np.concatenate(cumulative_audio)
         total_duration = len(combined_audio) / 24000.0
-        
+
         # Calculate start and end times for each subtitle.
         current_time = 0
         for sentence_data in sentences_data:
-            sentence_data['start_time'] = current_time
-            sentence_data['end_time'] = current_time + sentence_data['duration']
-            current_time += sentence_data['duration']
-        
+            sentence_data["start_time"] = current_time
+            sentence_data["end_time"] = current_time + sentence_data["duration"]
+            current_time += sentence_data["duration"]
+
         # 4. Start animations and audio playback.
         avatar = self.gui.get_avatar()
         if avatar:
             avatar.start_speaking()
-        
+
         self.audio_processor.play_audio_continuous_improved(combined_audio)
-        
+
         # 5. Update subtitles in sync with audio playback.
         start_time = time.time()
         current_sentence_index = 0
-        
-        print(f"Starting anime-style playback for {len(sentences_data)} sentences, total duration: {total_duration:.2f}s")
-        
+
+        print(
+            f"Starting anime-style playback for {len(sentences_data)} sentences, total duration: {total_duration:.2f}s"
+        )
+
         while True:
             elapsed_time = time.time() - start_time
             if elapsed_time >= total_duration:
                 break
-            
+
             # Find the sentence that corresponds to the current playback time.
             for i, sentence_data in enumerate(sentences_data):
-                if sentence_data['start_time'] <= elapsed_time < sentence_data['end_time']:
+                if (
+                    sentence_data["start_time"]
+                    <= elapsed_time
+                    < sentence_data["end_time"]
+                ):
                     if i != current_sentence_index:
                         current_sentence_index = i
-                        self.gui.show_subtitle_anime_style(sentence_data['text'])
+                        self.gui.show_subtitle_anime_style(sentence_data["text"])
                         print(f"Subtitle: {sentence_data['text']}")
                     break
-            
-            time.sleep(0.02) # Update subtitles at ~50Hz.
-        
+
+            time.sleep(0.02)  # Update subtitles at ~50Hz.
+
         # 6. Clean up after playback finishes.
         self.gui.hide_subtitle()
-        
+
         if avatar:
             avatar.stop_speaking()
             avatar.set_emotion("neutral")
-        
+
         self.is_speaking = False
         self.is_processing = False
         self.gui.enable_input_controls()
-        
+
         print("Anime-style playback completed!")
 
     @staticmethod
@@ -316,20 +341,22 @@ class OllamaHandler:
                 for line in response.iter_lines():
                     if line:
                         try:
-                            decoded_line = line.decode('utf-8')
+                            decoded_line = line.decode("utf-8")
                             json_chunk = json.loads(decoded_line)
-                            
+
                             # Append the content to the full response
-                            full_response += json_chunk.get("message", {}).get("content", "")
-                            
+                            full_response += json_chunk.get("message", {}).get(
+                                "content", ""
+                            )
+
                             # Check for response completion
                             if json_chunk.get("done"):
                                 yield full_response
                                 full_response = ""  # Reset for next response
-                                
+
                         except (json.JSONDecodeError, KeyError) as e:
                             print(f"Error parsing streaming chunk: {e} - Line: {line}")
-                
+
                 # Yield any remaining response content
                 if full_response:
                     yield full_response
@@ -356,10 +383,11 @@ class OllamaHandler:
             self.response_queue.put(text)
 
             # The audio playback consumer is started in _process_response_queue
-            
+
         except Exception as e:
             print(f"Error in text handling: {str(e)}")
             import traceback
+
             traceback.print_exc()
 
     def _process_response_queue(self):
@@ -373,7 +401,9 @@ class OllamaHandler:
 
                 # Start the streaming and playback threads for this specific input
                 processing_thread = threading.Thread(
-                    target=self._process_text_streaming, args=(text_to_process,), daemon=True
+                    target=self._process_text_streaming,
+                    args=(text_to_process,),
+                    daemon=True,
                 )
                 playback_thread = threading.Thread(
                     target=self._playback_consumer_anime_style, daemon=True
@@ -381,7 +411,7 @@ class OllamaHandler:
 
                 processing_thread.start()
                 playback_thread.start()
-                
+
                 # Wait for both threads to complete before processing the next item
                 processing_thread.join()
                 playback_thread.join()
@@ -389,6 +419,7 @@ class OllamaHandler:
             except Exception as e:
                 print(f"Error in response queue processor: {str(e)}")
                 import traceback
+
                 traceback.print_exc()
 
     def _process_text_streaming(self, text):
@@ -396,7 +427,7 @@ class OllamaHandler:
         try:
             print("\n=== Starting stream processing ===")
             avatar = self.gui.get_avatar()
-            
+
             # Set initial emotion based on user input
             user_emotion = self.emotion_handler.classify_emotion(text)
             if avatar:
@@ -408,12 +439,16 @@ class OllamaHandler:
             full_response = ""
 
             # Stream response from Ollama
-            for response_chunk in self.call_ollama_stream(text, self.message_history, MAX_HISTORY, system_prompt):
-                full_response = response_chunk  # The stream now yields the full response
+            for response_chunk in self.call_ollama_stream(
+                text, self.message_history, MAX_HISTORY, system_prompt
+            ):
+                full_response = (
+                    response_chunk  # The stream now yields the full response
+                )
 
                 # Split the full response into sentences
-                sentences = re.split(r'(?<=[.!?])\s+', full_response)
-                
+                sentences = re.split(r"(?<=[.!?])\s+", full_response)
+
                 for sentence in sentences:
                     if sentence.strip():
                         # Get emotion for the sentence
@@ -422,10 +457,8 @@ class OllamaHandler:
                             avatar.set_emotion(ai_emotion)
 
                         # Synthesize audio for the sentence
-                        speech, _, _ = self.inference_handler.process_text(
-                            "", sentence
-                        )
-                        
+                        speech, _, _ = self.inference_handler.process_text("", sentence)
+
                         duration = len(speech) / 24000
 
                         # Add the processed chunk to the queue
@@ -434,11 +467,14 @@ class OllamaHandler:
             # Update the main chat history with the full response
             if full_response:
                 self.gui.update_chat(self.model_name, full_response)
-                self.message_history.append({"role": "assistant", "content": full_response})
+                self.message_history.append(
+                    {"role": "assistant", "content": full_response}
+                )
 
         except Exception as e:
             print(f"Error in streaming process: {str(e)}")
             import traceback
+
             traceback.print_exc()
         finally:
             # Signal the end of the stream to the consumer

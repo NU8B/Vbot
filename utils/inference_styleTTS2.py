@@ -58,6 +58,7 @@ class StyleTTS2Inference:
         self.model_configs = {
             "Amelia": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",
             "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
+            "Gura": "nonoJDWAOIDAWKDA/Gura_reviewed_ft_StyleTTS2",
         }
 
         self.model_name = model_name
