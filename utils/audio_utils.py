@@ -11,7 +11,7 @@ import os
 
 
 class AudioProcessor:
-    def __init__(self):
+    def __init__(self, device_index=None):
         cache_dir = Path("./cache/style_tts2_ft")
         cache_dir.mkdir(exist_ok=True)
 
@@ -33,6 +33,7 @@ class AudioProcessor:
 
         # Voice input state
         self.is_listening = False
+        self.device_index = device_index
 
         # Pre-warm the model silently
         if torch.cuda.is_available() and Path(self.ref_audio_path).exists():
@@ -73,6 +74,8 @@ class AudioProcessor:
             gui.set_voice_button_text("Voice Input")
 
     def record_audio(self, is_listening_ref):
+        # Dynamic silence threshold
+        self.adjust_silence_threshold()
         CHUNK = 1024
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
@@ -81,6 +84,7 @@ class AudioProcessor:
         SILENCE_DURATION = 2
 
         p = pyaudio.PyAudio()
+        self.log_devices(p)
         frames = []
         silent_chunks = 0
         has_speech = False
@@ -91,6 +95,7 @@ class AudioProcessor:
             rate=RATE,
             input=True,
             frames_per_buffer=CHUNK,
+            input_device_index=self.device_index,
         )
 
         try:
@@ -102,11 +107,12 @@ class AudioProcessor:
                 audio_data = np.frombuffer(data, dtype=np.int16)
                 volume = np.abs(audio_data).mean()
 
-                if volume > SILENCE_THRESHOLD:
+                if volume > self.silence_threshold:
                     has_speech = True
                     silent_chunks = 0
                 else:
-                    silent_chunks += 1
+                    if has_speech:
+                        silent_chunks += 1
 
                 # Stop if silence for SILENCE_DURATION seconds
                 if has_speech and silent_chunks > int(RATE / CHUNK * SILENCE_DURATION):
@@ -127,6 +133,42 @@ class AudioProcessor:
             return str(output_path)
 
         return None
+
+    def adjust_silence_threshold(self):
+        """Adjust silence threshold based on ambient noise"""
+        print("Adjusting silence threshold... Please be quiet.")
+        p = pyaudio.PyAudio()
+        stream = p.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=16000,
+            input=True,
+            frames_per_buffer=1024,
+            input_device_index=self.device_index,
+        )
+
+        noise_levels = []
+        for _ in range(10):
+            data = stream.read(1024)
+            audio_data = np.frombuffer(data, dtype=np.int16)
+            noise_levels.append(np.abs(audio_data).mean())
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+        self.silence_threshold = np.mean(noise_levels) + 350
+        print(f"Silence threshold adjusted to: {self.silence_threshold:.2f}")
+
+    def log_devices(self, p):
+        """Log available audio devices"""
+        print("Available audio input devices:")
+        for i in range(p.get_device_count()):
+            info = p.get_device_info_by_index(i)
+            if info["maxInputChannels"] > 0:
+                print(f"  {i}: {info['name']}")
+        if self.device_index is not None:
+            print(f"Using device index: {self.device_index}")
 
     def transcribe_audio(self, audio_file):
         """Transcribe audio file to text using Whisper"""

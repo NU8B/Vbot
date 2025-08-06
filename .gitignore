@@ -1,4 +1,16 @@
 # Cache directory
+
+# Local environment and downloaded files
+# Ignore the entire cudnn directory, which contains downloaded archives and extracted files
+cudnn/
+
+# Debug and environment fixing scripts
+debug_import.py
+debug_transformers.py
+fix_cudnn.py
+fix_cudnn_windows.py
+environment_config.py
+check_cudnn_final.py
 cache/
 *.cache
 
@@ -86,3 +98,6 @@ AVATAR_UPSCALING_RESEARCH.md
 
 
 Real-ESRGAN/
+cudnn/extracted_cudnn/cudnn-windows-x86_64-8.9.7.29_cuda12-archive/bin/cudnn_adv_infer64_8.dll
+cudnn/extracted_cudnn/cudnn-windows-x86_64-8.9.7.29_cuda12-archive/bin/cudnn_adv_train64_8.dll
+cudnn/..

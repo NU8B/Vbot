@@ -6,6 +6,8 @@ from pathlib import Path
 import wx
 from datetime import datetime
 import re
+import argparse
+import pyaudio
 
 # Add the project root directory to Python path
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -22,12 +24,12 @@ AVATAR_SIZE = 800  # Define avatar size as a constant
 
 
 class ModernChatGUI(ChatGUI):
-    def __init__(self, root, on_send_callback, on_voice_toggle_callback):
+    def __init__(self, root, on_send_callback, on_voice_toggle_callback, model_name="Amelia"):
         # Initialize wx.App first (needed for avatar)
         self.wx_app = wx.App()
 
         # Get model name from environment
-        self.model_name = os.getenv("VOICE_TYPE", "Amelia")
+        self.model_name = model_name
 
         # Use a neutral background color
         self.bg_color = "#2b2b3b"
@@ -480,20 +482,56 @@ class ModernChatGUI(ChatGUI):
 
 
 def main():
-    MODEL_NAME = os.getenv("VOICE_TYPE", "Amelia")
+    # Get default device index
+    p = pyaudio.PyAudio()
+    try:
+        default_device_index = p.get_default_input_device_info()["index"]
+    except IOError:
+        default_device_index = None
+    p.terminate()
 
-    # Verify model directory exists
-    model_dir = Path(f"asset/model/{MODEL_NAME}")
-    if not model_dir.exists():
-        print(f"Error: Model directory not found: {model_dir}")
-        print("Available models:")
-        for model in Path("asset/model").glob("*"):
-            if model.is_dir():
-                print(f"- {model.name}")
+    # Setup command-line argument parsing
+    parser = argparse.ArgumentParser(description="Vbot Voice Assistant")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=os.getenv("MODEL_NAME", "Amelia"),
+        help="Name of the model to use (e.g., Amelia, Eveland, Gura)",
+    )
+    parser.add_argument(
+        "--device-index",
+        type=int,
+        default=default_device_index,
+        help="Index of the audio input device to use.",
+    )
+    args = parser.parse_args()
+
+    MODEL_NAME = args.model
+
+    # Check if model is valid
+    available_models = ["Amelia", "Eveland", "Gura"]
+    if MODEL_NAME not in available_models:
+        print(f"Error: Invalid model name '{MODEL_NAME}'.")
+        print(f"Available models: {', '.join(available_models)}")
+        sys.exit(1)
+
+    # List available models from StyleTTS2
+    from utils.inference_styleTTS2 import StyleTTS2Inference
+
+    tts_inference = StyleTTS2Inference(model_name=MODEL_NAME)
+    available_models = list(tts_inference.model_configs.keys())
+
+    if MODEL_NAME not in available_models:
+        print(f"Error: Model '{MODEL_NAME}' not found in StyleTTS2 configs.")
+        print("Available models in config:")
+        for model in available_models:
+            print(f"- {model}")
         sys.exit(1)
 
     # Initialize all components
-    init_handler = InitializationHandler(model_name=MODEL_NAME)
+    init_handler = InitializationHandler(
+        model_name=MODEL_NAME, device_index=args.device_index
+    )
     components = init_handler.initialize_all()
 
     # Initialize tkinter root
@@ -517,12 +555,13 @@ def main():
         lambda: components["audio_processor"].toggle_listening(
             gui, handle_voice_input, ollama_handler.is_processing
         ),
+        model_name=MODEL_NAME,
     )
 
     # Set GUI in Ollama Handler and configure audio duration callback
     ollama_handler.gui = gui
 
-    # Handle model switching
+    # ... (rest of the code remains the same)
     def handle_model_switch(new_model):
         if gui.is_processing:
             return

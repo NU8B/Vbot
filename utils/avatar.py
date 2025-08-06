@@ -520,13 +520,6 @@ class AnimatedCharacter:
                         wx_image.SetData(upscaled_image[:,:,:3].tobytes())
                         wx_image.SetAlpha(upscaled_image[:,:,3].tobytes())
                         
-                        # Log performance every 1 second instead of every 100 frames
-                        current_time = time.time()
-                        if current_time - self.last_stats_report_time >= 1.0 and self.ai_upscaler:
-                            stats = self.ai_upscaler.get_performance_stats()
-                            print(f"🎨 AI Upscaling Stats: {stats['avg_fps']:.1f} FPS, "
-                                  f"Last: {stats['last_process_time']*1000:.1f}ms")
-                            self.last_stats_report_time = current_time
                         
                     except Exception as e:
                         print(f"AI upscaling failed, using fallback: {e}")

@@ -83,6 +83,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ALPHA"],
             "beta": params["BETA"],
             "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "confusion": {
             "file": {
@@ -93,6 +94,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ALPHA"],
             "beta": params["BETA"],
             "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "caring": {
             "file": {
@@ -103,6 +105,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ALPHA"],
             "beta": params["BETA"],
             "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "curiosity": {
             "file": {
@@ -113,6 +116,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ALPHA"],
             "beta": params["BETA"],
             "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "desire": {
             "file": {
@@ -123,6 +127,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ALPHA"],
             "beta": params["BETA"],
             "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "relief": {
             "file": {
@@ -133,6 +138,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ALPHA"],
             "beta": params["BETA"],
             "embedding_scale": params["EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         # Happy emotions
         "admiration": {
@@ -144,6 +150,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "amusement": {
             "file": {
@@ -154,6 +161,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "approval": {
             "file": {
@@ -164,6 +172,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "excitement": {
             "file": {
@@ -174,6 +183,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "gratitude": {
             "file": {
@@ -184,6 +194,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "joy": {
             "file": {
@@ -194,6 +205,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "love": {
             "file": {
@@ -204,6 +216,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "optimism": {
             "file": {
@@ -214,6 +227,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "pride": {
             "file": {
@@ -224,6 +238,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["HAPPY_ALPHA"],
             "beta": params["HAPPY_BETA"],
             "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         # Sad emotions
         "disappointment": {
@@ -235,6 +250,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "embarrassment": {
             "file": {
@@ -245,6 +261,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "fear": {
             "file": {
@@ -255,6 +272,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "grief": {
             "file": {
@@ -265,6 +283,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "nervousness": {
             "file": {
@@ -275,6 +294,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "remorse": {
             "file": {
@@ -285,6 +305,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "sadness": {
             "file": {
@@ -295,6 +316,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SAD_ALPHA"],
             "beta": params["SAD_BETA"],
             "embedding_scale": params["SAD_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         # Angry emotions
         "disapproval": {
@@ -306,6 +328,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ANGRY_ALPHA"],
             "beta": params["ANGRY_BETA"],
             "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "disgust": {
             "file": {
@@ -316,6 +339,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ANGRY_ALPHA"],
             "beta": params["ANGRY_BETA"],
             "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "anger": {
             "file": {
@@ -326,6 +350,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ANGRY_ALPHA"],
             "beta": params["ANGRY_BETA"],
             "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "annoyance": {
             "file": {
@@ -336,6 +361,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["ANGRY_ALPHA"],
             "beta": params["ANGRY_BETA"],
             "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         # Surprised emotions
         "realization": {
@@ -347,6 +373,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SURPRISE_ALPHA"],
             "beta": params["SURPRISE_BETA"],
             "embedding_scale": params["SURPRISE_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
         "surprise": {
             "file": {
@@ -357,6 +384,7 @@ def create_emotion_config(model_name="Amelia"):
             "alpha": params["SURPRISE_ALPHA"],
             "beta": params["SURPRISE_BETA"],
             "embedding_scale": params["SURPRISE_EMBEDDING_SCALE"],
+            "speed": 1.0,
         },
     }
 

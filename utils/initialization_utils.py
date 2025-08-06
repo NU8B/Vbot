@@ -10,7 +10,7 @@ from .TTS_utils import InferenceHandler
 
 
 class InitializationHandler:
-    def __init__(self, model_name="Amelia"):
+    def __init__(self, model_name="Amelia", device_index=None):
         self.init_start = time.time()
         self.model_name = model_name
         self.docker_handler = None
@@ -21,6 +21,7 @@ class InitializationHandler:
         self.ollama_handler = None
         self.warmup_time = None
         self.styles_were_cached = None  # Store initial cache state
+        self.device_index = device_index
 
         # Timing information
         self.group1_time = None
@@ -112,7 +113,7 @@ class InitializationHandler:
             print("Computing reference styles...")
 
         tasks = {
-            "whisper": (AudioProcessor, [], {}),
+            "whisper": (AudioProcessor, [], {"device_index": self.device_index}),
             "emotion": (self._init_emotion_classifier, [], {}),
         }
 

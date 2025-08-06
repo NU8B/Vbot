@@ -63,9 +63,8 @@ class StyleTTS2Inference:
 
         self.model_name = model_name
         self.repo_id = repo_id if repo_id else self.model_configs[model_name]
-        self.device = (
-            device if device else ("cuda" if torch.cuda.is_available() else "cpu")
-        )
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(f"Using device: {self.device}")
 
         # Create cache directory based on model name
         self.cache_dir = Path("cache/style") / model_name
@@ -275,7 +274,9 @@ class StyleTTS2Inference:
         text = text.replace('"', "")  # Remove quotes only
         return text
 
-    def inference(self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale):
+    def inference(
+        self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale, speed=1.0
+    ):
         """Generate speech from text"""
         # Clean text minimally
         text = self.clean_text(text)
@@ -333,6 +334,9 @@ class StyleTTS2Inference:
 
             duration = torch.sigmoid(duration).sum(axis=-1)
             pred_dur = torch.round(duration.squeeze()).clamp(min=1)
+
+            # Adjust speed
+            pred_dur /= speed
 
             # Precompute pred_aln_trg tensor on the device
             pred_aln_trg = torch.zeros(
