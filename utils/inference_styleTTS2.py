@@ -80,10 +80,10 @@ class StyleTTS2Inference:
         with suppress_stdout():
             self.text_cleaner = TextCleaner()
 
-        # Set seeds for reproducibility
+        # Set seeds for reproducibility - OPTIMIZED FOR PERFORMANCE
         torch.manual_seed(0)
-        torch.backends.cudnn.benchmark = False
-        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = True  # Enable benchmark for faster performance
+        torch.backends.cudnn.deterministic = False  # Disable deterministic for speed
         random.seed(0)
         np.random.seed(0)
 
@@ -277,12 +277,15 @@ class StyleTTS2Inference:
 
     def inference(self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale):
         """Generate speech from text"""
+        print(f"[DEBUG] StyleTTS2: Starting inference for text: '{text[:30]}...'")
+
         # Clean text minimally
         text = self.clean_text(text)
 
         if text == "":
             return np.zeros(0), 0.0
 
+        print(f"[DEBUG] StyleTTS2: Phonemizing text...")
         ps = self.global_phonemizer.phonemize([text])
         if not ps or not ps[0]:
             print(f"Warning: Phonemizer returned empty for text: '{text}'")
@@ -290,6 +293,7 @@ class StyleTTS2Inference:
 
         ps = word_tokenize(ps[0])
         ps = " ".join(ps)
+        print(f"[DEBUG] StyleTTS2: Phonemized text: '{ps[:50]}...'")
 
         # Convert to tokens using the simple TextCleaner
         tokens = self.text_cleaner(ps)
@@ -304,14 +308,21 @@ class StyleTTS2Inference:
         text_mask = self._length_to_mask(input_lengths).to(self.device)
 
         # Use no_grad for inference
+        print(f"[DEBUG] StyleTTS2: Starting model inference...")
         with torch.inference_mode():
+            print(f"[DEBUG] StyleTTS2: Running text encoder...")
             t_en = self.model.text_encoder(tokens, input_lengths, text_mask)
+            print(f"[DEBUG] StyleTTS2: Running BERT...")
             bert_dur = self.model.bert(tokens, attention_mask=(~text_mask).int())
+            print(f"[DEBUG] StyleTTS2: Running BERT encoder...")
             d_en = self.model.bert_encoder(bert_dur).transpose(-1, -2)
 
             # Create noise directly on the device
             noise = torch.randn((1, 256), device=self.device).unsqueeze(1)
 
+            print(
+                f"[DEBUG] StyleTTS2: Starting diffusion sampling with {diffusion_steps} steps..."
+            )
             s_pred = self.sampler(
                 noise=noise,
                 embedding=bert_dur,
@@ -319,6 +330,7 @@ class StyleTTS2Inference:
                 features=ref_s,
                 num_steps=diffusion_steps,
             ).squeeze(1)
+            print(f"[DEBUG] StyleTTS2: Diffusion sampling completed")
 
             s = s_pred[:, 128:]
             ref = s_pred[:, :128]
@@ -365,4 +377,5 @@ class StyleTTS2Inference:
 
             out = self.model.decoder(asr, F0_pred, N_pred, ref.squeeze().unsqueeze(0))
 
+        print(f"[DEBUG] StyleTTS2: Inference completed, returning audio")
         return out.squeeze().cpu().numpy()[5000:-5000]

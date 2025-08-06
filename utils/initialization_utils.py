@@ -71,6 +71,24 @@ class InitializationHandler:
 
         return self._get_initialization_results()
 
+    def initialize_for_character_switch(self):
+        """Initialize only components needed for character switching (no AudioProcessor)"""
+        # Create cache directory
+        Path("./cache").mkdir(exist_ok=True)
+
+        # Group 1: Ollama warmup and StyleTTS2 init
+        self._initialize_group1()
+
+        # Group 2: Only emotion classifier and styles (no AudioProcessor)
+        self._initialize_group2_for_switch()
+
+        # Create inference handler
+        self.inference_handler = InferenceHandler(
+            self.tts_model, self.emotion_handler, model_name=self.model_name
+        )
+
+        return self._get_initialization_results()
+
     def _initialize_group1(self):
         """Initialize Ollama and StyleTTS2"""
         group1_start = time.time()
@@ -89,6 +107,83 @@ class InitializationHandler:
 
         print(f"\nOllama warm-up took {self.warmup_time:.2f}s")
         print(f"StyleTTS2 initialization took {self.group1_time:.2f}s")
+
+    def _initialize_group2_for_switch(self):
+        """Initialize only emotion classifier and styles (no AudioProcessor)"""
+        group2_start = time.time()
+        print("\nInitializing emotion classifier...")
+
+        # Check if all styles are cached for this model
+        self.styles_were_cached = True
+        unique_styles = set(EMOTION_MAPPING.values())
+        for style_file in unique_styles:
+            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            if not self.tts_model.is_style_cached(style_path):
+                self.styles_were_cached = False
+                break
+
+        if self.styles_were_cached:
+            print("Using cached styles")
+            print("Warming up inference...")
+        else:
+            print("Computing reference styles...")
+
+        tasks = {
+            "emotion": (self._init_emotion_classifier, [], {}),
+        }
+
+        if self.styles_were_cached:
+            # When styles are cached, we can load and use them directly
+            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            cached_style = self.tts_model.get_cached_style(neutral_path)
+
+            def warmup_task():
+                return self.tts_model.inference(
+                    text="This is a warm-up inference.",
+                    ref_s=cached_style,
+                    alpha=0.3,
+                    beta=0.7,
+                    diffusion_steps=5,
+                    embedding_scale=1.0,
+                )
+
+            tasks["warmup"] = (warmup_task, [], {})
+            tasks["ref_style"] = (lambda: cached_style, [], {})
+        else:
+            tasks["ref_style"] = (self._cache_all_styles, [], {})
+
+        self.results.update(self._run_parallel_tasks(tasks))
+        ref_style = self.results["ref_style"]["result"]
+        self.emotion_handler = self.results["emotion"]["result"]
+
+        # Print timings after operations
+        print(
+            f"\nEmotion classifier initialization took {self.results['emotion']['time']:.2f}s"
+        )
+        if "style_computation" in self.results:
+            print(
+                f"Styles computation took {self.results['style_computation']['time']:.2f}s"
+            )
+
+        # Calculate group2 time before warmup for non-cached case
+        self.group2_time = time.time() - group2_start
+
+        # Handle warmup for non-cached case
+        if not self.styles_were_cached:
+            print("\nWarming up inference...")
+            warmup_start = time.time()
+            _ = self.tts_model.inference(
+                text="This is a warm-up inference.",
+                ref_s=ref_style,
+                alpha=0.3,
+                beta=0.7,
+                diffusion_steps=5,
+                embedding_scale=1.0,
+            )
+            self.results["warmup"] = {"time": time.time() - warmup_start}
+            print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
+        else:
+            print(f"Warm-up took {self.results['warmup']['time']:.2f}s")
 
     def _initialize_group2(self):
         """Initialize Whisper, cache styles, and emotion classifier"""
@@ -221,7 +316,11 @@ class InitializationHandler:
         """Return all initialized components and timing information"""
         # Calculate actual group times including overlap
         print(f"\nTotal initialization time: {time.time() - self.init_start:.2f}s")
-        print(f"├─ Docker setup: {self.docker_time:.2f}s")
+
+        # Only print docker time if it exists (for character switching)
+        if hasattr(self, "docker_time") and self.docker_time is not None:
+            print(f"├─ Docker setup: {self.docker_time:.2f}s")
+
         print(f"├─ Group 1: {self.group1_time:.2f}s")
         print(f"│  ├─ Ollama warm-up")
         print(f"│  └─ StyleTTS2")
@@ -229,7 +328,8 @@ class InitializationHandler:
         if self.styles_were_cached:
             # When styles were initially cached, show warm-up as part of Group 2
             print(f"└─ Group 2: {self.group2_time:.2f}s")
-            print(f"   ├─ Whisper")
+            if hasattr(self, "audio_processor") and self.audio_processor is not None:
+                print(f"   ├─ Whisper")
             print(f"   ├─ Reference styles")
             print(f"   ├─ Emotion classifier")
             if "warmup" in self.results:
@@ -237,17 +337,24 @@ class InitializationHandler:
         else:
             # When styles needed computation, show warm-up separately
             print(f"├─ Group 2: {self.group2_time:.2f}s")
-            print(f"│  ├─ Whisper")
+            if hasattr(self, "audio_processor") and self.audio_processor is not None:
+                print(f"│  ├─ Whisper")
             print(f"│  ├─ Reference styles")
             print(f"│  └─ Emotion classifier")
             if "warmup" in self.results:
                 print(f"└─ Inference warm-up: {self.results['warmup']['time']:.2f}s")
 
-        return {
-            "docker_handler": self.docker_handler,
+        result = {
             "tts_model": self.tts_model,
-            "audio_processor": self.audio_processor,
             "emotion_handler": self.emotion_handler,
             "inference_handler": self.inference_handler,
             "warmup_time": self.warmup_time,
         }
+
+        # Only include components that exist (for character switching)
+        if hasattr(self, "docker_handler") and self.docker_handler is not None:
+            result["docker_handler"] = self.docker_handler
+        if hasattr(self, "audio_processor") and self.audio_processor is not None:
+            result["audio_processor"] = self.audio_processor
+
+        return result

@@ -21,38 +21,50 @@ class InferenceHandler:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def process_text(self, text, response, timings=None):
-        """Process text and generate speech with emotion."""
+        """Process text and generate speech with emotion - OPTIMIZED VERSION."""
         self.timings = timings if timings else {}
 
-        # Classify emotion
-        emotion_start = time.time()
-        detected_emotion = self.emotion_handler.classify_emotion(response)
-        self.timings["emotion"] = time.time() - emotion_start
+        try:
+            # Classify emotion
+            emotion_start = time.time()
+            detected_emotion = self.emotion_handler.classify_emotion(response)
+            self.timings["emotion"] = time.time() - emotion_start
 
-        # Get style file and parameters for emotion
-        emotion_params = self.emotion_config[detected_emotion]
-        style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
+            # Get style file and parameters for emotion
+            emotion_params = self.emotion_config[detected_emotion]
+            style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
 
-        # Get cached style
-        current_ref_style = self.tts_model.get_cached_style(style_path)
+            # Get cached style
+            current_ref_style = self.tts_model.get_cached_style(style_path)
 
-        # Text to Speech with emotion-specific parameters
-        tts_start = time.time()
-        speech = self.tts_model.inference(
-            text=response.strip(),
-            ref_s=current_ref_style,
-            alpha=emotion_params["alpha"],
-            beta=emotion_params["beta"],
-            diffusion_steps=DIFFUSION_STEPS,
-            embedding_scale=emotion_params["embedding_scale"],
-            speed=emotion_params["speed"],
-        )
-        self.timings["tts"] = time.time() - tts_start
+            # Text to Speech with emotion-specific parameters
+            print(
+                f"[DEBUG] Starting StyleTTS2 inference with {DIFFUSION_STEPS} steps..."
+            )
+            tts_start = time.time()
+            speech = self.tts_model.inference(
+                text=response.strip(),
+                ref_s=current_ref_style,
+                alpha=emotion_params["alpha"],
+                beta=emotion_params["beta"],
+                diffusion_steps=DIFFUSION_STEPS,
+                embedding_scale=emotion_params["embedding_scale"],
+                # speed=emotion_params["speed"],  # Commented out - StyleTTS2 doesn't support speed parameter
+            )
+            self.timings["tts"] = time.time() - tts_start
+            print(
+                f"[DEBUG] StyleTTS2 inference completed in {self.timings['tts']:.2f}s"
+            )
 
-        return speech, detected_emotion, style_path
+            return speech, detected_emotion, style_path
+
+        except Exception as e:
+            print(f"[ERROR] Failed to process text: {e}")
+            # Return a fallback response
+            return None, "neutral", None
 
     def play_audio(self, speech, duration, avatar, audio_processor):
-        """Play audio with avatar animation."""
+        """Play audio with avatar animation - OPTIMIZED VERSION."""
         try:
             print("\n=== Starting audio playback ===")
 

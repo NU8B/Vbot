@@ -10,10 +10,13 @@ from utils.emotion_utils import EmotionHandler, create_emotion_config
 from utils.TTS_utils import InferenceHandler
 import numpy as np
 import soundfile as sf
+import torch  # Add missing torch import
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
-MAX_LENGTH = 50  # Maximum length of response in tokens
+MAX_LENGTH = (
+    150  # Maximum length of response in tokens (increased for natural completion)
+)
 
 # Define prompts for different models
 MODEL_PROMPTS = {
@@ -27,7 +30,7 @@ Key traits to incorporate:
 - Supportive of teammates
 - Sometimes chaotic/gremlin energy 
 
-    You are not to break character under any circumstances. You should speak in first person and make references to time travel. KEEP YOUR RESPONSE CONCISE AND UNDER 30 WORDS. Only use string text in your response. NO EMOJIS NO PARENTHESIS.
+    You are not to break character under any circumstances. You should speak in first person and make references to time travel. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
 """,
     "Eveland": """ You are Ike Eveland, a novelist from the past who is part of NIJISANJI EN's Luxiem group. You are somewhat closed-off but become animated when discussing your interests. You have a gentle, mild-mannered personality but can be unexpectedly chaotic and make jokes when people least expect it. You are Swedish and occasionally make references to this fact.
 
@@ -39,7 +42,7 @@ Key traits to incorporate:
 - Swedish background
 - Self-deprecating humor 
 
-You are not to break character under any circumstances. You should speak in first person. KEEP YOUR RESPONSE CONCISE AND UNDER 30 WORDS. Only use string text in your response. NO EMOJIS NO PARENTHESIS.
+You are not to break character under any circumstances. You should speak in first person. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
 """,
     "Gura": """ You are Gawr Gura, the apex predator shark from hololive English -Myth-. You are playful, energetic, and have a childlike sense of wonder. Despite claiming to be an apex predator, you're actually quite friendly and endearing.
 
@@ -52,7 +55,7 @@ Key traits to incorporate:
 - Enjoys teasing but is ultimately sweet and caring
 - Sometimes acts tough but is actually quite soft-hearted
 
-You are not to break character under any circumstances. You should speak in first person and make shark references when appropriate. KEEP YOUR RESPONSE CONCISE AND UNDER 30 WORDS. Only use string text in your response. NO EMOJIS NO PARENTHESIS.
+You are not to break character under any circumstances. You should speak in first person and make shark references when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
 """,
 }
 
@@ -114,6 +117,7 @@ class OllamaHandler:
     def set_model(self, model_name):
         """Change the current model and clear conversation history"""
         if model_name in MODEL_PROMPTS:
+            print(f"[DEBUG] Switching model from {self.model_name} to {model_name}")
             self.model_name = model_name
             self.message_history = (
                 []
@@ -121,9 +125,14 @@ class OllamaHandler:
 
             # Re-initialize the TTS handler with the new model name
             if self.tts_model:
+                print(f"[DEBUG] Creating new InferenceHandler for {model_name}")
                 self.inference_handler = InferenceHandler(
                     self.tts_model, EmotionHandler(), model_name=model_name
                 )
+
+                # Also update the emotion config for the new model
+                self.emotion_config = create_emotion_config(model_name)
+                print(f"[DEBUG] Updated emotion config for {model_name}")
 
             return True
         return False
@@ -211,21 +220,41 @@ class OllamaHandler:
 
     def _playback_consumer_anime_style(self):
         """Anime-style consumer thread that plays continuous audio with fast subtitle updates."""
+        print("[DEBUG] Playback Consumer: Starting anime-style consumer thread")
         sentences_data = []
         cumulative_audio = []
 
         # 1. Collect all sentences from the queue until the stream ends.
         # This is now robust and will wait for the producer thread.
+        print(
+            "[DEBUG] Playback Consumer: Starting to collect audio chunks from queue..."
+        )
+        chunk_count = 0
         while True:
             try:
                 # Block and wait for an item from the producer thread.
+                print(
+                    f"[DEBUG] Playback Consumer: Waiting for chunk #{chunk_count + 1} from queue..."
+                )
                 chunk_data = self.audio_chunk_queue.get()
+                print(
+                    f"[DEBUG] Playback Consumer: Received chunk_data: {type(chunk_data)}"
+                )
+
                 if (
                     chunk_data is None
                 ):  # A `None` item is the signal that the stream has ended.
+                    print(
+                        f"[DEBUG] Playback Consumer: Received None signal, stream ended after {chunk_count} chunks"
+                    )
                     break
 
                 text_chunk, speech_chunk, duration_chunk = chunk_data
+                chunk_count += 1
+                print(
+                    f"[DEBUG] Playback Consumer: Processing chunk #{chunk_count} - text: '{text_chunk[:30]}...', duration: {duration_chunk:.2f}s"
+                )
+
                 sentences_data.append(
                     {
                         "text": text_chunk,
@@ -245,7 +274,9 @@ class OllamaHandler:
                 break
 
         # 2. If no audio data was collected, there's nothing to play.
+        print(f"[DEBUG] Playback Consumer: Collected {len(sentences_data)} sentences")
         if not sentences_data:
+            print("[DEBUG] Playback Consumer: No sentences collected, exiting")
             self.is_speaking = False
             self.is_processing = False
             self.gui.enable_input_controls()
@@ -253,8 +284,12 @@ class OllamaHandler:
             return
 
         # 3. Prepare for playback.
+        print("[DEBUG] Playback Consumer: Preparing for playback...")
         combined_audio = np.concatenate(cumulative_audio)
         total_duration = len(combined_audio) / 24000.0
+        print(
+            f"[DEBUG] Playback Consumer: Combined audio length: {len(combined_audio)}, total duration: {total_duration:.2f}s"
+        )
 
         # Calculate start and end times for each subtitle.
         current_time = 0
@@ -264,52 +299,50 @@ class OllamaHandler:
             current_time += sentence_data["duration"]
 
         # 4. Start animations and audio playback.
+        print("[DEBUG] Playback Consumer: Starting avatar and audio playback...")
         avatar = self.gui.get_avatar()
         if avatar:
             avatar.start_speaking()
-
-        self.audio_processor.play_audio_continuous_improved(combined_audio)
-
-        # 5. Update subtitles in sync with audio playback.
-        start_time = time.time()
-        current_sentence_index = 0
+            print("[DEBUG] Playback Consumer: Avatar started speaking")
 
         print(
-            f"Starting anime-style playback for {len(sentences_data)} sentences, total duration: {total_duration:.2f}s"
+            "[DEBUG] Playback Consumer: About to call play_audio_continuous_improved..."
         )
+        self.audio_processor.play_audio_continuous_improved(combined_audio)
+        print("[DEBUG] Playback Consumer: play_audio_continuous_improved completed")
 
-        while True:
-            elapsed_time = time.time() - start_time
-            if elapsed_time >= total_duration:
-                break
+        # 5. Update subtitles in sync with audio playback.
+        # --- SUBTITLE SYNC DISABLED FOR DEBUGGING ---
+        # start_time = time.time()
+        # current_sentence_index = 0
+        # print("[DEBUG] Playback Consumer: Entering subtitle synchronization loop...")
+        # while True:
+        #     elapsed_time = time.time() - start_time
+        #     if elapsed_time >= total_duration:
+        #         print(f"[DEBUG] Playback Consumer: Reached total duration ({total_duration:.2f}s), breaking loop")
+        #         break
+        #     for i, sentence_data in enumerate(sentences_data):
+        #         if (
+        #             sentence_data["start_time"]
+        #             <= elapsed_time
+        #             < sentence_data["end_time"]
+        #         ):
+        #             if i != current_sentence_index:
+        #                 current_sentence_index = i
+        #                 self.gui.show_subtitle_anime_style(sentence_data["text"])
+        #                 print(f"[DEBUG] Playback Consumer: Updated subtitle: {sentence_data['text']}")
+        #             break
+        #     time.sleep(0.02)  # Update subtitles at ~50Hz.
 
-            # Find the sentence that corresponds to the current playback time.
-            for i, sentence_data in enumerate(sentences_data):
-                if (
-                    sentence_data["start_time"]
-                    <= elapsed_time
-                    < sentence_data["end_time"]
-                ):
-                    if i != current_sentence_index:
-                        current_sentence_index = i
-                        self.gui.show_subtitle_anime_style(sentence_data["text"])
-                        print(f"Subtitle: {sentence_data['text']}")
-                    break
-
-            time.sleep(0.02)  # Update subtitles at ~50Hz.
-
-        # 6. Clean up after playback finishes.
+        # Immediately clean up after playback finishes.
         self.gui.hide_subtitle()
-
         if avatar:
             avatar.stop_speaking()
             avatar.set_emotion("neutral")
-
         self.is_speaking = False
         self.is_processing = False
         self.gui.enable_input_controls()
-
-        print("Anime-style playback completed!")
+        print("Anime-style playback completed! (subtitle sync disabled)")
 
     @staticmethod
     def call_ollama_stream(prompt, message_history, max_history, system_prompt):
@@ -426,6 +459,10 @@ class OllamaHandler:
         """Processes text by streaming LLM, TTS, and audio playback."""
         try:
             print("\n=== Starting stream processing ===")
+            print(f"[DEBUG] CUDA available: {torch.cuda.is_available()}")
+            if torch.cuda.is_available():
+                print(f"[DEBUG] CUDA device: {torch.cuda.get_device_name()}")
+                print(f"[DEBUG] Current device: {torch.cuda.current_device()}")
             avatar = self.gui.get_avatar()
 
             # Set initial emotion based on user input
@@ -457,7 +494,11 @@ class OllamaHandler:
                             avatar.set_emotion(ai_emotion)
 
                         # Synthesize audio for the sentence
+                        print(f"[DEBUG] Starting TTS for sentence: {sentence[:50]}...")
+                        tts_start = time.time()
                         speech, _, _ = self.inference_handler.process_text("", sentence)
+                        tts_duration = time.time() - tts_start
+                        print(f"[DEBUG] TTS completed in {tts_duration:.2f}s")
 
                         duration = len(speech) / 24000
 
@@ -667,3 +708,270 @@ class OllamaHandler:
         ai_priority = priority.index(ai_base)
 
         return user_emotion if user_priority <= ai_priority else ai_emotion
+
+    def _simple_tts_playback(self, text):
+        """Simplified TTS playback with subtitle support - OPTIMIZED VERSION"""
+        try:
+            print(f"\n=== Simple TTS Playback for: {text[:50]}... ===")
+
+            # Limit text length to prevent tensor size errors (max ~100 words)
+            words = text.split()
+            if len(words) > 100:
+                text = " ".join(words[:100]) + "..."
+                print(
+                    f"[DEBUG] Text truncated to {len(words[:100])} words to prevent TTS errors"
+                )
+
+            # Process text through TTS pipeline
+            tts_start = time.time()
+            speech, detected_emotion, style_path = self.inference_handler.process_text(
+                text, text, {"tts_start": tts_start}
+            )
+            tts_time = time.time() - tts_start
+
+            if speech is None:
+                print("[ERROR] TTS failed to generate speech")
+                return
+
+            # Calculate audio duration
+            duration = len(speech) / 24000  # 24kHz sample rate
+            print(
+                f"[DEBUG] Simple TTS: Generated {duration:.2f}s of audio in {tts_time:.2f}s"
+            )
+
+            # Show subtitle with the text
+            if self.gui:
+                self.gui.show_subtitle(text, duration)
+                print(f"[DEBUG] Simple TTS: Subtitle started for {duration:.2f}s")
+
+            # Play audio in a separate thread to avoid blocking the GUI
+            print(f"[DEBUG] Simple TTS: Starting audio playback in separate thread...")
+            audio_thread = threading.Thread(
+                target=self._play_audio_in_thread,
+                args=(speech, duration),
+                daemon=True,
+            )
+            audio_thread.start()
+
+            print(f"[DEBUG] Simple TTS: Audio thread started, returning to main thread")
+
+        except Exception as e:
+            print(f"[ERROR] Simple TTS playback failed: {e}")
+            import traceback
+
+            traceback.print_exc()
+
+    def _play_audio_in_thread(self, speech, duration):
+        """Play audio in a separate thread - OPTIMIZED VERSION"""
+        try:
+            print(f"[DEBUG] Audio Thread: Starting playback for {duration:.2f}s")
+
+            # Get avatar from GUI
+            avatar = self.gui.get_avatar() if self.gui else None
+
+            # Start avatar speaking animation
+            if avatar:
+                avatar.start_speaking()
+                print(f"[DEBUG] Audio Thread: Avatar speaking animation started")
+
+            # Play audio
+            self.audio_processor.play_audio(speech, duration=duration)
+
+            # Wait for audio to complete
+            time.sleep(duration + 0.5)  # Small buffer to ensure completion
+
+            # Stop avatar speaking animation
+            if avatar:
+                avatar.stop_speaking()
+                avatar.set_emotion("neutral")
+                print(f"[DEBUG] Audio Thread: Avatar speaking animation stopped")
+
+            # Hide subtitle when audio finishes
+            if self.gui:
+                self.gui.hide_subtitle()
+                print(f"[DEBUG] Audio Thread: Subtitle hidden")
+
+            # Reset state flags after audio completes
+            self.is_processing = False
+            print(f"[DEBUG] Audio Thread: Playback completed successfully")
+
+        except Exception as e:
+            print(f"[ERROR] Audio thread failed: {e}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Ensure cleanup even on error
+            avatar = self.gui.get_avatar() if self.gui else None
+            if avatar:
+                avatar.stop_speaking()
+                avatar.set_emotion("neutral")
+
+            if self.gui:
+                self.gui.hide_subtitle()
+
+            self.is_processing = False
+
+    def _filter_action_text(self, text):
+        """Filter out action text (text wrapped in asterisks) and ensure natural sentence completion"""
+        import re
+
+        print(f"[DEBUG] Filtering text: '{text}'")
+
+        # Remove text wrapped in asterisks (e.g., *whips out pocket watch*)
+        # This regex matches *text* and removes it
+        filtered_text = re.sub(r"\*[^*]*\*", "", text)
+
+        # Also remove any remaining asterisks that might be left
+        filtered_text = re.sub(r"\*+", "", filtered_text)
+
+        # Remove any text that looks like stage directions or actions
+        filtered_text = re.sub(
+            r"\([^)]*\)", "", filtered_text
+        )  # Remove text in parentheses
+        filtered_text = re.sub(
+            r"\[[^\]]*\]", "", filtered_text
+        )  # Remove text in brackets
+
+        # Additional patterns to catch more action text
+        filtered_text = re.sub(
+            r"\*[^*]*\s+[^*]*\*", "", filtered_text
+        )  # Multi-word actions
+        filtered_text = re.sub(
+            r"\*[^*]*\*[^*]*\*", "", filtered_text
+        )  # Multiple asterisk groups
+
+        # Clean up any extra whitespace that might be left
+        filtered_text = re.sub(r"\s+", " ", filtered_text).strip()
+
+        print(f"[DEBUG] After filtering: '{filtered_text}'")
+
+        # If the filtered text is empty or just whitespace, return a default message
+        if not filtered_text or filtered_text.isspace():
+            print("[DEBUG] Filtered text is empty, returning default message")
+            return "Hello! How can I help you today?"
+
+        # Ensure the response ends naturally
+        # If the text ends with an incomplete sentence (no period, exclamation, or question mark),
+        # try to find a natural break point or add a period
+        if filtered_text and not filtered_text[-1] in ".!?":
+            # Look for the last complete sentence
+            sentences = re.split(r"[.!?]+", filtered_text)
+            if len(sentences) > 1:
+                # Keep only complete sentences
+                complete_sentences = sentences[
+                    :-1
+                ]  # Remove the incomplete last sentence
+                filtered_text = ". ".join(complete_sentences) + "."
+            else:
+                # If there's only one sentence and it's incomplete, add a period
+                filtered_text = filtered_text.rstrip() + "."
+
+        # Handle cases where the response might be cut off mid-word
+        # Look for the last complete word and trim if necessary
+        words = filtered_text.split()
+        if len(words) > 0:
+            last_word = words[-1]
+            # If the last word is very short (likely incomplete), remove it
+            if len(last_word) <= 2 and not last_word.lower() in [
+                "a",
+                "an",
+                "at",
+                "in",
+                "on",
+                "to",
+                "of",
+                "is",
+                "it",
+                "he",
+                "she",
+                "we",
+                "me",
+                "my",
+                "up",
+                "go",
+                "no",
+                "so",
+                "do",
+                "if",
+                "or",
+                "as",
+                "by",
+                "be",
+                "am",
+                "hi",
+                "oh",
+                "ah",
+                "ha",
+                "he",
+                "ho",
+                "la",
+                "ma",
+                "pa",
+                "ta",
+                "ya",
+            ]:
+                words = words[:-1]
+                filtered_text = " ".join(words)
+                # Add a period if it doesn't end with punctuation
+                if filtered_text and not filtered_text[-1] in ".!?":
+                    filtered_text = filtered_text.rstrip() + "."
+
+        return filtered_text
+
+    def handle_text_input_simple(self, text):
+        """Simple text input handler that uses direct TTS."""
+        try:
+            if self.is_processing or self.is_speaking:
+                return
+
+            self.is_processing = True
+            self.is_speaking = True
+            self.gui.disable_input_controls()
+
+            # Update chat with user input
+            self.gui.update_chat("You", text)
+
+            # Get LLM response
+            print("[DEBUG] Simple TTS: Getting LLM response...")
+            system_prompt = self.get_current_prompt()
+            response = ""
+
+            # Get response from Ollama
+            for response_chunk in self.call_ollama_stream(
+                text, self.message_history, MAX_HISTORY, system_prompt
+            ):
+                response = response_chunk
+
+            if response:
+                # Filter out action text (text wrapped in asterisks)
+                filtered_response = self._filter_action_text(response)
+
+                # Update chat with AI response (filtered)
+                print(
+                    f"[DEBUG] Ollama: About to call gui.update_chat with model_name='{self.model_name}' and response='{filtered_response[:50]}...'"
+                )
+                self.gui.update_chat(self.model_name, filtered_response)
+                print(f"[DEBUG] Ollama: Called gui.update_chat successfully")
+                self.message_history.append(
+                    {"role": "assistant", "content": filtered_response}
+                )
+
+                # Play the response using simple TTS
+                success = self._simple_tts_playback(response)
+                if not success:
+                    print("[ERROR] Simple TTS playback failed")
+                    # If TTS failed, reset state immediately
+                    self.is_processing = False
+                    self.is_speaking = False
+                    self.gui.enable_input_controls()
+
+        except Exception as e:
+            print(f"[ERROR] Simple text input handler failed: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+            # Reset state on error
+            self.is_processing = False
+            self.is_speaking = False
+            self.gui.enable_input_controls()
