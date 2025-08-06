@@ -553,31 +553,31 @@ class ModernChatGUI(ChatGUI):
             print("[DEBUG] Subtitle window created successfully")
 
     def show_subtitle(self, text, duration=None):
-        """Show subtitle text with optional duration - DISPLAY ALL AT ONCE VERSION."""
+        """Show subtitle text with optional duration - CHUNK-BASED VERSION."""
         try:
             if not self.subtitle_window or not self.subtitle_window.winfo_exists():
                 self.create_subtitle_window()
 
-            # Clear current subtitle
-            self.subtitle_text.configure(state="normal")
-            self.subtitle_text.delete(1.0, tk.END)
-
-            # Display all text at once
-            self.subtitle_text.insert(tk.END, text, "current")
-            self.subtitle_text.configure(state="disabled")
-            self.subtitle_text.see(tk.END)
+            # Split text into sentences
+            sentences = self._split_into_sentences(text)
+            if not sentences:
+                return
 
             # Show subtitle window
             self.subtitle_window.deiconify()
             self.is_showing_subtitle = True
 
-            # Schedule hiding the subtitle after audio duration (if provided) or after 5 seconds
+            # Start displaying sentences
+            self._display_sentences(sentences, total_duration=duration)
+
+            # Schedule hiding the subtitle after audio duration (if provided)
             if duration:
                 self.subtitle_timer = self.root.after(
                     int(duration * 1000) + 2000, self.hide_subtitle
                 )
             else:
-                self.subtitle_timer = self.root.after(5000, self.hide_subtitle)
+                # Fallback to hide after a reasonable time if no duration is given
+                self.subtitle_timer = self.root.after(len(text) * 100, self.hide_subtitle)
 
         except Exception as e:
             print(f"[ERROR] Failed to show subtitle: {e}")
@@ -609,14 +609,31 @@ class ModernChatGUI(ChatGUI):
         return sentences
 
     def _display_sentences(self, sentences, total_duration=None):
-        """Display sentences one by one with timing - DEPRECATED (now shows all at once)."""
-        # This method is kept for compatibility but not used anymore
-        pass
+        """Display sentences one by one with timing."""
+        self.subtitle_queue = sentences
+        num_sentences = len(sentences)
+
+        if total_duration and num_sentences > 0:
+            time_per_sentence = (total_duration * 1000) / num_sentences
+        else:
+            # Estimate time based on sentence length (e.g., 150ms per character)
+            time_per_sentence = max(2000, len(self.subtitle_queue[0]) * 150 if self.subtitle_queue else 2000)
+
+        self._show_next_sentence(time_per_sentence)
 
     def _show_next_sentence(self, time_per_sentence):
-        """Show the next sentence in the queue - DEPRECATED (now shows all at once)."""
-        # This method is kept for compatibility but not used anymore
-        pass
+        """Show the next sentence in the queue."""
+        if self.subtitle_queue:
+            sentence = self.subtitle_queue.pop(0)
+            self.update_subtitle(sentence)
+
+            # Schedule the next sentence
+            self.subtitle_timer = self.root.after(
+                int(time_per_sentence), lambda: self._show_next_sentence(time_per_sentence)
+            )
+        else:
+            # Last sentence shown, wait a bit before hiding
+            self.root.after(2000, self.hide_subtitle)
 
     def hide_subtitle(self):
         """Hide the subtitle window."""
