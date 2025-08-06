@@ -2,6 +2,8 @@ import os
 import sys
 import tkinter as tk
 import warnings
+import pyaudio
+import argparse
 from pathlib import Path
 import wx
 from datetime import datetime
