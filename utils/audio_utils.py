@@ -39,27 +39,79 @@ class AudioProcessor:
         self.audio_stream = None
         self.pyaudio_instance = None
 
+        # Microphone selection
+        self.selected_device_index = device_index
+        self.selected_device_name = None
+
         # Pre-warm the model silently
         if torch.cuda.is_available() and Path(self.ref_audio_path).exists():
             self.transcribe_audio(self.ref_audio_path)
             torch.cuda.empty_cache()
+
+    def set_microphone(self, device_index, device_name):
+        """Set the microphone to use for recording"""
+        print(f"[DEBUG] Setting microphone to: {device_name} (index {device_index})")
+        self.selected_device_index = device_index
+        self.selected_device_name = device_name
+
+        # Close existing audio stream to force recreation with new device
+        if self.audio_stream:
+            try:
+                self.audio_stream.close()
+            except:
+                pass
+            self.audio_stream = None
 
     def _find_input_device(self):
         """Find a working input device for microphone recording"""
         if self.pyaudio_instance is None:
             self.pyaudio_instance = pyaudio.PyAudio()
 
-        # Try to find any device with input channels
+        print(
+            f"[DEBUG] Scanning {self.pyaudio_instance.get_device_count()} audio devices..."
+        )
+
+        # If a specific microphone is selected, try to use it
+        if self.selected_device_index is not None:
+            try:
+                device_info = self.pyaudio_instance.get_device_info_by_index(
+                    self.selected_device_index
+                )
+                if device_info["maxInputChannels"] > 0:
+                    print(
+                        f"[DEBUG] Using selected microphone: {device_info['name']} (index {self.selected_device_index})"
+                    )
+                    print(
+                        f"[DEBUG] Device details: channels={device_info['maxInputChannels']}, sample_rate={device_info.get('defaultSampleRate', 'N/A')}"
+                    )
+                    return self.selected_device_index
+                else:
+                    print(
+                        f"[DEBUG] Selected device {self.selected_device_index} has no input channels, falling back to auto-detection"
+                    )
+            except Exception as e:
+                print(
+                    f"[DEBUG] Error with selected device {self.selected_device_index}: {e}, falling back to auto-detection"
+                )
+
+        # Fall back to auto-detection if no specific device is selected or if it fails
         for i in range(self.pyaudio_instance.get_device_count()):
             try:
                 device_info = self.pyaudio_instance.get_device_info_by_index(i)
                 if device_info["maxInputChannels"] > 0:
-                    print(f"Using input device: {device_info['name']} (index {i})")
+                    print(
+                        f"[DEBUG] Found input device: {device_info['name']} (index {i})"
+                    )
+                    print(
+                        f"[DEBUG] Device details: channels={device_info['maxInputChannels']}, sample_rate={device_info.get('defaultSampleRate', 'N/A')}"
+                    )
+                    print(f"[DEBUG] Using microphone: {device_info['name']}")
                     return i
-            except Exception:
+            except Exception as e:
+                print(f"[DEBUG] Error checking device {i}: {e}")
                 continue
 
-        print("No suitable input device found")
+        print("[DEBUG] No suitable input device found")
         return None
 
     def toggle_listening(self, gui, process_callback, is_processing):
@@ -131,10 +183,18 @@ class AudioProcessor:
         # Find a working input device
         input_device_index = self._find_input_device()
         if input_device_index is None:
-            print("Error: No working input device found")
+            print("[DEBUG] Error: No working input device found")
             return None
         else:
             print(f"[DEBUG] Found input device at index: {input_device_index}")
+            # Get device name for additional debug info
+            try:
+                device_info = self.pyaudio_instance.get_device_info_by_index(
+                    input_device_index
+                )
+                print(f"[DEBUG] Recording from microphone: {device_info['name']}")
+            except Exception as e:
+                print(f"[DEBUG] Could not get device info: {e}")
 
         # Performance optimization: Reuse audio stream
         if self.audio_stream is None:

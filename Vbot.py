@@ -67,7 +67,9 @@ SUBTITLE_UPDATE_INTERVAL = 50  # Subtitle updates every 50ms
 
 
 class ModernChatGUI(ChatGUI):
-    def __init__(self, root, on_send_callback, on_voice_toggle_callback, model_name="Amelia"):
+    def __init__(
+        self, root, on_send_callback, on_voice_toggle_callback, model_name="Amelia"
+    ):
         # Initialize wx.App first (needed for avatar)
         self.wx_app = wx.App()
 
@@ -211,6 +213,19 @@ class ModernChatGUI(ChatGUI):
         )
         self.voice_btn.pack(side=tk.RIGHT, padx=3, pady=8)
 
+        # Microphone selection button - darker purple theme, auto size
+        self.mic_btn = tk.Button(
+            button_container,
+            text="🎙️",
+            font=("Arial", 12),
+            bg="#2d2d44",
+            fg="white",
+            relief=tk.FLAT,
+            command=self._show_microphone_menu,
+            height=1,  # Fixed height to make button smaller
+        )
+        self.mic_btn.pack(side=tk.RIGHT, padx=3, pady=8)
+
         # Send button - darker purple theme, auto size
         self.send_btn = tk.Button(
             button_container,
@@ -249,6 +264,7 @@ class ModernChatGUI(ChatGUI):
         for btn in [
             self.send_btn,
             self.voice_btn,
+            self.mic_btn,
             self.history_btn,
             self.background_btn,
         ]:
@@ -577,7 +593,9 @@ class ModernChatGUI(ChatGUI):
                 )
             else:
                 # Fallback to hide after a reasonable time if no duration is given
-                self.subtitle_timer = self.root.after(len(text) * 100, self.hide_subtitle)
+                self.subtitle_timer = self.root.after(
+                    len(text) * 100, self.hide_subtitle
+                )
 
         except Exception as e:
             print(f"[ERROR] Failed to show subtitle: {e}")
@@ -617,7 +635,9 @@ class ModernChatGUI(ChatGUI):
             time_per_sentence = (total_duration * 1000) / num_sentences
         else:
             # Estimate time based on sentence length (e.g., 150ms per character)
-            time_per_sentence = max(2000, len(self.subtitle_queue[0]) * 150 if self.subtitle_queue else 2000)
+            time_per_sentence = max(
+                2000, len(self.subtitle_queue[0]) * 150 if self.subtitle_queue else 2000
+            )
 
         self._show_next_sentence(time_per_sentence)
 
@@ -629,7 +649,8 @@ class ModernChatGUI(ChatGUI):
 
             # Schedule the next sentence
             self.subtitle_timer = self.root.after(
-                int(time_per_sentence), lambda: self._show_next_sentence(time_per_sentence)
+                int(time_per_sentence),
+                lambda: self._show_next_sentence(time_per_sentence),
             )
         else:
             # Last sentence shown, wait a bit before hiding
@@ -701,11 +722,13 @@ class ModernChatGUI(ChatGUI):
         self.input_box.configure(state="disabled")
         self.send_btn.configure(state="disabled")
         self.voice_btn.configure(state="disabled")
+        self.mic_btn.configure(state="disabled")
 
     def enable_input_controls(self):
         self.input_box.configure(state="normal")
         self.send_btn.configure(state="normal")
         self.voice_btn.configure(state="normal")
+        self.mic_btn.configure(state="normal")
 
     def set_voice_button_text(self, text):
         """Update the voice button text"""
@@ -913,6 +936,80 @@ class ModernChatGUI(ChatGUI):
                 print(f"Error adding background: {e}")
                 # You could show an error dialog here
 
+    def _show_microphone_menu(self):
+        """Show microphone selection menu"""
+        import pyaudio
+        from tkinter import Menu
+
+        # Create popup menu
+        menu = Menu(self.root, tearoff=0, bg="#2d2d44", fg="white", font=("Arial", 11))
+
+        # Get available microphones
+        p = pyaudio.PyAudio()
+        available_mics = []
+
+        try:
+            for i in range(p.get_device_count()):
+                try:
+                    device_info = p.get_device_info_by_index(i)
+                    if device_info["maxInputChannels"] > 0:
+                        available_mics.append((i, device_info["name"]))
+                except Exception:
+                    continue
+        finally:
+            p.terminate()
+
+        if not available_mics:
+            menu.add_command(
+                label=" No microphones found",
+                state="disabled",
+                font=("Arial", 11, "italic"),
+            )
+        else:
+            # Add current microphone indicator
+            current_mic = getattr(self, "selected_microphone_index", None)
+
+            for index, name in available_mics:
+                # Truncate long names for display
+                display_name = name[:40] + "..." if len(name) > 40 else name
+
+                # Mark current selection
+                if current_mic == index:
+                    display_name = f"✓ {display_name}"
+
+                menu.add_command(
+                    label=f"  {display_name}",
+                    command=lambda idx=index, mic_name=name: self._select_microphone(
+                        idx, mic_name
+                    ),
+                    font=("Arial", 11),
+                )
+
+        # Show menu at button position
+        x = self.mic_btn.winfo_rootx()
+        y = self.mic_btn.winfo_rooty() + self.mic_btn.winfo_height()
+        menu.post(x, y)
+
+    def _select_microphone(self, device_index, device_name):
+        """Handle microphone selection from menu"""
+        self.selected_microphone_index = device_index
+        print(f"[DEBUG] Selected microphone: {device_name} (index {device_index})")
+
+        # Update the microphone button text to show current selection
+        short_name = device_name[:15] + "..." if len(device_name) > 15 else device_name
+        self.mic_btn.config(text=f"🎙️ {short_name}")
+
+        # Store the full device name for reference
+        self.selected_microphone_name = device_name
+
+        # Notify the audio processor about the new microphone selection
+        if hasattr(self, "audio_processor_callback"):
+            self.audio_processor_callback(device_index, device_name)
+
+    def set_audio_processor_callback(self, callback):
+        """Set callback for audio processor to handle microphone changes"""
+        self.audio_processor_callback = callback
+
     def cleanup(self):
         """Clean up resources before shutdown"""
         try:
@@ -1021,6 +1118,12 @@ def main():
 
     # Set GUI in Ollama Handler and configure audio duration callback
     ollama_handler.gui = gui
+
+    # Connect microphone selection callback to audio processor
+    def handle_microphone_change(device_index, device_name):
+        components["audio_processor"].set_microphone(device_index, device_name)
+
+    gui.set_audio_processor_callback(handle_microphone_change)
 
     # ... (rest of the code remains the same)
     def handle_model_switch(new_model):

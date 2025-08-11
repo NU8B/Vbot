@@ -18,7 +18,7 @@
 #    - See detailed setup in asset/docker_setup_instructions.md
 
 # Core Dependencies
-numpy==1.26.0
+numpy>=2.0.0
 scipy==1.14.1
 pandas==2.2.3
 matplotlib==3.10.0
@@ -62,6 +62,7 @@ faster-whisper==1.1.0
 whisperx==3.3.1
 phonemizer==3.3.0
 resemblyzer==0.1.4
+onnxruntime>=1.19.0
 
 # NLP and Text Processing
 nltk==3.9.1

@@ -63,7 +63,7 @@ class StyleTTS2Inference:
 
         self.model_name = model_name
         self.repo_id = repo_id if repo_id else self.model_configs[model_name]
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Using device: {self.device}")
 
         # Create cache directory based on model name
@@ -272,6 +272,18 @@ class StyleTTS2Inference:
         """Clean text before phonemization - minimal cleaning like official implementation"""
         text = text.strip()
         text = text.replace('"', "")  # Remove quotes only
+
+        # Limit text length to prevent tensor size mismatch
+        # StyleTTS2 typically has a max sequence length of ~512 tokens
+        # Rough estimate: 1 token ≈ 1-2 characters for phonemized text
+        max_chars = 800  # Conservative limit to stay well under 512 tokens
+
+        if len(text) > max_chars:
+            print(
+                f"[WARNING] Text too long ({len(text)} chars), truncating to {max_chars} chars"
+            )
+            text = text[:max_chars] + "..."
+
         return text
 
     def inference(
@@ -300,6 +312,14 @@ class StyleTTS2Inference:
         tokens = self.text_cleaner(ps)
         if not tokens:  # If tokenization failed
             raise ValueError("Text tokenization failed")
+
+        # Check token length to prevent tensor size mismatch
+        max_tokens = 512  # StyleTTS2 maximum sequence length
+        if len(tokens) > max_tokens:
+            print(
+                f"[WARNING] Token sequence too long ({len(tokens)} tokens), truncating to {max_tokens} tokens"
+            )
+            tokens = tokens[:max_tokens]
 
         tokens.insert(0, 0)  # Add start token
         tokens = torch.LongTensor(tokens).to(self.device).unsqueeze(0)
