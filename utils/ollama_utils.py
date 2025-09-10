@@ -10,7 +10,7 @@ from utils.emotion_utils import EmotionHandler, create_emotion_config
 from utils.TTS_utils import InferenceHandler
 import numpy as np
 import soundfile as sf
-import torch  # Add missing torch import
+import torch
 
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
@@ -56,6 +56,19 @@ Key traits to incorporate:
 - Sometimes acts tough but is actually quite soft-hearted
 
 You are not to break character under any circumstances. You should speak in first person and make shark references when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
+""",
+    "Shiori": """ You are Shiori Novella, the archivist from hololive English -Advent-. You are mysterious, curious, and have a deep fascination with knowledge and stories. You possess an otherworldly charm and speak with an air of ancient wisdom.
+
+Key traits to incorporate:
+- Deep love for books, stories, and knowledge
+- Mysterious and somewhat enigmatic personality
+- Gentle but can be unexpectedly mischievous
+- Interest in the darker or more complex aspects of stories
+- Speaks with wisdom beyond her apparent years
+- Curious about human nature and experiences
+- Sometimes cryptic or philosophical in responses
+
+You are not to break character under any circumstances. You should speak in first person and reference your love of stories and knowledge when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *mysterious smile*). NEVER use asterisks for any reason.
 """,
 }
 
@@ -117,7 +130,6 @@ class OllamaHandler:
     def set_model(self, model_name):
         """Change the current model and clear conversation history"""
         if model_name in MODEL_PROMPTS:
-            print(f"[DEBUG] Switching model from {self.model_name} to {model_name}")
             self.model_name = model_name
             self.message_history = (
                 []
@@ -207,7 +219,14 @@ class OllamaHandler:
                 self.gui.show_subtitle(text_chunk)
 
                 # Play the audio chunk (this is a blocking call)
-                self.audio_processor.play_audio(speech_chunk, duration=duration_chunk)
+                if self.audio_processor:
+                    self.audio_processor.play_audio(
+                        speech_chunk, duration=duration_chunk
+                    )
+                else:
+                    print(
+                        "[WARNING] Audio processor not available, skipping audio chunk"
+                    )
 
             except Exception as e:
                 print(f"Error in playback consumer: {str(e)}")
@@ -765,6 +784,21 @@ class OllamaHandler:
         """Play audio in a separate thread - OPTIMIZED VERSION"""
         try:
             print(f"[DEBUG] Audio Thread: Starting playback for {duration:.2f}s")
+
+            # Safety check: if audio_processor is None, try to get it
+            if self.audio_processor is None:
+                print("[WARNING] Audio processor is None, attempting to get it...")
+                # Try to get audio processor from components if available
+                if hasattr(self, "_init_handler"):
+                    self.audio_processor = (
+                        self._init_handler.get_audio_processor_when_ready()
+                    )
+
+                if self.audio_processor is None:
+                    print(
+                        "[ERROR] Audio processor still not available, skipping audio playback"
+                    )
+                    return
 
             # Get avatar from GUI
             avatar = self.gui.get_avatar() if self.gui else None

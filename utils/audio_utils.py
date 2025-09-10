@@ -23,13 +23,16 @@ class AudioProcessor:
         model_name = os.getenv("VOICE_TYPE", "amelia_watson")
         self.ref_audio_path = f"asset/ref_sound/{model_name}/neutral.wav"
 
-        # Performance optimization: Use smaller model and optimized settings
+        # Performance optimization: Use smallest model and optimized settings
+        # Smart device selection with cuDNN fallback
+        whisper_device = self._select_whisper_device()
+
         self.whisper_model = WhisperModel(
-            "tiny",  # Use tiny model for faster processing
-            device="cuda" if torch.cuda.is_available() else "cpu",
-            compute_type="int8",  # Use int8 for faster processing
+            "tiny",  # Use tiny model for maximum speed
+            device=whisper_device,
+            compute_type="int8",  # Use int8 for maximum speed
             download_root=str(cache_dir / "whisper"),
-            num_workers=1,  # Reduce workers for better performance
+            num_workers=1,  # Single worker for better performance
         )
 
         # Voice input state
@@ -45,12 +48,23 @@ class AudioProcessor:
 
         # Pre-warm the model silently
         if torch.cuda.is_available() and Path(self.ref_audio_path).exists():
-            self.transcribe_audio(self.ref_audio_path)
             torch.cuda.empty_cache()
+
+    def _select_whisper_device(self):
+        """Smart device selection for Whisper with cuDNN fallback"""
+        if not torch.cuda.is_available():
+            return "cpu"
+
+        try:
+            # Test CUDA availability more safely
+            test_tensor = torch.randn(1, 10).cuda()
+            _ = test_tensor.cpu()  # Simple operation to test CUDA
+            return "cuda"
+        except Exception as e:
+            return "cpu"
 
     def set_microphone(self, device_index, device_name):
         """Set the microphone to use for recording"""
-        print(f"[DEBUG] Setting microphone to: {device_name} (index {device_index})")
         self.selected_device_index = device_index
         self.selected_device_name = device_name
 
@@ -66,10 +80,6 @@ class AudioProcessor:
         """Find a working input device for microphone recording"""
         if self.pyaudio_instance is None:
             self.pyaudio_instance = pyaudio.PyAudio()
-
-        print(
-            f"[DEBUG] Scanning {self.pyaudio_instance.get_device_count()} audio devices..."
-        )
 
         # If a specific microphone is selected, try to use it
         if self.selected_device_index is not None:
@@ -89,36 +99,23 @@ class AudioProcessor:
                     print(
                         f"[DEBUG] Selected device {self.selected_device_index} has no input channels, falling back to auto-detection"
                     )
-            except Exception as e:
-                print(
-                    f"[DEBUG] Error with selected device {self.selected_device_index}: {e}, falling back to auto-detection"
-                )
+            except Exception:
+                pass
 
         # Fall back to auto-detection if no specific device is selected or if it fails
         for i in range(self.pyaudio_instance.get_device_count()):
             try:
                 device_info = self.pyaudio_instance.get_device_info_by_index(i)
                 if device_info["maxInputChannels"] > 0:
-                    print(
-                        f"[DEBUG] Found input device: {device_info['name']} (index {i})"
-                    )
-                    print(
-                        f"[DEBUG] Device details: channels={device_info['maxInputChannels']}, sample_rate={device_info.get('defaultSampleRate', 'N/A')}"
-                    )
-                    print(f"[DEBUG] Using microphone: {device_info['name']}")
                     return i
-            except Exception as e:
-                print(f"[DEBUG] Error checking device {i}: {e}")
+            except Exception:
                 continue
 
-        print("[DEBUG] No suitable input device found")
         return None
 
     def toggle_listening(self, gui, process_callback, is_processing):
         """Toggle voice input recording"""
-        print(f"[DEBUG] toggle_listening called, is_processing: {is_processing}")
         if is_processing:
-            print("[DEBUG] Skipping voice input because is_processing is True")
             return
 
         if not self.is_listening:
@@ -133,12 +130,9 @@ class AudioProcessor:
 
     def _listen(self, gui, process_callback):
         """Record and process voice input"""
-        print("[DEBUG] _listen method started")
         try:
-            print("[DEBUG] Starting audio recording...")
             audio_file = self.record_audio(lambda: self.is_listening)
             if audio_file:
-                print(f"[DEBUG] Audio recorded successfully: {audio_file}")
                 timings = {"processing_start": time.time()}
                 gui.disable_input_controls()
 
@@ -146,31 +140,24 @@ class AudioProcessor:
                 text = self.transcribe_audio(audio_file)
                 timings["stt"] = time.time() - stt_start
 
-                print(f"[DEBUG] Transcription result: '{text}'")
-
                 # Process the transcribed text without showing it
                 process_callback(text, timings)
-            else:
-                print("[DEBUG] Audio recording failed or returned None")
         except Exception as e:
-            print(f"[DEBUG] Error in _listen: {e}")
             import traceback
 
             traceback.print_exc()
         finally:
             self.is_listening = False
             gui.set_voice_button_text("Voice Input")
-            print("[DEBUG] _listen method finished")
 
     def record_audio(self, is_listening_ref):
-        print("[DEBUG] record_audio method started")
-        # Performance optimization: Reduced chunk size and optimized parameters
-        CHUNK = 256  # Smaller chunks for faster processing (was 512)
+        # Performance optimization: Ultra-fast parameters for seamless experience
+        CHUNK = 128  # Smaller chunks for faster processing (was 256)
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
         RATE = 16000
-        SILENCE_THRESHOLD = 200  # Lower threshold for faster detection (was 300)
-        SILENCE_DURATION = 0.8  # Shorter silence duration for faster response (was 1)
+        SILENCE_THRESHOLD = 150  # Lower threshold for faster detection (was 200)
+        SILENCE_DURATION = 0.6  # Shorter silence duration for faster response (was 0.8)
 
         # Performance optimization: Reuse PyAudio instance
         if self.pyaudio_instance is None:
@@ -183,18 +170,7 @@ class AudioProcessor:
         # Find a working input device
         input_device_index = self._find_input_device()
         if input_device_index is None:
-            print("[DEBUG] Error: No working input device found")
             return None
-        else:
-            print(f"[DEBUG] Found input device at index: {input_device_index}")
-            # Get device name for additional debug info
-            try:
-                device_info = self.pyaudio_instance.get_device_info_by_index(
-                    input_device_index
-                )
-                print(f"[DEBUG] Recording from microphone: {device_info['name']}")
-            except Exception as e:
-                print(f"[DEBUG] Could not get device info: {e}")
 
         # Performance optimization: Reuse audio stream
         if self.audio_stream is None:
@@ -207,8 +183,7 @@ class AudioProcessor:
                     input_device_index=input_device_index,
                     frames_per_buffer=CHUNK,
                 )
-            except Exception as e:
-                print(f"Error opening audio stream: {e}")
+            except Exception:
                 return None
 
         try:
@@ -230,8 +205,7 @@ class AudioProcessor:
                 if has_speech and silent_chunks > int(SILENCE_DURATION * RATE / CHUNK):
                     break
 
-        except Exception as e:
-            print(f"Error recording audio: {e}")
+        except Exception:
             return None
         finally:
             # Don't close the stream, just stop reading
@@ -251,24 +225,23 @@ class AudioProcessor:
         return str(temp_file)
 
     def transcribe_audio(self, audio_file):
-        """Transcribe audio using Whisper - OPTIMIZED VERSION"""
+        """Transcribe audio using Whisper - ULTRA OPTIMIZED VERSION"""
         try:
-            # Performance optimization: Use beam_size=1 for faster inference
+            # Performance optimization: Minimal beam size for maximum speed
             segments, _ = self.whisper_model.transcribe(
                 audio_file,
-                beam_size=1,  # Reduce beam size for faster processing
+                beam_size=1,  # Minimal beam size for maximum speed
                 language="en",
                 task="transcribe",
-                vad_filter=True,  # Enable VAD for better accuracy
-                vad_parameters=dict(min_silence_duration_ms=500),  # Optimize VAD
+                vad_filter=False,  # Disable VAD for faster processing
+                # Remove VAD parameters for speed
             )
 
-            # Combine all segments
+            # Combine all segments quickly
             text = " ".join([segment.text for segment in segments]).strip()
             return text if text else ""
 
-        except Exception as e:
-            print(f"Error transcribing audio: {e}")
+        except Exception:
             return ""
 
     def play_audio(self, speech, sample_rate=24000, duration=None):
@@ -287,12 +260,11 @@ class AudioProcessor:
             # Wait for completion in a separate thread to avoid blocking
             def wait_for_completion():
                 sd.wait()
-                print(f"Audio playback completed (duration: {duration:.2f}s)")
 
             threading.Thread(target=wait_for_completion, daemon=True).start()
 
-        except Exception as e:
-            print(f"Error playing audio: {e}")
+        except Exception:
+            pass
 
     def play_audio_continuous(self, speech, sample_rate=24000):
         """Play audio continuously - OPTIMIZED VERSION"""
@@ -300,8 +272,8 @@ class AudioProcessor:
             # Performance optimization: Use sounddevice for better performance
             speech_normalized = speech / np.max(np.abs(speech)) * 0.8
             sd.play(speech_normalized, sample_rate, blocking=False)
-        except Exception as e:
-            print(f"Error playing continuous audio: {e}")
+        except Exception:
+            pass
 
     def play_audio_continuous_improved(self, speech, sample_rate=24000):
         """Improved continuous audio playback - OPTIMIZED VERSION"""
@@ -309,8 +281,8 @@ class AudioProcessor:
             # Performance optimization: Use sounddevice for better performance
             speech_normalized = speech / np.max(np.abs(speech)) * 0.8
             sd.play(speech_normalized, sample_rate, blocking=False)
-        except Exception as e:
-            print(f"Error playing improved continuous audio: {e}")
+        except Exception:
+            pass
 
     def is_audio_playing(self):
         """Check if audio is currently playing"""
@@ -325,16 +297,16 @@ class AudioProcessor:
         try:
             # Performance optimization: Use sounddevice wait
             sd.wait()
-        except Exception as e:
-            print(f"Error waiting for audio completion: {e}")
+        except Exception:
+            pass
 
     def stop_audio(self):
         """Stop audio playback - OPTIMIZED VERSION"""
         try:
             # Performance optimization: Use sounddevice stop
             sd.stop()
-        except Exception as e:
-            print(f"Error stopping audio: {e}")
+        except Exception:
+            pass
 
     def cleanup(self):
         """Clean up audio resources"""
@@ -352,6 +324,5 @@ class AudioProcessor:
                 self.pyaudio_instance.terminate()
                 self.pyaudio_instance = None
 
-            print("[DEBUG] Audio processor cleanup completed")
-        except Exception as e:
-            print(f"[ERROR] Failed to cleanup audio processor: {e}")
+        except Exception:
+            pass

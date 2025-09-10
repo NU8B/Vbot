@@ -22,6 +22,7 @@ sys.path.append(project_root)
 from utils.gui import ChatGUI
 from utils.initialization_utils import InitializationHandler
 from utils.avatar import AnimatedCharacter
+from utils.performance_boost import performance_monitor, memory_manager
 
 # Suppress all warnings and optimize for performance
 warnings.filterwarnings("ignore")
@@ -33,19 +34,6 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"  # Disable tokenizer parallelism 
 os.environ["CUDA_LAUNCH_BLOCKING"] = (
     "0"  # Disable CUDA launch blocking for better performance
 )
-
-# Enhanced performance optimizations
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = (
-    "max_split_size_mb:128"  # Optimize CUDA memory allocation
-)
-os.environ["OMP_NUM_THREADS"] = "4"  # Limit OpenMP threads
-os.environ["MKL_NUM_THREADS"] = "4"  # Limit MKL threads
-
-# Performance constants
-WX_UPDATE_INTERVAL = 33  # ~30 FPS instead of 60 FPS for better performance
-UI_UPDATE_INTERVAL = 100  # UI updates every 100ms
-CHAT_HISTORY_UPDATE_INTERVAL = 500  # Chat history updates every 500ms
-SUBTITLE_UPDATE_INTERVAL = 50  # Subtitle updates every 50ms
 
 # Enhanced performance optimizations
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = (
@@ -96,11 +84,15 @@ class ModernChatGUI(ChatGUI):
         self.subtitle_update_queue = queue.Queue()
 
         # Available models
-        self.available_models = ["Amelia", "Eveland", "Gura"]
+        self.available_models = ["Amelia", "Eveland", "Gura", "Shiori"]
         self.current_model_index = (
             0
             if self.model_name == "Amelia"
-            else (1 if self.model_name == "Eveland" else 2)
+            else (
+                1
+                if self.model_name == "Eveland"
+                else (2 if self.model_name == "Gura" else 3)
+            )  # Shiori
         )
 
         # Main container - use neutral background color
@@ -178,7 +170,11 @@ class ModernChatGUI(ChatGUI):
             bg=(
                 "#ffd05c"
                 if self.model_name == "Amelia"
-                else ("#318fc5" if self.model_name == "Eveland" else "#4a90e2")
+                else (
+                    "#318fc5"
+                    if self.model_name == "Eveland"
+                    else ("#4a90e2" if self.model_name == "Gura" else "#85318c")
+                )  # Shiori purple
             ),
             fg="black",
             relief=tk.FLAT,
@@ -216,7 +212,7 @@ class ModernChatGUI(ChatGUI):
         # Microphone selection button - darker purple theme, auto size
         self.mic_btn = tk.Button(
             button_container,
-            text="🎙️",
+            text="Mic⚙️",
             font=("Arial", 12),
             bg="#2d2d44",
             fg="white",
@@ -277,16 +273,24 @@ class ModernChatGUI(ChatGUI):
                 self.character_btn.configure(bg="#e6bb53")
             elif self.model_name == "Eveland":
                 self.character_btn.configure(bg="#2b7eb3")
-            else:  # Gura
+            elif self.model_name == "Gura":
                 self.character_btn.configure(bg="#3a7bc8")
+            elif self.model_name == "Shiori":
+                self.character_btn.configure(bg="#6e297a")
+            else:  # Default to Amelia
+                self.character_btn.configure(bg="#e6bb53")
 
         def character_hover_leave(e):
             if self.model_name == "Amelia":
                 self.character_btn.configure(bg="#ffd05c")
             elif self.model_name == "Eveland":
                 self.character_btn.configure(bg="#318fc5")
-            else:  # Gura
+            elif self.model_name == "Gura":
                 self.character_btn.configure(bg="#4a90e2")
+            elif self.model_name == "Shiori":
+                self.character_btn.configure(bg="#85318c")
+            else:  # Default to Amelia
+                self.character_btn.configure(bg="#ffd05c")
 
         self.character_btn.bind("<Enter>", character_hover_enter)
         self.character_btn.bind("<Leave>", character_hover_leave)
@@ -300,9 +304,6 @@ class ModernChatGUI(ChatGUI):
         )  # ~30 FPS instead of 60 FPS
 
         # Start UI update timers
-        self.root.after(UI_UPDATE_INTERVAL, self._process_ui_updates)
-        self.root.after(CHAT_HISTORY_UPDATE_INTERVAL, self._process_chat_updates)
-        self.root.after(SUBTITLE_UPDATE_INTERVAL, self._process_subtitle_updates)
         self.root.after(UI_UPDATE_INTERVAL, self._process_ui_updates)
         self.root.after(CHAT_HISTORY_UPDATE_INTERVAL, self._process_chat_updates)
         self.root.after(SUBTITLE_UPDATE_INTERVAL, self._process_subtitle_updates)
@@ -478,7 +479,6 @@ class ModernChatGUI(ChatGUI):
             )
 
             # Display chat history with improved formatting and colors
-            print(f"[DEBUG] Show History: Displaying {len(self.chat_history)} messages")
 
             if not self.chat_history:
                 history_text.insert(tk.END, "No chat history yet.\n", "message")
@@ -565,8 +565,6 @@ class ModernChatGUI(ChatGUI):
             self.subtitle_text.tag_configure(
                 "completed", foreground="#888888", font=("Arial", 16)
             )
-
-            print("[DEBUG] Subtitle window created successfully")
 
     def show_subtitle(self, text, duration=None):
         """Show subtitle text with optional duration - CHUNK-BASED VERSION."""
@@ -667,7 +665,6 @@ class ModernChatGUI(ChatGUI):
                 self.subtitle_window.withdraw()
 
             self.is_showing_subtitle = False
-            print("[DEBUG] Subtitle hidden")
 
         except Exception as e:
             print(f"[ERROR] Failed to hide subtitle: {e}")
@@ -696,24 +693,19 @@ class ModernChatGUI(ChatGUI):
                 self.subtitle_window = None
 
             self.is_showing_subtitle = False
-            print("[DEBUG] Subtitle cleanup completed")
         except Exception as e:
-            print(f"[ERROR] Failed to cleanup subtitles: {e}")
+            print(f"Failed to cleanup subtitles: {e}")
 
     def update_chat(self, speaker, message):
-        """Update chat history - OPTIMIZED VERSION with queuing"""
+        """Update chat history with queuing"""
         # Clean up the speaker name and ensure it's added to history
         if speaker in ["AI", "Assistant"]:
             speaker = self.model_name
         elif speaker == "You":
             speaker = "You"
-        else:
-            # For any other speaker (like character names), use as is
-            pass
 
         # Add to pending updates queue instead of directly to history
         self.pending_chat_updates.append((speaker, message))
-        print(f"[DEBUG] Chat: Queued message: {speaker}: {message[:50]}...")
 
     def clear_input(self):
         self.input_box.delete(0, tk.END)
@@ -783,7 +775,7 @@ class ModernChatGUI(ChatGUI):
 
         # If no characters found, use default list
         if not character_dirs:
-            character_dirs = ["Amelia", "Eveland", "Gura"]
+            character_dirs = ["Amelia", "Eveland", "Gura", "Shiori"]
 
         # Add character options to menu
         for character in character_dirs:
@@ -809,8 +801,6 @@ class ModernChatGUI(ChatGUI):
         if character_name == self.model_name:
             return  # Already selected
 
-        print(f"\n=== Switching to {character_name} ===")
-
         # Update model name and environment variable
         self.model_name = character_name
         os.environ["VOICE_TYPE"] = character_name
@@ -820,14 +810,18 @@ class ModernChatGUI(ChatGUI):
             self.character_btn.configure(bg="#ffd05c")
         elif character_name == "Eveland":
             self.character_btn.configure(bg="#318fc5")
-        else:  # Gura
+        elif character_name == "Gura":
             self.character_btn.configure(bg="#4a90e2")
+        elif character_name == "Shiori":
+            self.character_btn.configure(bg="#85318c")
+        else:  # Default to Amelia
+            self.character_btn.configure(bg="#ffd05c")
 
         # Notify user of character change
         self.chat_history.append(
             (
                 "System",
-                f"Switched to {character_name} character",
+                f"Switched to {character_name}",
                 datetime.now().strftime("%I:%M %p"),
             )
         )
@@ -841,7 +835,6 @@ class ModernChatGUI(ChatGUI):
         self.wx_frame.Hide()
 
         # Create new avatar instance
-        print(f"Reinitializing avatar for {character_name}...")
         self.avatar = AnimatedCharacter(self.wx_frame, WINDOW_WIDTH, WINDOW_HEIGHT)
         self.wx_frame.Show()
 
@@ -993,7 +986,7 @@ class ModernChatGUI(ChatGUI):
     def _select_microphone(self, device_index, device_name):
         """Handle microphone selection from menu"""
         self.selected_microphone_index = device_index
-        print(f"[DEBUG] Selected microphone: {device_name} (index {device_index})")
+        print(f"🎙️ Microphone: {device_name}")
 
         # Update the microphone button text to show current selection
         short_name = device_name[:15] + "..." if len(device_name) > 15 else device_name
@@ -1009,6 +1002,10 @@ class ModernChatGUI(ChatGUI):
     def set_audio_processor_callback(self, callback):
         """Set callback for audio processor to handle microphone changes"""
         self.audio_processor_callback = callback
+
+    def set_model_switch_callback(self, callback):
+        """Set callback for model switching"""
+        self.on_model_switch = callback
 
     def cleanup(self):
         """Clean up resources before shutdown"""
@@ -1034,12 +1031,15 @@ class ModernChatGUI(ChatGUI):
             if self.avatar:
                 self.avatar.cleanup()
 
-            print("[DEBUG] GUI cleanup completed")
         except Exception as e:
-            print(f"[ERROR] Failed to cleanup GUI: {e}")
+            print(f"Cleanup error: {e}")
 
 
 def main():
+    # Apply initial optimizations
+    memory_manager.optimize_pytorch()
+    print(f"💾 Memory optimizations applied")
+
     # Get default device index
     p = pyaudio.PyAudio()
     try:
@@ -1054,7 +1054,7 @@ def main():
         "--model",
         type=str,
         default=os.getenv("MODEL_NAME", "Amelia"),
-        help="Name of the model to use (e.g., Amelia, Eveland, Gura)",
+        help="Name of the model to use (e.g., Amelia, Eveland, Gura, Shiori)",
     )
     parser.add_argument(
         "--device-index",
@@ -1067,7 +1067,7 @@ def main():
     MODEL_NAME = args.model
 
     # Check if model is valid
-    available_models = ["Amelia", "Eveland", "Gura"]
+    available_models = ["Amelia", "Eveland", "Gura", "Shiori"]
     if MODEL_NAME not in available_models:
         print(f"Error: Invalid model name '{MODEL_NAME}'.")
         print(f"Available models: {', '.join(available_models)}")
@@ -1086,20 +1086,34 @@ def main():
             print(f"- {model}")
         sys.exit(1)
 
-    # Initialize all components
+    # Initialize components with optimized startup
+    print(f"🚀 Starting Vbot with {MODEL_NAME} model...")
+    performance_monitor.start_timer("main_initialization")
+
     init_handler = InitializationHandler(
         model_name=MODEL_NAME, device_index=args.device_index
     )
     components = init_handler.initialize_all()
 
-    # Initialize tkinter root
+    performance_monitor.end_timer("main_initialization")
+
+    # Initialize tkinter root early (UI shows while background loading continues)
+    print("🎨 Starting UI...")
     root = tk.Tk()
-    root.title("Vbot")
+    root.title(f"Vbot - {MODEL_NAME}")
     root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
     root.configure(bg="#2b2b3b")
 
-    # Create Ollama Handler
+    # Create Ollama Handler with proper components
     ollama_handler = init_handler.create_ollama_handler()
+
+    # Set reference to init_handler for lazy audio processor loading
+    ollama_handler._init_handler = init_handler
+
+    # If audio processor is not ready, try to update it
+    if not ollama_handler.audio_processor:
+        print("⏳ Audio processor still loading...")
+        # We'll set up a callback to update it when ready
 
     # Create a wrapper for voice input processing
     def handle_voice_input(text, timings):
@@ -1110,8 +1124,8 @@ def main():
     gui = ModernChatGUI(
         root,
         ollama_handler.handle_text_input_simple,
-        lambda: components["audio_processor"].toggle_listening(
-            gui, handle_voice_input, ollama_handler.is_processing
+        lambda: get_voice_toggle_callback(
+            components, gui, handle_voice_input, ollama_handler
         ),
         model_name=MODEL_NAME,
     )
@@ -1119,29 +1133,64 @@ def main():
     # Set GUI in Ollama Handler and configure audio duration callback
     ollama_handler.gui = gui
 
+    # Set up periodic check for audio processor
+    def check_audio_processor():
+        """Periodically check if audio processor is ready"""
+        if not ollama_handler.audio_processor:
+            if init_handler.update_ollama_handler_audio_processor(ollama_handler):
+                print("🎤 Voice input ready")
+            else:
+                # Check again in 1 second
+                root.after(1000, check_audio_processor)
+
+    # Start the audio processor check
+    root.after(100, check_audio_processor)
+
     # Connect microphone selection callback to audio processor
     def handle_microphone_change(device_index, device_name):
-        components["audio_processor"].set_microphone(device_index, device_name)
+        audio_processor = get_audio_processor(components, init_handler)
+        if audio_processor:
+            audio_processor.set_microphone(device_index, device_name)
 
     gui.set_audio_processor_callback(handle_microphone_change)
+
+    # Helper functions for lazy-loaded components
+    def get_audio_processor(components, init_handler):
+        """Get audio processor, waiting if necessary"""
+        if "audio_processor" in components:
+            return components["audio_processor"]
+        elif "get_audio_processor" in components:
+            return components["get_audio_processor"]()
+        else:
+            # Fallback: get from init handler
+            return init_handler.get_audio_processor_when_ready()
+
+    def get_voice_toggle_callback(components, gui, handle_voice_input, ollama_handler):
+        """Get voice toggle callback, handling lazy loading"""
+        audio_processor = get_audio_processor(components, init_handler)
+        if audio_processor:
+            return audio_processor.toggle_listening(
+                gui, handle_voice_input, ollama_handler.is_processing
+            )
+        else:
+            print("Audio processor not ready yet")
+            return None
 
     # ... (rest of the code remains the same)
     def handle_model_switch(new_model):
         if gui.is_processing:
             return
 
-        print(f"\n=== Switching to {new_model} model ===")
+        print(f"🔄 Switching to {new_model}...")
 
         # Update Ollama handler
         ollama_handler.set_model(new_model)
 
-        # Create new initialization handler for the new model
-        print(f"Initializing components for {new_model}...")
-        init_handler = InitializationHandler(model_name=new_model)
-        new_components = init_handler.initialize_for_character_switch()
+        # Create new initialization handler for the new model (optimized for switching)
+        new_init_handler = InitializationHandler(model_name=new_model)
+        new_components = new_init_handler.initialize_for_character_switch()
 
-        # Update only the components that need to change for different characters
-        # Don't reinitialize audio_processor to avoid faster_whisper/onnxruntime issues
+        # Update only essential components for faster switching
         components["inference_handler"] = new_components["inference_handler"]
         components["tts_model"] = new_components["tts_model"]
         components["emotion_handler"] = new_components["emotion_handler"]
@@ -1150,32 +1199,37 @@ def main():
         ollama_handler.tts_model = new_components["tts_model"]
         ollama_handler.inference_handler = new_components["inference_handler"]
         ollama_handler.emotion_handler = new_components["emotion_handler"]
-        # Keep the existing audio_processor to avoid reinitialization issues
-
-        print(f"Components reinitialized for {new_model}")
 
         # Update window title
         root.title(f"Vbot - {new_model}")
+        print(f"✅ Switched to {new_model}")
 
         # Update GUI's voice toggle callback with existing audio processor
-        gui.on_voice_toggle_callback = lambda: components[
-            "audio_processor"
-        ].toggle_listening(gui, handle_voice_input, ollama_handler.is_processing)
-
-        print("=== Model switch complete ===\n")
+        audio_processor = get_audio_processor(components, init_handler)
+        if audio_processor:
+            gui.on_voice_toggle_callback = lambda: audio_processor.toggle_listening(
+                gui, handle_voice_input, ollama_handler.is_processing
+            )
 
     # Set the model switch callback
     gui.set_model_switch_callback(handle_model_switch)
 
     # Register cleanup on window close
-    root.protocol(
-        "WM_DELETE_WINDOW",
-        lambda: (
-            gui.cleanup(),
-            components["docker_handler"].cleanup(),
-            root.destroy(),
-        ),
-    )
+    def cleanup_and_exit():
+        try:
+            gui.cleanup()
+            if "docker_handler" in components:
+                components["docker_handler"].cleanup()
+            init_handler.cleanup()
+            memory_manager.clear_cache()
+        except Exception as e:
+            print(f"Error during cleanup: {e}")
+        finally:
+            root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", cleanup_and_exit)
+
+    print("🎉 Vbot is ready!")
 
     # Start the application
     root.mainloop()

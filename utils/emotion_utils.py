@@ -59,6 +59,23 @@ MODEL_PARAMS = {
         "SURPRISE_BETA": 0.7,
         "SURPRISE_EMBEDDING_SCALE": 0.5,
     },
+    "Shiori": {
+        "ALPHA": 0.3,
+        "BETA": 0.7,
+        "EMBEDDING_SCALE": 0.4,
+        "ANGRY_ALPHA": 0.3,
+        "ANGRY_BETA": 0.7,
+        "ANGRY_EMBEDDING_SCALE": 0.5,
+        "HAPPY_ALPHA": 0.3,
+        "HAPPY_BETA": 0.7,
+        "HAPPY_EMBEDDING_SCALE": 0.5,
+        "SAD_ALPHA": 0.3,
+        "SAD_BETA": 0.7,
+        "SAD_EMBEDDING_SCALE": 0.5,
+        "SURPRISE_ALPHA": 0.3,
+        "SURPRISE_BETA": 0.7,
+        "SURPRISE_EMBEDDING_SCALE": 0.5,
+    },
 }
 
 
@@ -71,322 +88,118 @@ def get_model_params(model_name="Amelia"):
 def create_emotion_config(model_name="Amelia"):
     params = get_model_params(model_name)
 
-    return {
-        # Format: "emotion": {"file": {"model_name": "file.wav"}, "alpha": float, "beta": float, "embedding_scale": float, "speed": float}
-        # Neutral emotions
-        "neutral": {
-            "file": {
-                "Amelia": "Amelia/neutral.wav",
-                "Eveland": "Eveland/neutral.wav",
-                "Gura": "Gura/neutral.wav",
-            },
-            "alpha": params["ALPHA"],
-            "beta": params["BETA"],
-            "embedding_scale": params["EMBEDDING_SCALE"],
-            "speed": 1.0,
+    # Define available character models and their fallbacks
+    AVAILABLE_CHARACTERS = ["Amelia", "Eveland", "Gura", "Shiori"]
+
+    # Centralized emotion definitions with audio file mappings
+    # Format: emotion_name: (audio_type, alpha_param, beta_param, embedding_param)
+    EMOTION_DEFINITIONS = {
+        # Neutral emotions - use neutral audio and default parameters
+        "neutral": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
+        "confusion": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
+        "caring": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
+        "curiosity": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
+        "desire": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
+        "relief": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
+        # Happy emotions - use happy audio and happy parameters
+        "admiration": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "amusement": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "approval": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "excitement": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "gratitude": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "joy": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "love": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "optimism": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        "pride": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
+        # Sad emotions - use sad audio and sad parameters
+        "disappointment": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        "embarrassment": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        "fear": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        "grief": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        "nervousness": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        "remorse": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        "sadness": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
+        # Angry emotions - use angry audio and angry parameters
+        "disapproval": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
+        "disgust": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
+        "anger": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
+        "annoyance": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
+        # Surprised emotions - use surprised audio and surprise parameters
+        "realization": (
+            "surprised",
+            "SURPRISE_ALPHA",
+            "SURPRISE_BETA",
+            "SURPRISE_EMBEDDING_SCALE",
+        ),
+        "surprise": (
+            "surprised",
+            "SURPRISE_ALPHA",
+            "SURPRISE_BETA",
+            "SURPRISE_EMBEDDING_SCALE",
+        ),
+    }
+
+    # Character audio file mapping with fallbacks for missing characters
+    CHARACTER_AUDIO_MAPPING = {
+        "Amelia": {
+            "neutral": "Amelia/neutral.wav",
+            "happy": "Amelia/happy.wav",
+            "sad": "Amelia/sad.wav",
+            "angry": "Amelia/angry.wav",
+            "surprised": "Amelia/surprised.wav",
         },
-        "confusion": {
-            "file": {
-                "Amelia": "Amelia/neutral.wav",
-                "Eveland": "Eveland/neutral.wav",
-                "Gura": "Gura/neutral.wav",
-            },
-            "alpha": params["ALPHA"],
-            "beta": params["BETA"],
-            "embedding_scale": params["EMBEDDING_SCALE"],
-            "speed": 1.0,
+        "Eveland": {
+            "neutral": "Eveland/neutral.wav",
+            "happy": "Eveland/happy.wav",
+            "sad": "Eveland/sad.wav",
+            "angry": "Eveland/angry.wav",
+            "surprised": "Eveland/surprised.wav",
         },
-        "caring": {
-            "file": {
-                "Amelia": "Amelia/neutral.wav",
-                "Eveland": "Eveland/neutral.wav",
-                "Gura": "Gura/neutral.wav",
-            },
-            "alpha": params["ALPHA"],
-            "beta": params["BETA"],
-            "embedding_scale": params["EMBEDDING_SCALE"],
-            "speed": 1.0,
+        "Gura": {
+            "neutral": "Gura/neutral.wav",
+            "happy": "Gura/happy.wav",
+            "sad": "Gura/sad.wav",
+            "angry": "Gura/angry.wav",
+            "surprised": "Gura/surprised.wav",
         },
-        "curiosity": {
-            "file": {
-                "Amelia": "Amelia/neutral.wav",
-                "Eveland": "Eveland/neutral.wav",
-                "Gura": "Gura/neutral.wav",
-            },
-            "alpha": params["ALPHA"],
-            "beta": params["BETA"],
-            "embedding_scale": params["EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "desire": {
-            "file": {
-                "Amelia": "Amelia/neutral.wav",
-                "Eveland": "Eveland/neutral.wav",
-                "Gura": "Gura/neutral.wav",
-            },
-            "alpha": params["ALPHA"],
-            "beta": params["BETA"],
-            "embedding_scale": params["EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "relief": {
-            "file": {
-                "Amelia": "Amelia/neutral.wav",
-                "Eveland": "Eveland/neutral.wav",
-                "Gura": "Gura/neutral.wav",
-            },
-            "alpha": params["ALPHA"],
-            "beta": params["BETA"],
-            "embedding_scale": params["EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        # Happy emotions
-        "admiration": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "amusement": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "approval": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "excitement": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "gratitude": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "joy": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "love": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "optimism": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "pride": {
-            "file": {
-                "Amelia": "Amelia/happy.wav",
-                "Eveland": "Eveland/happy.wav",
-                "Gura": "Gura/happy.wav",
-            },
-            "alpha": params["HAPPY_ALPHA"],
-            "beta": params["HAPPY_BETA"],
-            "embedding_scale": params["HAPPY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        # Sad emotions
-        "disappointment": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "embarrassment": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "fear": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "grief": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "nervousness": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "remorse": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "sadness": {
-            "file": {
-                "Amelia": "Amelia/sad.wav",
-                "Eveland": "Eveland/sad.wav",
-                "Gura": "Gura/sad.wav",
-            },
-            "alpha": params["SAD_ALPHA"],
-            "beta": params["SAD_BETA"],
-            "embedding_scale": params["SAD_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        # Angry emotions
-        "disapproval": {
-            "file": {
-                "Amelia": "Amelia/angry.wav",
-                "Eveland": "Eveland/angry.wav",
-                "Gura": "Gura/angry.wav",
-            },
-            "alpha": params["ANGRY_ALPHA"],
-            "beta": params["ANGRY_BETA"],
-            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "disgust": {
-            "file": {
-                "Amelia": "Amelia/angry.wav",
-                "Eveland": "Eveland/angry.wav",
-                "Gura": "Gura/angry.wav",
-            },
-            "alpha": params["ANGRY_ALPHA"],
-            "beta": params["ANGRY_BETA"],
-            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "anger": {
-            "file": {
-                "Amelia": "Amelia/angry.wav",
-                "Eveland": "Eveland/angry.wav",
-                "Gura": "Gura/angry.wav",
-            },
-            "alpha": params["ANGRY_ALPHA"],
-            "beta": params["ANGRY_BETA"],
-            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "annoyance": {
-            "file": {
-                "Amelia": "Amelia/angry.wav",
-                "Eveland": "Eveland/angry.wav",
-                "Gura": "Gura/angry.wav",
-            },
-            "alpha": params["ANGRY_ALPHA"],
-            "beta": params["ANGRY_BETA"],
-            "embedding_scale": params["ANGRY_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        # Surprised emotions
-        "realization": {
-            "file": {
-                "Amelia": "Amelia/surprised.wav",
-                "Eveland": "Eveland/surprised.wav",
-                "Gura": "Gura/surprised.wav",
-            },
-            "alpha": params["SURPRISE_ALPHA"],
-            "beta": params["SURPRISE_BETA"],
-            "embedding_scale": params["SURPRISE_EMBEDDING_SCALE"],
-            "speed": 1.0,
-        },
-        "surprise": {
-            "file": {
-                "Amelia": "Amelia/surprised.wav",
-                "Eveland": "Eveland/surprised.wav",
-                "Gura": "Gura/surprised.wav",
-            },
-            "alpha": params["SURPRISE_ALPHA"],
-            "beta": params["SURPRISE_BETA"],
-            "embedding_scale": params["SURPRISE_EMBEDDING_SCALE"],
-            "speed": 1.0,
+        "Shiori": {
+            # PLACEHOLDER: Using Amelia's audio until Shiori's audio files are available
+            "neutral": "Amelia/neutral.wav",
+            "happy": "Amelia/happy.wav",
+            "sad": "Amelia/sad.wav",
+            "angry": "Amelia/angry.wav",
+            "surprised": "Amelia/surprised.wav",
         },
     }
+
+    # Build the emotion config dynamically
+    emotion_config = {}
+
+    for emotion_name, (
+        audio_type,
+        alpha_param,
+        beta_param,
+        embedding_param,
+    ) in EMOTION_DEFINITIONS.items():
+        # Build file mapping for all characters
+        file_mapping = {}
+        for character in AVAILABLE_CHARACTERS:
+            if character in CHARACTER_AUDIO_MAPPING:
+                file_mapping[character] = CHARACTER_AUDIO_MAPPING[character][audio_type]
+            else:
+                # Fallback to Amelia if character not found
+                file_mapping[character] = CHARACTER_AUDIO_MAPPING["Amelia"][audio_type]
+
+        # Add emotion configuration
+        emotion_config[emotion_name] = {
+            "file": file_mapping,
+            "alpha": params[alpha_param],
+            "beta": params[beta_param],
+            "embedding_scale": params[embedding_param],
+            "speed": 1.0,
+        }
+
+    return emotion_config
 
 
 # Initialize EMOTION_CONFIG with default model (Amelia)
@@ -509,3 +322,51 @@ EMOTION_MAPPING = {
     "pleased": "happy",
     "disappointed": "sad",
 }
+
+
+def add_new_character(character_name, audio_files=None, use_fallback=True):
+    """
+    Utility function to easily add a new character to the system.
+
+    Args:
+        character_name (str): Name of the new character
+        audio_files (dict): Optional dictionary with audio file mappings
+                           Format: {"neutral": "path/to/neutral.wav", "happy": "path/to/happy.wav", ...}
+        use_fallback (bool): If True, uses Amelia's audio files as fallback for missing files
+
+    Example:
+        # Add new character with all audio files
+        add_new_character("Ina", {
+            "neutral": "Ina/neutral.wav",
+            "happy": "Ina/happy.wav",
+            "sad": "Ina/sad.wav",
+            "angry": "Ina/angry.wav",
+            "surprised": "Ina/surprised.wav"
+        })
+
+        # Add new character using Amelia's audio as placeholder
+        add_new_character("Ina", use_fallback=True)
+    """
+    # This function is for documentation purposes - the actual character addition
+    # should be done by modifying the CHARACTER_AUDIO_MAPPING and AVAILABLE_CHARACTERS
+    # in the create_emotion_config function above.
+
+    print(
+        f"""
+To add character '{character_name}':
+
+1. Add '{character_name}' to AVAILABLE_CHARACTERS list in create_emotion_config()
+2. Add entry to CHARACTER_AUDIO_MAPPING:
+   "{character_name}": {{
+       "neutral": "{character_name}/neutral.wav" if audio_files else "Amelia/neutral.wav",
+       "happy": "{character_name}/happy.wav" if audio_files else "Amelia/happy.wav", 
+       "sad": "{character_name}/sad.wav" if audio_files else "Amelia/sad.wav",
+       "angry": "{character_name}/angry.wav" if audio_files else "Amelia/angry.wav",
+       "surprised": "{character_name}/surprised.wav" if audio_files else "Amelia/surprised.wav"
+   }}
+3. Add character parameters to MODEL_PARAMS at the top of the file
+4. That's it! All emotions will be automatically configured.
+"""
+    )
+
+    return True

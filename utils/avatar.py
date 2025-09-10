@@ -132,6 +132,7 @@ class AnimatedCharacter:
             "Amelia": "asset/Background/Amelia/back.png",
             "Gura": "asset/Background/Gura/back.png",
             "Eveland": "asset/Background/Eveland/back.jpg",
+            "Shiori": "asset/Background/Shiori/back.png",
         }
         default_bg = char_bg_map.get(self.model_name)
         self.bg_files = []

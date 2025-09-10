@@ -26,6 +26,15 @@ logging.getLogger().setLevel(logging.ERROR)
 # Disable tokenizers parallelism warning
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+# Performance optimizations
+torch.backends.cudnn.benchmark = True
+torch.backends.cudnn.deterministic = False
+
+# VRAM optimization - Use minimal memory
+if torch.cuda.is_available():
+    torch.cuda.set_per_process_memory_fraction(0.4)  # Limit to 40% VRAM
+    torch.cuda.empty_cache()
+
 # Add StyleTTS2 directory to Python path
 styletts2_path = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "StyleTTS2"
@@ -59,12 +68,18 @@ class StyleTTS2Inference:
             "Amelia": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",
             "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
             "Gura": "nonoJDWAOIDAWKDA/Gura_reviewed_ft_StyleTTS2",
+            "Shiori": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",  # PLACEHOLDER: Using Amelia's voice until Shiori's voice model is available
         }
 
         self.model_name = model_name
         self.repo_id = repo_id if repo_id else self.model_configs[model_name]
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Using device: {self.device}")
+
+        # Smart device selection with cuDNN fallback
+        self.device = self._select_device_with_fallback()
+
+        # Apply memory optimizations
+        if self.device == "cuda":
+            torch.cuda.set_per_process_memory_fraction(0.8)  # Use max 80% of GPU memory
 
         # Create cache directory based on model name
         self.cache_dir = Path("cache/style") / model_name
@@ -86,10 +101,10 @@ class StyleTTS2Inference:
         random.seed(0)
         np.random.seed(0)
 
-        # Initialize mel spectrogram transform
+        # Initialize mel spectrogram transform with optimized settings
         self.to_mel = torchaudio.transforms.MelSpectrogram(
             n_mels=80, n_fft=2048, win_length=1200, hop_length=300
-        )
+        ).to(self.device)
         self.mean, self.std = -4, 4
 
         # Initialize phonemizer
@@ -100,7 +115,29 @@ class StyleTTS2Inference:
         # Load all necessary components
         self._load_components()
 
+        # Clear GPU cache after loading
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    def _select_device_with_fallback(self):
+        """Smart device selection with cuDNN fallback"""
+        if not torch.cuda.is_available():
+            return "cpu"
+
+        try:
+            # Test cuDNN availability by creating a simple convolution operation
+            test_tensor = torch.randn(1, 1, 3, 3).cuda()
+            conv = torch.nn.Conv2d(1, 1, 3).cuda()
+            with torch.no_grad():
+                _ = conv(test_tensor)
+            return "cuda"
+        except Exception as e:
+            print(f"⚠️ cuDNN not available, using CPU: {str(e)}")
+            return "cpu"
+
     def _download_file(self, filename):
+        """Download a file from the HuggingFace repository"""
+        return hf_hub_download(repo_id=self.repo_id, filename=filename)
         """Download a file from the HuggingFace repository"""
         return hf_hub_download(repo_id=self.repo_id, filename=filename)
 
@@ -201,7 +238,7 @@ class StyleTTS2Inference:
 
     def _preprocess(self, wave):
         """Preprocess audio waveform to mel spectrogram"""
-        wave_tensor = torch.from_numpy(wave).float()
+        wave_tensor = torch.from_numpy(wave).float().to(self.device)
         mel_tensor = self.to_mel(wave_tensor)
         mel_tensor = (torch.log(1e-5 + mel_tensor.unsqueeze(0)) - self.mean) / self.std
         return mel_tensor
@@ -279,9 +316,6 @@ class StyleTTS2Inference:
         max_chars = 800  # Conservative limit to stay well under 512 tokens
 
         if len(text) > max_chars:
-            print(
-                f"[WARNING] Text too long ({len(text)} chars), truncating to {max_chars} chars"
-            )
             text = text[:max_chars] + "..."
 
         return text
@@ -289,26 +323,61 @@ class StyleTTS2Inference:
     def inference(
         self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale, speed=1.0
     ):
-        """Generate speech from text"""
-        print(f"[DEBUG] StyleTTS2: Starting inference for text: '{text[:30]}...'")
+        """Generate speech from text with cuDNN error handling"""
+        try:
+            return self._inference_internal(
+                text, ref_s, alpha, beta, diffusion_steps, embedding_scale, speed
+            )
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "cudnn" in error_msg or "cuda" in error_msg:
+                print(f"⚠️ CUDA/cuDNN error detected: {e}")
+                print("🔄 Switching to CPU mode and retrying...")
 
+                # Switch to CPU mode
+                old_device = self.device
+                self.device = "cpu"
+
+                # Move models to CPU
+                try:
+                    for key in self.model:
+                        self.model[key] = self.model[key].cpu()
+
+                    # Retry inference on CPU
+                    result = self._inference_internal(
+                        text,
+                        ref_s,
+                        alpha,
+                        beta,
+                        diffusion_steps,
+                        embedding_scale,
+                        speed,
+                    )
+                    return result
+
+                except Exception as cpu_error:
+                    self.device = old_device  # Restore original device
+                    raise cpu_error
+            else:
+                # Re-raise non-CUDA errors
+                raise e
+
+    def _inference_internal(
+        self, text, ref_s, alpha, beta, diffusion_steps, embedding_scale, speed=1.0
+    ):
+        """Generate speech from text"""
         # Clean text minimally
         text = self.clean_text(text)
 
         if text == "":
             return np.zeros(0), 0.0
 
-        print(f"[DEBUG] StyleTTS2: Phonemizing text...")
         ps = self.global_phonemizer.phonemize([text])
         if not ps or not ps[0]:
-            print(f"Warning: Phonemizer returned empty for text: '{text}'")
             return np.zeros(0, dtype=np.float32), 0.0
 
         ps = word_tokenize(ps[0])
         ps = " ".join(ps)
-        print(f"[DEBUG] StyleTTS2: Phonemized text: '{ps[:50]}...'")
-
-        # Convert to tokens using the simple TextCleaner
         tokens = self.text_cleaner(ps)
         if not tokens:  # If tokenization failed
             raise ValueError("Text tokenization failed")
@@ -316,9 +385,6 @@ class StyleTTS2Inference:
         # Check token length to prevent tensor size mismatch
         max_tokens = 512  # StyleTTS2 maximum sequence length
         if len(tokens) > max_tokens:
-            print(
-                f"[WARNING] Token sequence too long ({len(tokens)} tokens), truncating to {max_tokens} tokens"
-            )
             tokens = tokens[:max_tokens]
 
         tokens.insert(0, 0)  # Add start token
@@ -329,21 +395,14 @@ class StyleTTS2Inference:
         text_mask = self._length_to_mask(input_lengths).to(self.device)
 
         # Use no_grad for inference
-        print(f"[DEBUG] StyleTTS2: Starting model inference...")
         with torch.inference_mode():
-            print(f"[DEBUG] StyleTTS2: Running text encoder...")
             t_en = self.model.text_encoder(tokens, input_lengths, text_mask)
-            print(f"[DEBUG] StyleTTS2: Running BERT...")
             bert_dur = self.model.bert(tokens, attention_mask=(~text_mask).int())
-            print(f"[DEBUG] StyleTTS2: Running BERT encoder...")
             d_en = self.model.bert_encoder(bert_dur).transpose(-1, -2)
 
             # Create noise directly on the device
             noise = torch.randn((1, 256), device=self.device).unsqueeze(1)
 
-            print(
-                f"[DEBUG] StyleTTS2: Starting diffusion sampling with {diffusion_steps} steps..."
-            )
             s_pred = self.sampler(
                 noise=noise,
                 embedding=bert_dur,
@@ -351,7 +410,6 @@ class StyleTTS2Inference:
                 features=ref_s,
                 num_steps=diffusion_steps,
             ).squeeze(1)
-            print(f"[DEBUG] StyleTTS2: Diffusion sampling completed")
 
             s = s_pred[:, 128:]
             ref = s_pred[:, :128]
@@ -401,5 +459,8 @@ class StyleTTS2Inference:
 
             out = self.model.decoder(asr, F0_pred, N_pred, ref.squeeze().unsqueeze(0))
 
-        print(f"[DEBUG] StyleTTS2: Inference completed, returning audio")
+        # Clean up VRAM after inference
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         return out.squeeze().cpu().numpy()[5000:-5000]
