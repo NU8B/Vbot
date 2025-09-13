@@ -69,6 +69,7 @@ class StyleTTS2Inference:
             "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
             "Gura": "nonoJDWAOIDAWKDA/Gura_reviewed_ft_StyleTTS2",
             "Shiori": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",  # PLACEHOLDER: Using Amelia's voice until Shiori's voice model is available
+            "Wilson": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",  # Wilson's TTS model
         }
 
         self.model_name = model_name

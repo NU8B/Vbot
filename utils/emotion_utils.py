@@ -76,6 +76,23 @@ MODEL_PARAMS = {
         "SURPRISE_BETA": 0.7,
         "SURPRISE_EMBEDDING_SCALE": 0.5,
     },
+    "Wilson": {
+        "ALPHA": 0.3,
+        "BETA": 0.7,
+        "EMBEDDING_SCALE": 0.4,
+        "ANGRY_ALPHA": 0.3,
+        "ANGRY_BETA": 0.7,
+        "ANGRY_EMBEDDING_SCALE": 0.5,
+        "HAPPY_ALPHA": 0.3,
+        "HAPPY_BETA": 0.7,
+        "HAPPY_EMBEDDING_SCALE": 0.5,
+        "SAD_ALPHA": 0.3,
+        "SAD_BETA": 0.7,
+        "SAD_EMBEDDING_SCALE": 0.5,
+        "SURPRISE_ALPHA": 0.3,
+        "SURPRISE_BETA": 0.7,
+        "SURPRISE_EMBEDDING_SCALE": 0.5,
+    },
 }
 
 
@@ -89,7 +106,7 @@ def create_emotion_config(model_name="Amelia"):
     params = get_model_params(model_name)
 
     # Define available character models and their fallbacks
-    AVAILABLE_CHARACTERS = ["Amelia", "Eveland", "Gura", "Shiori"]
+    AVAILABLE_CHARACTERS = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
 
     # Centralized emotion definitions with audio file mappings
     # Format: emotion_name: (audio_type, alpha_param, beta_param, embedding_param)
@@ -169,6 +186,13 @@ def create_emotion_config(model_name="Amelia"):
             "sad": "Amelia/sad.wav",
             "angry": "Amelia/angry.wav",
             "surprised": "Amelia/surprised.wav",
+        },
+        "Wilson": {
+            "neutral": "Wilson/neutral.wav",
+            "happy": "Wilson/happy.wav",
+            "sad": "Wilson/sad.wav",
+            "angry": "Wilson/angry.wav",
+            "surprised": "Wilson/surprised.wav",
         },
     }
 

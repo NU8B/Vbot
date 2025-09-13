@@ -58,7 +58,14 @@ class AnimatedCharacter:
                 self.bg_color = f.read().strip()
         except:
             # Default background colors for each model
-            self.bg_color = "#2b2b3b" if self.model_name == "Eveland" else "#ffd05c"
+            model_colors = {
+                "Amelia": "#ffd05c",
+                "Eveland": "#2b2b3b",
+                "Gura": "#4a90e2",
+                "Shiori": "#85318c",
+                "Wilson": "#8eeefe",
+            }
+            self.bg_color = model_colors.get(self.model_name, "#2b2b3b")
 
         # Update model path to match the new structure
         self.model_path = model_path or Path(
@@ -133,6 +140,7 @@ class AnimatedCharacter:
             "Gura": "asset/Background/Gura/back.png",
             "Eveland": "asset/Background/Eveland/back.jpg",
             "Shiori": "asset/Background/Shiori/back.png",
+            "Wilson": "asset/Background/Wilson/back.png",
         }
         default_bg = char_bg_map.get(self.model_name)
         self.bg_files = []
@@ -918,7 +926,7 @@ class AnimatedCharacter:
             self.bg_names = []
 
     def _load_selected_background(self):
-        """Load the currently selected background image"""
+        """Load the currently selected background image with proper aspect ratio handling"""
         try:
             if (
                 hasattr(self, "bg_files")
@@ -928,9 +936,27 @@ class AnimatedCharacter:
             ):
                 img = wx.Image(self.bg_files[self.selected_bg_idx], wx.BITMAP_TYPE_ANY)
                 if img.IsOk():
-                    # Scale background to window size (720p)
-                    w, h = self.width, self.height
-                    img = img.Scale(w, h, wx.IMAGE_QUALITY_HIGH)
+                    # Scale background maintaining aspect ratio to avoid stretching
+                    window_w, window_h = self.width, self.height
+                    img_w, img_h = img.GetWidth(), img.GetHeight()
+                    
+                    # Calculate scaling to fit while maintaining aspect ratio
+                    scale_w = window_w / img_w
+                    scale_h = window_h / img_h
+                    scale = max(scale_w, scale_h)  # Scale to cover the entire window
+                    
+                    new_w = int(img_w * scale)
+                    new_h = int(img_h * scale)
+                    
+                    # Scale the image
+                    img = img.Scale(new_w, new_h, wx.IMAGE_QUALITY_HIGH)
+                    
+                    # Center crop if needed
+                    if new_w > window_w or new_h > window_h:
+                        crop_x = max(0, (new_w - window_w) // 2)
+                        crop_y = max(0, (new_h - window_h) // 2)
+                        img = img.GetSubImage(wx.Rect(crop_x, crop_y, window_w, window_h))
+                    
                     self.background_bitmap = wx.Bitmap(img)
                 else:
                     self.background_bitmap = None

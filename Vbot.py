@@ -84,15 +84,19 @@ class ModernChatGUI(ChatGUI):
         self.subtitle_update_queue = queue.Queue()
 
         # Available models
-        self.available_models = ["Amelia", "Eveland", "Gura", "Shiori"]
+        self.available_models = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
         self.current_model_index = (
             0
             if self.model_name == "Amelia"
             else (
                 1
                 if self.model_name == "Eveland"
-                else (2 if self.model_name == "Gura" else 3)
-            )  # Shiori
+                else (
+                    2
+                    if self.model_name == "Gura"
+                    else (3 if self.model_name == "Shiori" else 4)
+                )
+            )  # Wilson
         )
 
         # Main container - use neutral background color
@@ -173,8 +177,16 @@ class ModernChatGUI(ChatGUI):
                 else (
                     "#318fc5"
                     if self.model_name == "Eveland"
-                    else ("#4a90e2" if self.model_name == "Gura" else "#85318c")
-                )  # Shiori purple
+                    else (
+                        "#4a90e2"
+                        if self.model_name == "Gura"
+                        else (
+                            "#85318c"
+                            if self.model_name == "Shiori"
+                            else "#8eeefe"  # Wilson light blue
+                        )
+                    )
+                )
             ),
             fg="black",
             relief=tk.FLAT,
@@ -277,6 +289,10 @@ class ModernChatGUI(ChatGUI):
                 self.character_btn.configure(bg="#3a7bc8")
             elif self.model_name == "Shiori":
                 self.character_btn.configure(bg="#6e297a")
+            elif self.model_name == "Wilson":
+                self.character_btn.configure(
+                    bg="#6dd2ea"
+                )  # Darker Wilson blue on hover
             else:  # Default to Amelia
                 self.character_btn.configure(bg="#e6bb53")
 
@@ -289,6 +305,8 @@ class ModernChatGUI(ChatGUI):
                 self.character_btn.configure(bg="#4a90e2")
             elif self.model_name == "Shiori":
                 self.character_btn.configure(bg="#85318c")
+            elif self.model_name == "Wilson":
+                self.character_btn.configure(bg="#8eeefe")  # Wilson light blue
             else:  # Default to Amelia
                 self.character_btn.configure(bg="#ffd05c")
 
@@ -814,6 +832,8 @@ class ModernChatGUI(ChatGUI):
             self.character_btn.configure(bg="#4a90e2")
         elif character_name == "Shiori":
             self.character_btn.configure(bg="#85318c")
+        elif character_name == "Wilson":
+            self.character_btn.configure(bg="#8eeefe")
         else:  # Default to Amelia
             self.character_btn.configure(bg="#ffd05c")
 
@@ -1067,7 +1087,7 @@ def main():
     MODEL_NAME = args.model
 
     # Check if model is valid
-    available_models = ["Amelia", "Eveland", "Gura", "Shiori"]
+    available_models = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
     if MODEL_NAME not in available_models:
         print(f"Error: Invalid model name '{MODEL_NAME}'.")
         print(f"Available models: {', '.join(available_models)}")
