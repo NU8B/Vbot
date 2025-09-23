@@ -180,12 +180,11 @@ def create_emotion_config(model_name="Amelia"):
             "surprised": "Gura/surprised.wav",
         },
         "Shiori": {
-            # PLACEHOLDER: Using Amelia's audio until Shiori's audio files are available
-            "neutral": "Amelia/neutral.wav",
-            "happy": "Amelia/happy.wav",
-            "sad": "Amelia/sad.wav",
-            "angry": "Amelia/angry.wav",
-            "surprised": "Amelia/surprised.wav",
+            "neutral": "Shiori/neutral.wav",
+            "happy": "Shiori/happy.wav",
+            "sad": "Shiori/sad.wav",
+            "angry": "Shiori/angry.wav",
+            "surprised": "Shiori/surprised.wav",
         },
         "Wilson": {
             "neutral": "Wilson/neutral.wav",

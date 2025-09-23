@@ -30,7 +30,7 @@ DISCARD_THRESHOLD = 1.0  # Discard segments shorter than 1 second
 MIN_DURATION = 3.0  # Minimum segment duration in seconds
 MAX_DURATION = 7.5  # Maximum segment duration in seconds
 COMBINE_SILENCE_GAP = 1.0  # Silence duration between combined segments in seconds
-SKIP_CHECK = True  # Set to True to skip quality checks and accept all segments
+SKIP_CHECK = False  # Set to True to skip quality checks and accept all segments
 
 # Audio segmentation settings
 SEGMENT_SETTINGS = {

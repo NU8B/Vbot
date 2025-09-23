@@ -14,8 +14,8 @@ from utils.initialization_utils import InitializationHandler
 # Suppress all warnings
 warnings.filterwarnings("ignore")
 
-# Model selection - can be changed to "Eveland" or "Amelia"
-MODEL_NAME = os.getenv('VOICE_TYPE', 'Amelia') 
+# Model selection - can be changed to "Eveland", "Amelia", "Gura", "Shiori", or "Wilson"
+MODEL_NAME = os.getenv("VOICE_TYPE", "Amelia")
 
 # Verify model directory exists
 model_dir = Path(f"asset/model/{MODEL_NAME}")
