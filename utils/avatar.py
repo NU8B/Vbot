@@ -213,18 +213,69 @@ class AnimatedCharacter:
             self.cached_character_image = self.character_model.get_character_image(
                 self.device
             )
-            self.poser = self.character_model.get_poser(self.device)
-            print("Character image and poser loaded successfully")
+            print(f"📸 Character image cached: {self.cached_character_image.shape if self.cached_character_image is not None else 'None'}")
+            
+            # Load poser with error handling
+            try:
+                print(f"Loading poser for model at: {self.model_path}")
+                print(f"Face morpher file: {self.character_model.face_morpher_file_name}")
+                print(f"Body morpher file: {self.character_model.body_morpher_file_name}")
+                
+                # Check if morpher files exist
+                import os
+                face_exists = os.path.exists(self.character_model.face_morpher_file_name)
+                body_exists = os.path.exists(self.character_model.body_morpher_file_name)
+                print(f"Face morpher exists: {face_exists}")
+                print(f"Body morpher exists: {body_exists}")
+                
+                if not face_exists or not body_exists:
+                    print("❌ Missing morpher files - cannot create poser")
+                    self.poser = None
+                    return
+                
+                self.poser = self.character_model.get_poser(self.device)
+                
+                if self.poser is None:
+                    print("❌ Poser creation returned None")
+                    print("This usually indicates corrupted or incompatible model files")
+                    return
+                
+                # Debug: Check poser structure
+                print(f"✅ Poser created successfully: {type(self.poser).__name__}")
+                if hasattr(self.poser, 'modules'):
+                    if self.poser.modules is not None:
+                        print(f"📋 Poser modules: {list(self.poser.modules.keys())}")
+                    else:
+                        print("⚠️ Poser.modules is None")
+                else:
+                    print("⚠️ Poser has no modules attribute")
+                    
+                print("Character image and poser loaded successfully")
+                
+                # Verify that the poser has the required modules
+                if hasattr(self.poser, 'modules') and self.poser.modules is not None:
+                    print(f"Poser modules loaded: {list(self.poser.modules.keys())}")
+                else:
+                    print("Warning: Poser does not have modules attribute or modules is None")
+                    
+            except Exception as e:
+                print(f"Error loading poser: {e}")
+                import traceback
+                traceback.print_exc()
+                print("Attempting to continue without poser...")
+                self.poser = None
+                return
 
-            # Initialize parameter mapping
-            self.param_mapping = {
-                # Face rotation
-                "head_x": self.get_parameter_index(
-                    PoseParameterCategory.FACE_ROTATION, "head_x"
-                ),
-                "head_y": self.get_parameter_index(
-                    PoseParameterCategory.FACE_ROTATION, "head_y"
-                ),
+            # Initialize parameter mapping only if poser is available
+            if self.poser is not None:
+                self.param_mapping = {
+                    # Face rotation
+                    "head_x": self.get_parameter_index(
+                        PoseParameterCategory.FACE_ROTATION, "head_x"
+                    ),
+                    "head_y": self.get_parameter_index(
+                        PoseParameterCategory.FACE_ROTATION, "head_y"
+                    ),
                 "neck_z": self.get_parameter_index(
                     PoseParameterCategory.FACE_ROTATION, "neck_z"
                 ),
@@ -315,8 +366,14 @@ class AnimatedCharacter:
                 "breathing": self.get_parameter_index(
                     PoseParameterCategory.BREATHING, "breathing"
                 ),
-            }
-            print("Parameter mapping initialized successfully")
+                }
+                print("Parameter mapping initialized successfully")
+            else:
+                print("⚠️ Poser not available - avatar will display static image only")
+                self.param_mapping = {}
+                # Display the static character image immediately
+                if self.cached_character_image is not None:
+                    self._display_static_image()
 
         except Exception as e:
             print(f"Error loading character model: {str(e)}")
@@ -335,12 +392,14 @@ class AnimatedCharacter:
             self.last_update_time = current_time
 
             if self.poser is None:
+                # If no poser available, display static character image
+                if self.cached_character_image is not None:
+                    self._display_static_image()
                 return
 
             # Create pose parameters
             pose = [0.0] * self.poser.num_parameters
             animation_values = None
-
             # Get animation values based on emotion and maintain it
             if self.target_emotion == "happy":
                 animation_values = self.happy_animation.update(delta_time)
@@ -610,6 +669,8 @@ class AnimatedCharacter:
         self, category: PoseParameterCategory, param_name: str = None
     ) -> int:
         """Get the parameter index for a given category and name"""
+        if self.poser is None:
+            return -1
         params = self.poser.get_pose_parameter_groups()
         for param in params:
             if param.get_category() == category:
@@ -733,22 +794,111 @@ class AnimatedCharacter:
             torch.cuda.empty_cache()
 
     def _generate_output_image(self, pose):
-        with torch.no_grad():
-            output_image = self.poser.pose(self.cached_character_image, pose)
-            output_image = output_image[0].detach().cpu()
-            output_image = convert_output_image_from_torch_to_numpy(output_image)
+        try:
+            with torch.no_grad():
+                output_image = self.poser.pose(self.cached_character_image, pose)
+                output_image = output_image[0].detach().cpu()
+                output_image = convert_output_image_from_torch_to_numpy(output_image)
+        except KeyError as e:
+            if 'body_morpher' in str(e):
+                print(f"Error in animation update: {e}")
+                print("This indicates a problem with the character model files.")
+                print("Using fallback: returning cached character image")
+                # Return the cached character image as fallback
+                try:
+                    if self.cached_character_image.dim() == 4:
+                        fallback_image = self.cached_character_image[0].detach().cpu()
+                    else:
+                        fallback_image = self.cached_character_image.detach().cpu()
+                    output_image = convert_output_image_from_torch_to_numpy(fallback_image)
+                except Exception as fallback_error:
+                    print(f"Error in fallback image processing: {fallback_error}")
+                    # Create a blank image as last resort
+                    output_image = np.zeros((512, 512, 4), dtype=np.uint8)
+                    output_image[:, :, 3] = 255  # Set alpha to opaque
+            else:
+                raise
+        except Exception as e:
+            print(f"Unexpected error in animation update: {e}")
+            # Return the cached character image as fallback
+            try:
+                if self.cached_character_image.dim() == 4:
+                    fallback_image = self.cached_character_image[0].detach().cpu()
+                else:
+                    fallback_image = self.cached_character_image.detach().cpu()
+                output_image = convert_output_image_from_torch_to_numpy(fallback_image)
+            except Exception as fallback_error:
+                print(f"Error in fallback image processing: {fallback_error}")
+                # Create a blank image as last resort
+                output_image = np.zeros((512, 512, 4), dtype=np.uint8)
+                output_image[:, :, 3] = 255  # Set alpha to opaque
 
-            # Convert to bitmap with AI upscaling
+        # Convert to bitmap with AI upscaling
+        if len(output_image.shape) == 3 and output_image.shape[2] == 4:
+            output_image = output_image.copy(order="C")
+
+            # Check if we need to upscale - OPTIMIZED FOR PERFORMANCE
+            needs_upscaling = (
+                output_image.shape[1] != self.width
+                or output_image.shape[0] != self.height
+            )
+
+            # Use fast standard scaling (AI upscaling disabled for performance)
+            if needs_upscaling:
+                wx_image = self._fallback_upscale_wx(output_image)
+            else:
+                # No scaling needed
+                wx_image = wx.Image(output_image.shape[1], output_image.shape[0])
+                wx_image.SetData(output_image[:, :, :3].tobytes())
+                wx_image.SetAlpha(output_image[:, :, 3].tobytes())
+
+            self.result_bitmap = wx.Bitmap(wx_image)
+
+            # Periodic memory cleanup - OPTIMIZED
+            if (
+                self.frame_count % 60 == 0 and torch.cuda.is_available()
+            ):  # Every 60 frames instead of every frame
+                torch.cuda.empty_cache()
+
+            # Clear intermediate tensors
+            del output_image
+            del pose
+
+            # Request redraw
+            self.panel.Refresh()
+        else:
+            print(f"Error: Invalid image format - shape: {output_image.shape}")
+
+    def _display_static_image(self):
+        """Display the static character image when poser is not available"""
+        try:
+            if self.cached_character_image is None:
+                return
+                
+            # Convert cached character image to displayable format
+            try:
+                if self.cached_character_image.dim() == 4:
+                    static_image = self.cached_character_image[0].detach().cpu()
+                else:
+                    static_image = self.cached_character_image.detach().cpu()
+                output_image = convert_output_image_from_torch_to_numpy(static_image)
+            except Exception as tensor_error:
+                print(f"Error processing cached character image: {tensor_error}")
+                # Create a blank image as fallback
+                output_image = np.zeros((512, 512, 4), dtype=np.uint8)
+                output_image[:, :, 3] = 255  # Set alpha to opaque
+            
+            # Convert to bitmap
             if len(output_image.shape) == 3 and output_image.shape[2] == 4:
                 output_image = output_image.copy(order="C")
 
-                # Check if we need to upscale - OPTIMIZED FOR PERFORMANCE
+                # Check if we need to upscale
                 needs_upscaling = (
                     output_image.shape[1] != self.width
                     or output_image.shape[0] != self.height
                 )
 
-                # Use fast standard scaling (AI upscaling disabled for performance)
+                # Use standard scaling
                 if needs_upscaling:
                     wx_image = self._fallback_upscale_wx(output_image)
                 else:
@@ -759,20 +909,11 @@ class AnimatedCharacter:
 
                 self.result_bitmap = wx.Bitmap(wx_image)
 
-                # Periodic memory cleanup - OPTIMIZED
-                if (
-                    self.frame_count % 60 == 0 and torch.cuda.is_available()
-                ):  # Every 60 frames instead of every frame
-                    torch.cuda.empty_cache()
-
-                # Clear intermediate tensors
-                del output_image
-                del pose
-
                 # Request redraw
                 self.panel.Refresh()
-            else:
-                print(f"Error: Invalid image format - shape: {output_image.shape}")
+                
+        except Exception as e:
+            print(f"Error displaying static image: {e}")
 
     def _fallback_upscale_wx(self, output_image):
         """Enhanced fallback upscaling using wx with better quality settings."""
