@@ -50,6 +50,8 @@ class AnimatedCharacter:
         self.width = width
         self.height = height
         self.model_name = os.getenv("VOICE_TYPE", "Amelia")
+        print(f"🎭 AnimatedCharacter initializing with model: {self.model_name}")
+        print(f"🔍 VOICE_TYPE environment variable: {os.getenv('VOICE_TYPE')}")
 
         # Get background color from bg_color.txt or use model-specific defaults
         bg_color_path = Path(f"asset/model/{self.model_name}/bg_color.txt")

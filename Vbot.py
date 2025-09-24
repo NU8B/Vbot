@@ -23,6 +23,8 @@ from utils.gui import ChatGUI
 from utils.initialization_utils import InitializationHandler
 from utils.avatar import AnimatedCharacter
 from utils.performance_boost import performance_monitor, memory_manager
+from utils.welcome_screen import show_welcome_screen
+from utils.user_preferences import should_show_welcome_screen, get_last_selected_avatar
 
 # Suppress all warnings and optimize for performance
 warnings.filterwarnings("ignore")
@@ -909,6 +911,16 @@ class ModernChatGUI(ChatGUI):
             command=self._add_new_background,
             font=("Arial", 11, "italic"),
         )
+        
+        # Add separator
+        menu.add_separator()
+        
+        # Add "Change Avatar" option
+        menu.add_command(
+            label="  🔄 Change Avatar",
+            command=self._show_avatar_selection,
+            font=("Arial", 11, "bold"),
+        )
 
         # Show menu at button position
         x = self.background_btn.winfo_rootx()
@@ -1026,6 +1038,38 @@ class ModernChatGUI(ChatGUI):
     def set_model_switch_callback(self, callback):
         """Set callback for model switching"""
         self.on_model_switch = callback
+    
+    def _show_avatar_selection(self):
+        """Show avatar selection dialog"""
+        if self.is_processing:
+            return
+        
+        try:
+            from utils.welcome_screen import show_welcome_screen
+            from utils.user_preferences import record_avatar_selection
+            
+            def on_avatar_selected(selected_avatar: str):
+                """Handle avatar selection from welcome screen"""
+                if selected_avatar != self.model_name:
+                    # Record the selection
+                    record_avatar_selection(selected_avatar)
+                    
+                    # Switch to the new avatar
+                    self._select_character(selected_avatar)
+            
+            # Hide current window temporarily
+            self.root.withdraw()
+            
+            # Show welcome screen
+            show_welcome_screen(on_avatar_selected)
+            
+            # Restore window when done
+            self.root.deiconify()
+            
+        except Exception as e:
+            print(f"Error showing avatar selection: {e}")
+            # Restore window if error occurred
+            self.root.deiconify()
 
     def cleanup(self):
         """Clean up resources before shutdown"""
@@ -1055,43 +1099,20 @@ class ModernChatGUI(ChatGUI):
             print(f"Cleanup error: {e}")
 
 
-def main():
+def launch_main_app(selected_model: str, device_index: int = None):
+    """Launch the main Vbot application with the selected model"""
     # Apply initial optimizations
     memory_manager.optimize_pytorch()
     print(f"💾 Memory optimizations applied")
 
-    # Get default device index
-    p = pyaudio.PyAudio()
-    try:
-        default_device_index = p.get_default_input_device_info()["index"]
-    except IOError:
-        default_device_index = None
-    p.terminate()
-
-    # Setup command-line argument parsing
-    parser = argparse.ArgumentParser(description="Vbot Voice Assistant")
-    parser.add_argument(
-        "--model",
-        type=str,
-        default=os.getenv("MODEL_NAME", "Amelia"),
-        help="Name of the model to use (e.g., Amelia, Eveland, Gura, Shiori)",
-    )
-    parser.add_argument(
-        "--device-index",
-        type=int,
-        default=default_device_index,
-        help="Index of the audio input device to use.",
-    )
-    args = parser.parse_args()
-
-    MODEL_NAME = args.model
+    MODEL_NAME = selected_model
 
     # Check if model is valid
     available_models = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
     if MODEL_NAME not in available_models:
         print(f"Error: Invalid model name '{MODEL_NAME}'.")
         print(f"Available models: {', '.join(available_models)}")
-        sys.exit(1)
+        return
 
     # List available models from StyleTTS2
     from utils.inference_styleTTS2 import StyleTTS2Inference
@@ -1104,14 +1125,14 @@ def main():
         print("Available models in config:")
         for model in available_models:
             print(f"- {model}")
-        sys.exit(1)
+        return
 
     # Initialize components with optimized startup
     print(f"🚀 Starting Vbot with {MODEL_NAME} model...")
     performance_monitor.start_timer("main_initialization")
 
     init_handler = InitializationHandler(
-        model_name=MODEL_NAME, device_index=args.device_index
+        model_name=MODEL_NAME, device_index=device_index
     )
     components = init_handler.initialize_all()
 
@@ -1253,6 +1274,64 @@ def main():
 
     # Start the application
     root.mainloop()
+
+
+def main():
+    """Main entry point - shows welcome screen first, then launches app"""
+    # Get default device index
+    p = pyaudio.PyAudio()
+    try:
+        default_device_index = p.get_default_input_device_info()["index"]
+    except IOError:
+        default_device_index = None
+    p.terminate()
+
+    # Setup command-line argument parsing
+    parser = argparse.ArgumentParser(description="Vbot Voice Assistant")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,  # Changed to None to force welcome screen
+        help="Name of the model to use (e.g., Amelia, Eveland, Gura, Shiori). If not specified, welcome screen will be shown.",
+    )
+    parser.add_argument(
+        "--device-index",
+        type=int,
+        default=default_device_index,
+        help="Index of the audio input device to use.",
+    )
+    parser.add_argument(
+        "--skip-welcome",
+        action="store_true",
+        help="Skip the welcome screen and use default model (Amelia)",
+    )
+    args = parser.parse_args()
+
+    # Determine whether to show welcome screen
+    show_welcome = should_show_welcome_screen()
+    
+    # If model is specified via command line or skip-welcome flag, launch directly
+    if args.model or args.skip_welcome:
+        model_name = args.model or "Amelia"
+        print(f"🚀 Launching directly with {model_name} model...")
+        launch_main_app(model_name, args.device_index)
+    elif not show_welcome:
+        # User has used the app before and has preferences - use last selected avatar
+        last_avatar = get_last_selected_avatar()
+        model_name = last_avatar or "Amelia"
+        print(f"🚀 Welcome back! Launching with your preferred avatar: {model_name}")
+        launch_main_app(model_name, args.device_index)
+    else:
+        # Show welcome screen for new users or when requested
+        print("👋 Welcome to Vbot! Please select your AI companion...")
+        
+        def on_avatar_selected(selected_avatar: str):
+            """Callback when user selects an avatar from welcome screen"""
+            print(f"✨ Selected avatar: {selected_avatar}")
+            launch_main_app(selected_avatar, args.device_index)
+        
+        # Show the welcome screen
+        show_welcome_screen(on_avatar_selected)
 
 
 if __name__ == "__main__":
