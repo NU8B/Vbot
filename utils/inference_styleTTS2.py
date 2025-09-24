@@ -69,7 +69,7 @@ class StyleTTS2Inference:
             "Eveland": "nonoJDWAOIDAWKDA/Eveland1_ft_StyleTTS2",
             "Gura": "nonoJDWAOIDAWKDA/Gura_reviewed_ft_StyleTTS2",
             "Shiori": "nonoJDWAOIDAWKDA/Shiori_reviewed_ft_StyleTTS2",
-            "Wilson": "nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2",  # Wilson's TTS model
+            "Wilson": "nonoJDWAOIDAWKDA/Wilson_reviewed_ft_StyleTTS2",  # Wilson's dedicated TTS model
         }
 
         self.model_name = model_name
