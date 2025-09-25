@@ -506,10 +506,13 @@ class SeamlessVbotInterface:
         self.main_container.destroy()
         
         # Create chat GUI in the root window (it will create its own layout)
+        # Get the actual voice toggle function (not a lambda that returns it)
+        voice_toggle_func = self._get_voice_toggle_callback(correct_model_data)
+        
         self.chat_gui = ModernChatGUI(
             self.root,
             correct_model_data["ollama_handler"].handle_text_input_simple,
-            lambda: self._get_voice_toggle_callback(correct_model_data),
+            voice_toggle_func,  # Pass the actual function, not a lambda
             model_name=self.selected_avatar
         )
         
