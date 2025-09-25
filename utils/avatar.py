@@ -213,7 +213,6 @@ class AnimatedCharacter:
             self.cached_character_image = self.character_model.get_character_image(
                 self.device
             )
-            print(f"📸 Character image cached: {self.cached_character_image.shape if self.cached_character_image is not None else 'None'}")
             
             # Load poser with error handling
             try:
@@ -237,18 +236,7 @@ class AnimatedCharacter:
                 
                 if self.poser is None:
                     print("❌ Poser creation returned None")
-                    print("This usually indicates corrupted or incompatible model files")
                     return
-                
-                # Debug: Check poser structure
-                print(f"✅ Poser created successfully: {type(self.poser).__name__}")
-                if hasattr(self.poser, 'modules'):
-                    if self.poser.modules is not None:
-                        print(f"📋 Poser modules: {list(self.poser.modules.keys())}")
-                    else:
-                        print("⚠️ Poser.modules is None")
-                else:
-                    print("⚠️ Poser has no modules attribute")
                     
                 print("Character image and poser loaded successfully")
                 
@@ -371,9 +359,6 @@ class AnimatedCharacter:
             else:
                 print("⚠️ Poser not available - avatar will display static image only")
                 self.param_mapping = {}
-                # Display the static character image immediately
-                if self.cached_character_image is not None:
-                    self._display_static_image()
 
         except Exception as e:
             print(f"Error loading character model: {str(e)}")
@@ -805,33 +790,15 @@ class AnimatedCharacter:
                 print("This indicates a problem with the character model files.")
                 print("Using fallback: returning cached character image")
                 # Return the cached character image as fallback
-                try:
-                    if self.cached_character_image.dim() == 4:
-                        fallback_image = self.cached_character_image[0].detach().cpu()
-                    else:
-                        fallback_image = self.cached_character_image.detach().cpu()
-                    output_image = convert_output_image_from_torch_to_numpy(fallback_image)
-                except Exception as fallback_error:
-                    print(f"Error in fallback image processing: {fallback_error}")
-                    # Create a blank image as last resort
-                    output_image = np.zeros((512, 512, 4), dtype=np.uint8)
-                    output_image[:, :, 3] = 255  # Set alpha to opaque
+                fallback_image = self.cached_character_image[0].detach().cpu()
+                output_image = convert_output_image_from_torch_to_numpy(fallback_image)
             else:
                 raise
         except Exception as e:
             print(f"Unexpected error in animation update: {e}")
             # Return the cached character image as fallback
-            try:
-                if self.cached_character_image.dim() == 4:
-                    fallback_image = self.cached_character_image[0].detach().cpu()
-                else:
-                    fallback_image = self.cached_character_image.detach().cpu()
-                output_image = convert_output_image_from_torch_to_numpy(fallback_image)
-            except Exception as fallback_error:
-                print(f"Error in fallback image processing: {fallback_error}")
-                # Create a blank image as last resort
-                output_image = np.zeros((512, 512, 4), dtype=np.uint8)
-                output_image[:, :, 3] = 255  # Set alpha to opaque
+            fallback_image = self.cached_character_image[0].detach().cpu()
+            output_image = convert_output_image_from_torch_to_numpy(fallback_image)
 
         # Convert to bitmap with AI upscaling
         if len(output_image.shape) == 3 and output_image.shape[2] == 4:
@@ -876,17 +843,8 @@ class AnimatedCharacter:
                 return
                 
             # Convert cached character image to displayable format
-            try:
-                if self.cached_character_image.dim() == 4:
-                    static_image = self.cached_character_image[0].detach().cpu()
-                else:
-                    static_image = self.cached_character_image.detach().cpu()
-                output_image = convert_output_image_from_torch_to_numpy(static_image)
-            except Exception as tensor_error:
-                print(f"Error processing cached character image: {tensor_error}")
-                # Create a blank image as fallback
-                output_image = np.zeros((512, 512, 4), dtype=np.uint8)
-                output_image[:, :, 3] = 255  # Set alpha to opaque
+            static_image = self.cached_character_image[0].detach().cpu()
+            output_image = convert_output_image_from_torch_to_numpy(static_image)
             
             # Convert to bitmap
             if len(output_image.shape) == 3 and output_image.shape[2] == 4:
