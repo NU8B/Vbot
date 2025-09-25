@@ -341,6 +341,7 @@ class AnimatedCharacter:
 
             # Get animation values based on emotion and maintain it
             if self.target_emotion == "happy":
+                print(f"[ANIMATION DEBUG] Updating HAPPY animation (delta_time: {delta_time:.3f})")
                 animation_values = self.happy_animation.update(delta_time)
 
                 # Apply happy-specific parameters
@@ -380,6 +381,7 @@ class AnimatedCharacter:
                     pose[eye_happy_index + 1] = 0.6
 
             elif self.target_emotion == "sad":
+                print(f"[ANIMATION DEBUG] Updating SAD animation (delta_time: {delta_time:.3f})")
                 animation_values = self.sad_animation.update(delta_time)
 
                 # Handle eye parameters
@@ -427,6 +429,7 @@ class AnimatedCharacter:
                     pose[head_y_index] = -0.3  # Tilt head down
 
             elif self.target_emotion == "angry":
+                print(f"[ANIMATION DEBUG] Updating ANGRY animation (delta_time: {delta_time:.3f})")
                 animation_values = self.angry_animation.update(delta_time)
 
                 # Handle eye parameters
@@ -459,6 +462,7 @@ class AnimatedCharacter:
                     pose[eyebrow_angry_index + 1] = 0.8
 
             elif self.target_emotion == "surprise":
+                print(f"[ANIMATION DEBUG] Updating SURPRISE animation (delta_time: {delta_time:.3f})")
                 animation_values = self.surprise_animation.update(delta_time)
 
                 # Handle eye parameters
@@ -486,6 +490,7 @@ class AnimatedCharacter:
                     pose[iris_small_index + 1] = -0.2
 
             else:  # neutral/idle
+                print(f"[ANIMATION DEBUG] Updating IDLE/NEUTRAL animation (target_emotion: {self.target_emotion}, delta_time: {delta_time:.3f})")
                 animation_values = self.idle_animation.update(delta_time)
 
             # Apply common animation values
@@ -671,7 +676,8 @@ class AnimatedCharacter:
 
     def set_emotion(self, emotion: str):
         """Set the target emotion for animation transition"""
-        print(f"[DEBUG] Raw emotion from classifier: {emotion}")
+        print(f"[AVATAR EMOTION DEBUG] Raw emotion from classifier: {emotion}")
+        print(f"[AVATAR EMOTION DEBUG] Current target emotion: {self.target_emotion}")
 
         # Map RoBERTa emotions to our animation states
         emotion_mapping = {
@@ -717,8 +723,12 @@ class AnimatedCharacter:
 
         # Only update if emotion actually changes
         if mapped_emotion != self.target_emotion:
+            old_emotion = self.target_emotion
             self.target_emotion = mapped_emotion
-            print(f"[DEBUG] Setting emotion to: {self.target_emotion}")
+            print(f"[AVATAR EMOTION DEBUG] Emotion changed from '{old_emotion}' to '{self.target_emotion}'")
+            print(f"[AVATAR EMOTION DEBUG] Animation will switch to: {self.target_emotion}")
+        else:
+            print(f"[AVATAR EMOTION DEBUG] Emotion unchanged, staying at: {self.target_emotion}")
 
     def start_speaking(self):
         """Called when character starts speaking"""

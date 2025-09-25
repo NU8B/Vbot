@@ -260,16 +260,21 @@ class EmotionHandler:
 
     def classify_emotion(self, text):
         """Classify the emotion of the given text using RoBERTa."""
+        print(f"[EMOTION CLASSIFIER DEBUG] Input text: '{text}'")
         result = self.emotion_classifier(text)
         emotion = result[0][0]["label"]
         confidence = result[0][0]["score"]
+        print(f"[EMOTION CLASSIFIER DEBUG] Raw classification: {emotion} (confidence: {confidence:.3f})")
 
         # Store confidence for later use
         self._last_confidence = confidence
 
         # Use neutral for low confidence predictions
         if confidence < 0.3:
+            print(f"[EMOTION CLASSIFIER DEBUG] Low confidence ({confidence:.3f}), using neutral instead")
             emotion = "neutral"
+        else:
+            print(f"[EMOTION CLASSIFIER DEBUG] High confidence, keeping emotion: {emotion}")
 
         return emotion
 

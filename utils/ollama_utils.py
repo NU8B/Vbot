@@ -30,7 +30,7 @@ Key traits to incorporate:
 - Supportive of teammates
 - Sometimes chaotic/gremlin energy 
 
-    You are not to break character under any circumstances. You should speak in first person and make references to time travel. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
+    You are not to break character under any circumstances. You should speak in first person and make references to time travel. Keep your responses natural and conversational, typically 1-3 sentences. IMPORTANT: Keep responses under 400 characters total. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
 """,
     "Eveland": """ You are Ike Eveland, a novelist from the past who is part of NIJISANJI EN's Luxiem group. You are somewhat closed-off but become animated when discussing your interests. You have a gentle, mild-mannered personality but can be unexpectedly chaotic and make jokes when people least expect it. You are Swedish and occasionally make references to this fact.
 
@@ -42,7 +42,7 @@ Key traits to incorporate:
 - Swedish background
 - Self-deprecating humor 
 
-You are not to break character under any circumstances. You should speak in first person. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
+You are not to break character under any circumstances. You should speak in first person. Keep your responses natural and conversational, typically 1-3 sentences. IMPORTANT: Keep responses under 400 characters total. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
 """,
     "Gura": """ You are Gawr Gura, the apex predator shark from hololive English -Myth-. You are playful, energetic, and have a childlike sense of wonder. Despite claiming to be an apex predator, you're actually quite friendly and endearing.
 
@@ -55,7 +55,7 @@ Key traits to incorporate:
 - Enjoys teasing but is ultimately sweet and caring
 - Sometimes acts tough but is actually quite soft-hearted
 
-You are not to break character under any circumstances. You should speak in first person and make shark references when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
+You are not to break character under any circumstances. You should speak in first person and make shark references when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. IMPORTANT: Keep responses under 400 characters total. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *Gremlin Mode*). NEVER use asterisks for any reason.
 """,
     "Shiori": """ You are Shiori Novella, the archivist from hololive English -Advent-. You are mysterious, curious, and have a deep fascination with knowledge and stories. You possess an otherworldly charm and speak with an air of ancient wisdom.
 
@@ -68,7 +68,7 @@ Key traits to incorporate:
 - Curious about human nature and experiences
 - Sometimes cryptic or philosophical in responses
 
-You are not to break character under any circumstances. You should speak in first person and reference your love of stories and knowledge when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *mysterious smile*). NEVER use asterisks for any reason.
+You are not to break character under any circumstances. You should speak in first person and reference your love of stories and knowledge when appropriate. Keep your responses natural and conversational, typically 1-3 sentences. IMPORTANT: Keep responses under 400 characters total. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *mysterious smile*). NEVER use asterisks for any reason.
 """,
 }
 
@@ -485,9 +485,16 @@ class OllamaHandler:
             avatar = self.gui.get_avatar()
 
             # Set initial emotion based on user input
+            print(f"[EMOTION DEBUG] Classifying user input: '{text}'")
             user_emotion = self.emotion_handler.classify_emotion(text)
+            user_confidence = self.emotion_handler.get_last_confidence()
+            print(f"[EMOTION DEBUG] User emotion: {user_emotion} (confidence: {user_confidence:.2f})")
             if avatar:
+                print(f"[EMOTION DEBUG] Setting avatar emotion to: {user_emotion}")
                 avatar.set_emotion(user_emotion)
+                print(f"[EMOTION DEBUG] Avatar current emotion after setting: {avatar.target_emotion}")
+            else:
+                print(f"[EMOTION DEBUG] No avatar available to set emotion")
 
             # Get system prompt for the current model
             system_prompt = self.get_current_prompt()
@@ -508,9 +515,16 @@ class OllamaHandler:
                 for sentence in sentences:
                     if sentence.strip():
                         # Get emotion for the sentence
+                        print(f"[EMOTION DEBUG] Classifying AI sentence: '{sentence[:50]}...'")
                         ai_emotion = self.emotion_handler.classify_emotion(sentence)
+                        ai_confidence = self.emotion_handler.get_last_confidence()
+                        print(f"[EMOTION DEBUG] AI emotion: {ai_emotion} (confidence: {ai_confidence:.2f})")
                         if avatar:
+                            print(f"[EMOTION DEBUG] Setting avatar emotion to: {ai_emotion}")
                             avatar.set_emotion(ai_emotion)
+                            print(f"[EMOTION DEBUG] Avatar current emotion after setting: {avatar.target_emotion}")
+                        else:
+                            print(f"[EMOTION DEBUG] No avatar available to set emotion")
 
                         # Synthesize audio for the sentence
                         print(f"[DEBUG] Starting TTS for sentence: {sentence[:50]}...")
@@ -741,6 +755,21 @@ class OllamaHandler:
                     f"[DEBUG] Text truncated to {len(words[:100])} words to prevent TTS errors"
                 )
 
+            # Classify emotion before TTS processing
+            print(f"[EMOTION DEBUG] Classifying text for TTS: '{text[:50]}...'")
+            ai_emotion = self.emotion_handler.classify_emotion(text)
+            ai_confidence = self.emotion_handler.get_last_confidence()
+            print(f"[EMOTION DEBUG] TTS emotion: {ai_emotion} (confidence: {ai_confidence:.2f})")
+            
+            # Set avatar emotion BEFORE TTS processing
+            avatar = self.gui.get_avatar() if self.gui else None
+            if avatar:
+                print(f"[EMOTION DEBUG] Setting avatar emotion to: {ai_emotion}")
+                avatar.set_emotion(ai_emotion)
+                print(f"[EMOTION DEBUG] Avatar current emotion after setting: {avatar.target_emotion}")
+            else:
+                print(f"[EMOTION DEBUG] No avatar available to set emotion")
+
             # Process text through TTS pipeline
             tts_start = time.time()
             speech, detected_emotion, style_path = self.inference_handler.process_text(
@@ -757,6 +786,7 @@ class OllamaHandler:
             print(
                 f"[DEBUG] Simple TTS: Generated {duration:.2f}s of audio in {tts_time:.2f}s"
             )
+            print(f"[EMOTION DEBUG] TTS detected emotion: {detected_emotion} (from inference handler)")
 
             # Show subtitle with the text
             if self.gui:
@@ -965,6 +995,20 @@ class OllamaHandler:
 
             # Update chat with user input
             self.gui.update_chat("You", text)
+            
+            # Classify user emotion and set avatar emotion
+            print(f"[EMOTION DEBUG] Classifying user input: '{text}'")
+            user_emotion = self.emotion_handler.classify_emotion(text)
+            user_confidence = self.emotion_handler.get_last_confidence()
+            print(f"[EMOTION DEBUG] User emotion: {user_emotion} (confidence: {user_confidence:.2f})")
+            
+            avatar = self.gui.get_avatar() if self.gui else None
+            if avatar:
+                print(f"[EMOTION DEBUG] Setting avatar emotion to user emotion: {user_emotion}")
+                avatar.set_emotion(user_emotion)
+                print(f"[EMOTION DEBUG] Avatar current emotion after setting: {avatar.target_emotion}")
+            else:
+                print(f"[EMOTION DEBUG] No avatar available to set emotion")
 
             # Get LLM response
             print("[DEBUG] Simple TTS: Getting LLM response...")

@@ -435,10 +435,10 @@ class ModernChatGUI(ChatGUI):
                 main_width = self.root.winfo_width()
                 main_height = self.root.winfo_height()
 
-                subtitle_x = main_x + (main_width - 800) // 2
-                subtitle_y = main_y + main_height - 200  # 50px from bottom
+                subtitle_x = main_x + (main_width - 900) // 2
+                subtitle_y = main_y + main_height - 250  # More space from bottom
 
-                self.subtitle_window.geometry(f"800x150+{subtitle_x}+{subtitle_y}")
+                self.subtitle_window.geometry(f"900x200+{subtitle_x}+{subtitle_y}")
         except Exception as e:
             print(f"[ERROR] Failed to update subtitle position: {e}")
 
@@ -540,7 +540,7 @@ class ModernChatGUI(ChatGUI):
         if self.subtitle_window is None or not self.subtitle_window.winfo_exists():
             self.subtitle_window = tk.Toplevel(self.root)
             self.subtitle_window.title("Subtitles")
-            self.subtitle_window.geometry("800x150")
+            self.subtitle_window.geometry("900x200")  # Made wider and taller
             self.subtitle_window.configure(bg="#000000")
 
             # Make window stay on top and remove decorations
@@ -548,7 +548,7 @@ class ModernChatGUI(ChatGUI):
             self.subtitle_window.overrideredirect(True)
 
             # Set 50% opacity for the background
-            self.subtitle_window.attributes("-alpha", 0.7)
+            self.subtitle_window.attributes("-alpha", 0.8)  # Slightly more opaque
 
             # Position at bottom center of main window
             main_x = self.root.winfo_x()
@@ -556,51 +556,58 @@ class ModernChatGUI(ChatGUI):
             main_width = self.root.winfo_width()
             main_height = self.root.winfo_height()
 
-            subtitle_x = main_x + (main_width - 800) // 2
-            subtitle_y = main_y + main_height - 200  # 50px from bottom
+            subtitle_x = main_x + (main_width - 900) // 2
+            subtitle_y = main_y + main_height - 250  # More space from bottom
 
-            self.subtitle_window.geometry(f"800x150+{subtitle_x}+{subtitle_y}")
+            self.subtitle_window.geometry(f"900x200+{subtitle_x}+{subtitle_y}")
 
-            # Create subtitle text widget
+            # Create a frame for the text widget and scrollbar
+            text_frame = tk.Frame(self.subtitle_window, bg="#000000")
+            text_frame.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+            # Create scrollbar
+            scrollbar = tk.Scrollbar(text_frame, bg="#333333", troughcolor="#000000")
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # Create subtitle text widget with scrollbar
             self.subtitle_text = tk.Text(
-                self.subtitle_window,
+                text_frame,
                 bg="#000000",
                 fg="#FFFFFF",
-                font=("Arial", 16, "bold"),
+                font=("Arial", 14, "bold"),  # Slightly smaller font
                 wrap=tk.WORD,
                 relief=tk.FLAT,
-                padx=20,
-                pady=20,
-                height=4,
+                padx=15,
+                pady=15,
+                height=6,  # More lines
                 state="disabled",
+                yscrollcommand=scrollbar.set,
             )
-            self.subtitle_text.pack(expand=True, fill=tk.BOTH)
+            self.subtitle_text.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+            
+            # Configure scrollbar
+            scrollbar.config(command=self.subtitle_text.yview)
 
             # Configure text tags for different styles
             self.subtitle_text.tag_configure(
-                "current", foreground="#00FF00", font=("Arial", 16, "bold")
+                "current", foreground="#00FF00", font=("Arial", 14, "bold")
             )
             self.subtitle_text.tag_configure(
-                "completed", foreground="#888888", font=("Arial", 16)
+                "completed", foreground="#CCCCCC", font=("Arial", 14)
             )
 
     def show_subtitle(self, text, duration=None):
-        """Show subtitle text with optional duration - CHUNK-BASED VERSION."""
+        """Show subtitle text - FULL TEXT VERSION with scrolling."""
         try:
             if not self.subtitle_window or not self.subtitle_window.winfo_exists():
                 self.create_subtitle_window()
-
-            # Split text into sentences
-            sentences = self._split_into_sentences(text)
-            if not sentences:
-                return
 
             # Show subtitle window
             self.subtitle_window.deiconify()
             self.is_showing_subtitle = True
 
-            # Start displaying sentences
-            self._display_sentences(sentences, total_duration=duration)
+            # Display the full text at once
+            self.update_subtitle(text)
 
             # Schedule hiding the subtitle after audio duration (if provided)
             if duration:
@@ -610,7 +617,7 @@ class ModernChatGUI(ChatGUI):
             else:
                 # Fallback to hide after a reasonable time if no duration is given
                 self.subtitle_timer = self.root.after(
-                    len(text) * 100, self.hide_subtitle
+                    max(5000, len(text) * 50), self.hide_subtitle  # At least 5 seconds
                 )
 
         except Exception as e:
@@ -688,14 +695,16 @@ class ModernChatGUI(ChatGUI):
             print(f"[ERROR] Failed to hide subtitle: {e}")
 
     def update_subtitle(self, text):
-        """Update the current subtitle text."""
+        """Update the current subtitle text with auto-scrolling."""
         try:
             if self.subtitle_text and self.is_showing_subtitle:
                 self.subtitle_text.configure(state="normal")
                 self.subtitle_text.delete(1.0, tk.END)
                 self.subtitle_text.insert(tk.END, text, "current")
                 self.subtitle_text.configure(state="disabled")
+                # Auto-scroll to bottom to show the latest text
                 self.subtitle_text.see(tk.END)
+                print(f"[SUBTITLE DEBUG] Updated subtitle with text: '{text[:50]}...'")
         except Exception as e:
             print(f"[ERROR] Failed to update subtitle: {e}")
 
