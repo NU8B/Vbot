@@ -13,7 +13,7 @@ import time
 
 # Import PIL for image handling
 try:
-    from PIL import Image, ImageTk
+    from PIL import Image, ImageTk, ImageDraw
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
@@ -55,6 +55,7 @@ class SeamlessVbotInterface:
         # Avatar selection UI
         self.avatar_frames = {}
         self.avatar_images = {}  # Store loaded images
+        self.avatar_buttons = {}  # Store button references
         self.continue_btn = None
         
         # Avatar image mapping
@@ -67,12 +68,12 @@ class SeamlessVbotInterface:
         }
         
     def _load_avatar_image(self, avatar_name: str, size: tuple = (120, 120)):
-        """Load and resize avatar image"""
+        """Load and resize avatar image with rounded corners"""
         if not PIL_AVAILABLE:
             return None
             
         # Check if already loaded
-        cache_key = f"{avatar_name}_{size[0]}x{size[1]}"
+        cache_key = f"{avatar_name}_{size[0]}x{size[1]}_rounded"
         if cache_key in self.avatar_images:
             return self.avatar_images[cache_key]
             
@@ -104,15 +105,18 @@ class SeamlessVbotInterface:
                 img.thumbnail(size, Image.Resampling.LANCZOS)
                 
                 # Create a new image with the exact size and center the resized image
-                final_img = Image.new('RGB', size, (59, 59, 75))  # Dark background color
+                final_img = Image.new('RGB', size, (90, 90, 90))  # Gray background color
                 
                 # Calculate position to center the image
                 x = (size[0] - img.width) // 2
                 y = (size[1] - img.height) // 2
                 final_img.paste(img, (x, y))
                 
+                # Create rounded version
+                rounded_img = self._create_rounded_image(final_img, 15)  # 15px radius for images
+                
                 # Convert to PhotoImage
-                photo = ImageTk.PhotoImage(final_img)
+                photo = ImageTk.PhotoImage(rounded_img)
                 
                 # Cache the image
                 self.avatar_images[cache_key] = photo
@@ -123,6 +127,51 @@ class SeamlessVbotInterface:
             return None
             
         return None
+    
+    def _create_rounded_image(self, img, radius):
+        """Create a rounded version of an image"""
+        try:
+            # Create a mask for rounded corners
+            mask = Image.new('L', img.size, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.rounded_rectangle([(0, 0), img.size], radius=radius, fill=255)
+            
+            # Apply the mask to create rounded corners
+            rounded = Image.new('RGBA', img.size, (0, 0, 0, 0))
+            rounded.paste(img, (0, 0))
+            rounded.putalpha(mask)
+            
+            return rounded
+        except Exception as e:
+            print(f"❌ Error creating rounded image: {e}")
+            return img
+    
+    def _create_rounded_button_bg(self, width, height, radius, color):
+        """Create a rounded rectangle background for buttons"""
+        if not PIL_AVAILABLE:
+            return None
+            
+        try:
+            # Create image with transparent background
+            img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(img)
+            
+            # Convert hex color to RGB
+            if color.startswith('#'):
+                color = color[1:]
+            rgb_color = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+            
+            # Draw rounded rectangle
+            draw.rounded_rectangle(
+                [(0, 0), (width-1, height-1)], 
+                radius=radius, 
+                fill=rgb_color + (255,)  # Add alpha
+            )
+            
+            return ImageTk.PhotoImage(img)
+        except Exception as e:
+            print(f"❌ Error creating rounded button: {e}")
+            return None
         
     def initialize(self):
         """Initialize the main window and start the loading process"""
@@ -130,7 +179,7 @@ class SeamlessVbotInterface:
         self.root = tk.Tk()
         self.root.title("Vbot - AI Companion")
         self.root.geometry(self.selection_window_size)
-        self.root.configure(bg="#1a1a2e")
+        self.root.configure(bg="#3c3c3c")  # Match the dark gray from reference
         self.root.resizable(True, True)
         
         # Center window with selection size
@@ -140,7 +189,7 @@ class SeamlessVbotInterface:
         self.root.geometry(f"{self.selection_window_size}+{x}+{y}")
         
         # Create main container
-        self.main_container = tk.Frame(self.root, bg="#1a1a2e")
+        self.main_container = tk.Frame(self.root, bg="#3c3c3c")
         self.main_container.pack(expand=True, fill=tk.BOTH)
         
         # REMOVED: No more preloading - go straight to welcome screen
@@ -198,7 +247,7 @@ class SeamlessVbotInterface:
     def _create_welcome_ui(self):
         """Create the welcome screen UI"""
         # Header
-        header_frame = tk.Frame(self.main_container, bg="#1a1a2e", height=120)
+        header_frame = tk.Frame(self.main_container, bg="#3c3c3c", height=120)
         header_frame.pack(fill=tk.X, padx=20, pady=(20, 0))
         header_frame.pack_propagate(False)
         
@@ -208,7 +257,7 @@ class SeamlessVbotInterface:
             text="Choose Your AI Companion",
             font=("Arial", 28, "bold"),
             fg="#ffffff",
-            bg="#1a1a2e"
+            bg="#3c3c3c"
         )
         title_label.pack(pady=(20, 5))
         
@@ -217,19 +266,19 @@ class SeamlessVbotInterface:
             header_frame,
             text="All models are ready! Select your preferred avatar to continue.",
             font=("Arial", 14),
-            fg="#4CAF50",  # Green to indicate ready status
-            bg="#1a1a2e"
+            fg="#a0a0a0",  # Softer gray for subtitle
+            bg="#3c3c3c"
         )
         subtitle_label.pack()
         
         # Avatar selection area
-        content_frame = tk.Frame(self.main_container, bg="#1a1a2e")
+        content_frame = tk.Frame(self.main_container, bg="#3c3c3c")
         content_frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
         
         # Create scrollable frame for avatars
-        canvas = tk.Canvas(content_frame, bg="#1a1a2e", highlightthickness=0)
+        canvas = tk.Canvas(content_frame, bg="#3c3c3c", highlightthickness=0)
         scrollbar = ttk.Scrollbar(content_frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg="#1a1a2e")
+        scrollable_frame = tk.Frame(canvas, bg="#3c3c3c")
         
         scrollable_frame.bind(
             "<Configure>",
@@ -239,9 +288,9 @@ class SeamlessVbotInterface:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        # Create avatar cards
+        # Create avatar cards with better space utilization
         avatars = self.avatar_recommender.get_all_avatars()
-        cols = 3
+        cols = 3  # 3 columns for optimal space usage
         
         for i, avatar_name in enumerate(avatars):
             row = i // cols
@@ -252,14 +301,31 @@ class SeamlessVbotInterface:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
         
-        # Mousewheel support (bind to canvas specifically, not globally)
+        # Enhanced mousewheel support with better responsiveness
         def _on_mousewheel(event):
             try:
-                canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+                # More responsive scrolling - scroll by 3 units instead of 1
+                canvas.yview_scroll(int(-3*(event.delta/120)), "units")
             except tk.TclError:
                 # Canvas might be destroyed, ignore the error
                 pass
+        
+        # Bind mousewheel to multiple elements for better coverage
         canvas.bind("<MouseWheel>", _on_mousewheel)
+        scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
+        
+        # Also bind to the main container for when mouse is outside canvas
+        def _on_container_mousewheel(event):
+            try:
+                # Check if mouse is over the content area
+                x, y = self.main_container.winfo_pointerxy()
+                widget = self.main_container.winfo_containing(x, y)
+                if widget and (widget == canvas or widget in canvas.winfo_children()):
+                    canvas.yview_scroll(int(-3*(event.delta/120)), "units")
+            except tk.TclError:
+                pass
+        
+        self.main_container.bind("<MouseWheel>", _on_container_mousewheel)
         
         # Store canvas reference for cleanup
         self.welcome_canvas = canvas
@@ -279,16 +345,19 @@ class SeamlessVbotInterface:
         # REMOVED: No more preloader - all models are available for selection
         is_loaded = True  # All avatars are now selectable
         
-        # Main card frame
+        # Main card frame with rounded appearance - LARGER SIZE
         card_frame = tk.Frame(
             parent,
-            bg="#2b2b3b" if is_loaded else "#3d3d3d",
-            relief=tk.RAISED,
-            borderwidth=2,
-            padx=15,
-            pady=15
+            bg="#4a4a4a" if is_loaded else "#3d3d3d",
+            relief=tk.FLAT,  # Remove raised border for modern look
+            borderwidth=0,
+            padx=30,  # Increased padding
+            pady=30   # Increased padding
         )
-        card_frame.grid(row=row, column=col, padx=15, pady=15, sticky="nsew")
+        card_frame.grid(row=row, column=col, padx=25, pady=25, sticky="nsew")  # Increased spacing
+        
+        # Add rounded corner effect by configuring the frame
+        card_frame.configure(highlightbackground="#5a5a5a", highlightthickness=1)
         
         # Configure grid weights
         parent.grid_columnconfigure(col, weight=1)
@@ -310,81 +379,148 @@ class SeamlessVbotInterface:
         )
         status_label.pack(anchor="ne")
         
-        # Avatar image
-        image_frame = tk.Frame(card_frame, bg="#3b3b4b", width=120, height=120)
-        image_frame.pack(pady=(0, 10))
+        # Avatar image with rounded frame - LARGER SIZE
+        image_size = 180  # Increased from 120 to 180
+        image_frame = tk.Frame(card_frame, bg=card_frame["bg"], width=image_size, height=image_size, relief=tk.FLAT)
+        image_frame.pack(pady=(0, 20))  # Increased spacing
         image_frame.pack_propagate(False)
         
-        # Try to load real avatar image
-        avatar_photo = self._load_avatar_image(avatar_name, (120, 120))
+        # Try to load real avatar image (now with rounded corners) - LARGER SIZE
+        avatar_photo = self._load_avatar_image(avatar_name, (image_size, image_size))
         
         if avatar_photo:
-            # Use real image
+            # Use real image (already rounded)
             image_label = tk.Label(
                 image_frame,
                 image=avatar_photo,
-                bg="#3b3b4b"
+                bg=card_frame["bg"],
+                borderwidth=0,
+                highlightthickness=0
             )
             image_label.pack(expand=True)
             # Keep a reference to prevent garbage collection
             image_label.image = avatar_photo
         else:
-            # Fallback to placeholder emoji
+            # Fallback to placeholder emoji with rounded background - LARGER SIZE
+            placeholder_bg = self._create_rounded_button_bg(image_size, image_size, 20, "#5a5a5a")
             placeholder_label = tk.Label(
                 image_frame,
                 text="👤",
-                font=("Arial", 36),
+                font=("Arial", 54),  # Increased font size
                 fg=avatar_info.get("color", "#ffffff"),
-                bg="#3b3b4b"
+                bg=card_frame["bg"],
+                borderwidth=0,
+                highlightthickness=0
             )
+            if placeholder_bg:
+                placeholder_label.config(image=placeholder_bg, compound=tk.CENTER)
+                placeholder_label.image = placeholder_bg
+            else:
+                placeholder_label.config(bg="#5a5a5a")
             placeholder_label.pack(expand=True)
         
-        # Avatar name
+        # Avatar name - LARGER FONT
         name_label = tk.Label(
             card_frame,
             text=avatar_info.get("name", avatar_name),
-            font=("Arial", 14, "bold"),
+            font=("Arial", 18, "bold"),  # Increased from 14 to 18
             fg="#ffffff",
             bg=card_frame["bg"]
         )
-        name_label.pack(pady=(0, 5))
+        name_label.pack(pady=(0, 8))  # Increased spacing
         
-        # Personality
+        # Personality with better visibility
+        personality_text = avatar_info.get("personality", "")
+        personality_color = avatar_info.get("color", "#b0b0b0")
+        
+        # Ensure good contrast - make dark colors lighter and light colors more visible
+        if personality_color in ["#85318c", "#8eeefe"]:  # Shiori's purple and Wilson's cyan
+            # Use lighter, more visible versions
+            if personality_color == "#85318c":  # Shiori's purple
+                personality_color = "#c478d1"  # Lighter purple
+            elif personality_color == "#8eeefe":  # Wilson's cyan  
+                personality_color = "#5dd9f0"  # Slightly darker cyan
+        
         personality_label = tk.Label(
             card_frame,
-            text=avatar_info.get("personality", ""),
-            font=("Arial", 10),
-            fg=avatar_info.get("color", "#b0b0b0"),
+            text=personality_text,
+            font=("Arial", 13, "bold"),  # Increased from 10 to 13
+            fg=personality_color,
             bg=card_frame["bg"]
         )
-        personality_label.pack(pady=(0, 10))
+        personality_label.pack(pady=(0, 15))  # Increased spacing
         
-        # Select button (only enabled if model is loaded)
+        # Select button with rounded pill style
+        btn_color = avatar_info.get("color", "#4a90e2") if is_loaded else "#666666"
+        
+        # Create rounded button background - LARGER SIZE
+        btn_width, btn_height = 150, 50  # Increased from 120x40 to 150x50
+        btn_bg = self._create_rounded_button_bg(btn_width, btn_height, 25, btn_color)
+        
         select_btn = tk.Button(
             card_frame,
             text="Select" if is_loaded else "Not Available",
-            font=("Arial", 11, "bold"),
-            bg=avatar_info.get("color", "#4a90e2") if is_loaded else "#666666",
-            fg="black" if is_loaded else "#999999",
+            font=("Arial", 14, "bold"),  # Increased from 11 to 14
+            fg="white" if is_loaded else "#999999",
             relief=tk.FLAT,
-            padx=15,
-            pady=6,
             state="normal" if is_loaded else "disabled",
-            command=lambda name=avatar_name: self._select_avatar(name) if is_loaded else None
+            command=lambda name=avatar_name: self._select_avatar(name) if is_loaded else None,
+            borderwidth=0,
+            cursor="hand2" if is_loaded else "arrow",
+            highlightthickness=0
         )
-        select_btn.pack()
+        
+        # Apply rounded background if available
+        if btn_bg:
+            select_btn.config(image=btn_bg, compound=tk.CENTER, bg=card_frame["bg"])
+            select_btn.image = btn_bg  # Keep reference
+        else:
+            # Fallback to regular styling
+            select_btn.config(
+                bg=btn_color,
+                padx=25,
+                pady=10
+            )
+        
+        select_btn.pack(pady=(10, 0))
+        
+        # Store button reference for later updates
+        self.avatar_buttons[avatar_name] = select_btn
         
         # Hover effects (only for loaded models)
         if is_loaded:
             def on_enter(e, frame=card_frame, btn=select_btn, color=avatar_info.get("color", "#4a90e2")):
-                frame.configure(bg="#3b3b4b")
+                if avatar_name == self.selected_avatar:
+                    # Selected card hover - make it even more dramatic
+                    frame.configure(bg="#7a7a7a", highlightbackground=color, highlightthickness=5)
+                else:
+                    # Regular hover
+                    frame.configure(bg="#5a5a5a", highlightbackground="#7a7a7a", highlightthickness=2)
+                
                 darker_color = self._darken_color(color)
-                btn.configure(bg=darker_color)
+                # Create hover state rounded button - LARGER SIZE
+                hover_bg = self._create_rounded_button_bg(150, 50, 25, darker_color)
+                if hover_bg:
+                    btn.config(image=hover_bg)
+                    btn.image = hover_bg
+                else:
+                    btn.configure(bg=darker_color)
             
             def on_leave(e, frame=card_frame, btn=select_btn, color=avatar_info.get("color", "#4a90e2")):
-                if avatar_name != self.selected_avatar:
-                    frame.configure(bg="#2b2b3b")
-                btn.configure(bg=color)
+                if avatar_name == self.selected_avatar:
+                    # Restore selected state
+                    frame.configure(bg="#6a6a6a", highlightbackground=color, highlightthickness=4)
+                else:
+                    # Restore unselected state
+                    frame.configure(bg="#4a4a4a", highlightbackground="#5a5a5a", highlightthickness=1)
+                
+                # Restore original button background - LARGER SIZE
+                original_bg = self._create_rounded_button_bg(150, 50, 25, color)
+                if original_bg:
+                    btn.config(image=original_bg)
+                    btn.image = original_bg
+                else:
+                    btn.configure(bg=color)
             
             card_frame.bind("<Enter>", on_enter)
             card_frame.bind("<Leave>", on_leave)
@@ -403,55 +539,114 @@ class SeamlessVbotInterface:
     
     def _create_welcome_footer(self):
         """Create footer with action buttons"""
-        footer_frame = tk.Frame(self.main_container, bg="#1a1a2e", height=80)
+        footer_frame = tk.Frame(self.main_container, bg="#3c3c3c", height=80)
         footer_frame.pack(fill=tk.X, padx=20, pady=(0, 20))
         footer_frame.pack_propagate(False)
         
-        # Continue button
+        # Continue button with rounded pill style
+        continue_bg = self._create_rounded_button_bg(160, 50, 25, "#4a90e2")
+        
         self.continue_btn = tk.Button(
             footer_frame,
             text="Continue",
             font=("Arial", 14, "bold"),
-            bg="#4a90e2",
             fg="white",
             relief=tk.FLAT,
-            padx=30,
-            pady=12,
             state="disabled",
-            command=self._continue_to_chat
+            command=self._continue_to_chat,
+            borderwidth=0,
+            cursor="hand2",
+            highlightthickness=0
         )
+        
+        if continue_bg:
+            self.continue_btn.config(image=continue_bg, compound=tk.CENTER, bg="#3c3c3c")
+            self.continue_btn.image = continue_bg
+        else:
+            self.continue_btn.config(bg="#4a90e2", padx=40, pady=15)
+            
         self.continue_btn.pack(side=tk.RIGHT, pady=20)
         
-        # Recommendation button
+        # Recommendation button with rounded pill style
+        recommend_bg = self._create_rounded_button_bg(180, 45, 22, "#6a6a6a")
+        
         recommend_btn = tk.Button(
             footer_frame,
             text="Get Recommendation",
             font=("Arial", 12),
-            bg="#2d2d44",
             fg="white",
             relief=tk.FLAT,
-            padx=20,
-            pady=10,
-            command=self._show_recommendation_dialog
+            command=self._show_recommendation_dialog,
+            borderwidth=0,
+            cursor="hand2",
+            highlightthickness=0
         )
+        
+        if recommend_bg:
+            recommend_btn.config(image=recommend_bg, compound=tk.CENTER, bg="#3c3c3c")
+            recommend_btn.image = recommend_bg
+        else:
+            recommend_btn.config(bg="#6a6a6a", padx=30, pady=12)
+            
         recommend_btn.pack(side=tk.LEFT, pady=20)
     
     def _select_avatar(self, avatar_name: str):
-        """Handle avatar selection"""
+        """Handle avatar selection with dramatic visual feedback"""
         # REMOVED: No more preloader check - all avatars are selectable
         
         # Reset previous selection
         if self.selected_avatar and self.selected_avatar in self.avatar_frames:
-            self.avatar_frames[self.selected_avatar].configure(bg="#2b2b3b")
+            self.avatar_frames[self.selected_avatar].configure(
+                bg="#4a4a4a", 
+                highlightbackground="#5a5a5a", 
+                highlightthickness=1
+            )
+            # Reset button text
+            self._update_button_selection_state(self.selected_avatar, False)
         
-        # Set new selection
+        # Set new selection with dramatic visual changes
         self.selected_avatar = avatar_name
         if avatar_name in self.avatar_frames:
-            self.avatar_frames[avatar_name].configure(bg="#3b3b4b")
+            avatar_info = self.avatar_recommender.get_avatar_info(avatar_name)
+            selected_color = avatar_info.get("color", "#4a90e2")
+            
+            # Create a bright, glowing border effect
+            self.avatar_frames[avatar_name].configure(
+                bg="#6a6a6a",  # Lighter background
+                highlightbackground=selected_color,  # Use avatar's theme color for border
+                highlightthickness=4  # Much thicker border
+            )
+            
+            # Update the button text to show it's selected
+            self._update_button_selection_state(avatar_name, True)
         
         # Enable continue button
         if self.continue_btn:
             self.continue_btn.configure(state="normal")
+    
+    def _update_button_selection_state(self, avatar_name: str, is_selected: bool):
+        """Update button text and style to show selection state"""
+        if avatar_name in self.avatar_buttons:
+            btn = self.avatar_buttons[avatar_name]
+            avatar_info = self.avatar_recommender.get_avatar_info(avatar_name)
+            btn_color = avatar_info.get("color", "#4a90e2")
+            
+            if is_selected:
+                # Selected state - change text and make button more prominent
+                btn.config(text="✓ Selected")
+                # Create a brighter version of the button - LARGER SIZE
+                bright_bg = self._create_rounded_button_bg(150, 50, 25, btn_color)
+                if bright_bg:
+                    btn.config(image=bright_bg)
+                    btn.image = bright_bg
+            else:
+                # Unselected state - restore original text
+                btn.config(text="Select")
+                # Restore original button - LARGER SIZE
+                original_bg = self._create_rounded_button_bg(150, 50, 25, btn_color)
+                if original_bg:
+                    btn.config(image=original_bg)
+                    btn.image = original_bg
     
     def _continue_to_chat(self):
         """Continue to chat interface - Load model on-demand"""
@@ -532,8 +727,9 @@ class SeamlessVbotInterface:
             
         except Exception as e:
             print(f"❌ Error loading {self.selected_avatar}: {e}")
-            # Schedule error display on main thread
-            self.root.after(100, lambda: self._show_error_screen(f"Failed to load {self.selected_avatar}: {str(e)}"))
+            # Schedule error display on main thread - capture error message in local variable
+            error_msg = f"Failed to load {self.selected_avatar}: {str(e)}"
+            self.root.after(100, lambda: self._show_error_screen(error_msg))
     
     def _transition_to_chat_with_data(self, model_data: Dict[str, Any]):
         """Transition to chat with loaded model data"""
@@ -802,9 +998,23 @@ class SeamlessVbotInterface:
         new_ollama_handler.gui = self.chat_gui
         self.chat_gui.on_send_callback = new_ollama_handler.handle_text_input_simple
         
-        # CRITICAL: Set the correct model for the Ollama handler IMMEDIATELY
+        # Ensure the TTS model is correct for this avatar (SET BEFORE set_model)
+        new_tts_model = new_model_data["components"].get("tts_model")
+        if new_tts_model:
+            print(f"🔊 Preparing TTS model for {new_model} voice")
+            print(f"🔍 TTS model type: {type(new_tts_model).__name__}")
+            print(f"🔍 TTS model name: {getattr(new_tts_model, 'model_name', 'Unknown')}")
+            print(f"🔍 TTS repo_id: {getattr(new_tts_model, 'repo_id', 'Unknown')}")
+            
+            # Attach the correct TTS object first so set_model rebuilds InferenceHandler correctly
+            new_ollama_handler.tts_model = new_tts_model
+        else:
+            print(f"⚠️ No TTS model found for {new_model}")
+            print(f"🔍 Available components: {list(new_model_data['components'].keys())}")
+        
+        # Now set the personality so the InferenceHandler is rebuilt using the correct TTS
         if hasattr(new_ollama_handler, 'set_model'):
-            print(f"🎭 Setting Ollama handler to {new_model} personality")
+            print(f"🎭 Setting Ollama handler to {new_model} personality (with correct TTS)")
             new_ollama_handler.set_model(new_model)
         
         # CRITICAL: Update the chat GUI's ollama handler reference IMMEDIATELY
@@ -812,25 +1022,7 @@ class SeamlessVbotInterface:
             self.chat_gui.ollama_handler = new_ollama_handler
             print(f"✅ Chat GUI now using {new_model} Ollama handler")
         
-        # Ensure the TTS model is correct for this avatar
-        new_tts_model = new_model_data["components"].get("tts_model")
-        if new_tts_model:
-            print(f"🔊 Updating TTS model to {new_model} voice")
-            print(f"🔍 TTS model type: {type(new_tts_model).__name__}")
-            print(f"🔍 Current TTS model name: {getattr(new_tts_model, 'model_name', 'Unknown')}")
-            print(f"🔍 Current TTS repo_id: {getattr(new_tts_model, 'repo_id', 'Unknown')}")
-            
-            # Force update the TTS model to ensure it's using the correct voice
-            if hasattr(new_tts_model, 'model_name') and new_tts_model.model_name != new_model:
-                print(f"⚠️ TTS model mismatch! Expected {new_model}, got {new_tts_model.model_name}")
-                print("🔄 This explains why all voices sound like Amelia!")
-                
-            new_ollama_handler.tts_model = new_tts_model
-        else:
-            print(f"⚠️ No TTS model found for {new_model}")
-            print(f"🔍 Available components: {list(new_model_data['components'].keys())}")
-        
-        # Update the chat GUI's ollama handler reference
+        # Update the chat GUI's ollama handler reference (redundant safety)
         if hasattr(self.chat_gui, 'ollama_handler'):
             self.chat_gui.ollama_handler = new_ollama_handler
         
