@@ -15,7 +15,7 @@ import time
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
-from utils.preloader import ModelPreloader, LoadingScreen
+# from utils.preloader import ModelPreloader, LoadingScreen  # REMOVED - No more preloading
 from utils.welcome_screen import AvatarRecommender, RecommendationDialog
 from utils.user_preferences import get_user_preferences, record_avatar_selection
 from utils.performance_boost import performance_monitor
@@ -27,8 +27,8 @@ class SeamlessVbotInterface:
     def __init__(self, device_index: int = None):
         self.device_index = device_index
         self.root = None
-        self.preloader = None
-        self.current_screen = "loading"  # loading -> welcome -> chat
+        # self.preloader = None  # REMOVED - No more preloading
+        self.current_screen = "welcome"  # welcome -> chat (skip loading)
         self.selected_avatar = None
         self.chat_gui = None
         self.avatar_recommender = AvatarRecommender()
@@ -63,33 +63,13 @@ class SeamlessVbotInterface:
         self.main_container = tk.Frame(self.root, bg="#1a1a2e")
         self.main_container.pack(expand=True, fill=tk.BOTH)
         
-        # Initialize preloader
-        self.preloader = ModelPreloader(self.device_index)
-        self.preloader.set_progress_callback(self._on_loading_progress)
-        
-        # Start with loading screen
-        self._show_loading_screen()
-        
-        # Start model preloading in background
-        threading.Thread(
-            target=self._preload_models_async,
-            daemon=True,
-            name="ModelPreloader"
-        ).start()
+        # REMOVED: No more preloading - go straight to welcome screen
+        # Start with welcome screen (skip loading)
+        self._show_welcome_screen()
         
         return self.root
     
-    def _preload_models_async(self):
-        """Preload models asynchronously"""
-        try:
-            success = self.preloader.preload_all_models(max_workers=2)
-            
-            # Schedule transition to welcome screen on main thread
-            self.root.after(1000, lambda: self._transition_to_welcome(success))
-            
-        except Exception as e:
-            print(f"Error during model preloading: {e}")
-            self.root.after(100, lambda: self._transition_to_welcome(False))
+    # REMOVED: _preload_models_async - No more preloading
     
     def _on_loading_progress(self, model_name: str, progress: float, status: str):
         """Handle loading progress updates"""
@@ -216,8 +196,8 @@ class SeamlessVbotInterface:
         """Create an avatar selection card"""
         avatar_info = self.avatar_recommender.get_avatar_info(avatar_name)
         
-        # Check if model is loaded
-        is_loaded = self.preloader.is_model_loaded(avatar_name)
+        # REMOVED: No more preloader - all models are available for selection
+        is_loaded = True  # All avatars are now selectable
         
         # Main card frame
         card_frame = tk.Frame(
@@ -359,8 +339,7 @@ class SeamlessVbotInterface:
     
     def _select_avatar(self, avatar_name: str):
         """Handle avatar selection"""
-        if not self.preloader.is_model_loaded(avatar_name):
-            return
+        # REMOVED: No more preloader check - all avatars are selectable
         
         # Reset previous selection
         if self.selected_avatar and self.selected_avatar in self.avatar_frames:
@@ -376,29 +355,102 @@ class SeamlessVbotInterface:
             self.continue_btn.configure(state="normal")
     
     def _continue_to_chat(self):
-        """Continue to chat interface"""
+        """Continue to chat interface - Load model on-demand"""
         if self.selected_avatar:
             # Record selection
             record_avatar_selection(self.selected_avatar)
             
-            # Transition to chat
-            self._transition_to_chat()
+            # Show loading message
+            self._show_loading_message(f"Loading {self.selected_avatar}...")
+            
+            # Load model in background thread
+            threading.Thread(
+                target=self._load_selected_model,
+                daemon=True,
+                name="ModelLoader"
+            ).start()
     
-    def _transition_to_chat(self):
-        """Transition from welcome to chat interface"""
-        if not self.selected_avatar:
-            return
+    def _show_loading_message(self, message: str):
+        """Show loading message while model loads"""
+        # Clear container
+        for widget in self.main_container.winfo_children():
+            widget.destroy()
         
+        # Loading frame
+        loading_frame = tk.Frame(self.main_container, bg="#1a1a2e")
+        loading_frame.pack(expand=True, fill=tk.BOTH)
+        
+        # Loading message
+        tk.Label(
+            loading_frame,
+            text="🚀 Loading...",
+            font=("Arial", 24, "bold"),
+            fg="#4CAF50",
+            bg="#1a1a2e"
+        ).pack(pady=(200, 20))
+        
+        tk.Label(
+            loading_frame,
+            text=message,
+            font=("Arial", 16),
+            fg="#ffffff",
+            bg="#1a1a2e"
+        ).pack(pady=(0, 20))
+        
+        # Update display
+        self.root.update()
+    
+    def _load_selected_model(self):
+        """Load the selected model on-demand"""
+        try:
+            print(f"🚀 Loading {self.selected_avatar} model on-demand...")
+            
+            # Import here to avoid circular imports
+            from utils.initialization_utils import InitializationHandler
+            
+            # Create initialization handler for the selected model
+            init_handler = InitializationHandler(
+                model_name=self.selected_avatar, 
+                device_index=self.device_index
+            )
+            
+            # Initialize all components
+            components = init_handler.initialize_all()
+            
+            # Create Ollama handler
+            ollama_handler = init_handler.create_ollama_handler()
+            
+            # Store model data
+            model_data = {
+                "init_handler": init_handler,
+                "components": components,
+                "ollama_handler": ollama_handler,
+                "model_name": self.selected_avatar
+            }
+            
+            # Schedule transition to chat on main thread
+            self.root.after(100, lambda: self._transition_to_chat_with_data(model_data))
+            
+        except Exception as e:
+            print(f"❌ Error loading {self.selected_avatar}: {e}")
+            # Schedule error display on main thread
+            self.root.after(100, lambda: self._show_error_screen(f"Failed to load {self.selected_avatar}: {str(e)}"))
+    
+    def _transition_to_chat_with_data(self, model_data: Dict[str, Any]):
+        """Transition to chat with loaded model data"""
         self.current_screen = "chat"
         
-        # Get model data
-        model_data = self.preloader.get_model_data(self.selected_avatar)
-        if not model_data:
-            self._show_error_screen("Selected model not available")
-            return
+        # Store model data for switching
+        self.model_data = {self.selected_avatar: model_data}
         
-        # Clear container with fade effect
-        self._fade_transition(lambda: self._create_chat_interface(model_data))
+        # Clear container
+        for widget in self.main_container.winfo_children():
+            widget.destroy()
+        
+        # Create chat interface
+        self._create_chat_interface(model_data)
+    
+    # REMOVED: Old _transition_to_chat function - replaced with _transition_to_chat_with_data
     
     def _fade_transition(self, callback):
         """Create a smooth fade transition effect"""
@@ -426,11 +478,8 @@ class SeamlessVbotInterface:
         # Update window title
         self.root.title(f"Vbot - {self.selected_avatar}")
         
-        # Ensure we're using the correct model data for the selected avatar
-        correct_model_data = self.preloader.get_model_data(self.selected_avatar)
-        if not correct_model_data:
-            print(f"❌ Model data not found for {self.selected_avatar}, falling back to provided data")
-            correct_model_data = model_data
+        # Use the provided model data directly (no preloader)
+        correct_model_data = model_data
         
         print(f"🎭 Creating chat interface for {self.selected_avatar}")
         print(f"📋 Using model: {correct_model_data['model_name']}")
@@ -472,6 +521,14 @@ class SeamlessVbotInterface:
         if correct_tts_model:
             print(f"🔊 Setting TTS model for {self.selected_avatar} voice")
             print(f"🔍 TTS model type: {type(correct_tts_model).__name__}")
+            print(f"🔍 Initial TTS model name: {getattr(correct_tts_model, 'model_name', 'Unknown')}")
+            print(f"🔍 Initial TTS repo_id: {getattr(correct_tts_model, 'repo_id', 'Unknown')}")
+            
+            # Check if the TTS model matches the selected avatar
+            if hasattr(correct_tts_model, 'model_name') and correct_tts_model.model_name != self.selected_avatar:
+                print(f"⚠️ Initial TTS model mismatch! Expected {self.selected_avatar}, got {correct_tts_model.model_name}")
+                print("🔄 This is why all voices sound like Amelia!")
+                
             correct_model_data["ollama_handler"].tts_model = correct_tts_model
         else:
             print(f"⚠️ No TTS model found for {self.selected_avatar}")
@@ -555,23 +612,69 @@ class SeamlessVbotInterface:
         return get_voice_toggle
     
     def _handle_model_switch(self, new_model: str):
-        """Handle switching to a different model"""
-        if not self.preloader.is_model_loaded(new_model):
-            print(f"Model {new_model} not loaded")
-            return
-        
-        if self.chat_gui and self.chat_gui.is_processing:
-            return
-        
+        """Handle switching to a different model - Load on-demand"""
         print(f"🔄 Switching to {new_model}...")
         
-        # Get new model data
-        new_model_data = self.preloader.get_model_data(new_model)
-        if not new_model_data:
-            return
+        # CRITICAL: Stop any current processing immediately
+        if self.chat_gui and hasattr(self.chat_gui, 'ollama_handler'):
+            current_handler = self.chat_gui.ollama_handler
+            if hasattr(current_handler, 'is_processing'):
+                current_handler.is_processing = False
+                print(f"🛑 Stopped current processing for immediate switch")
         
-        # Update selected avatar
+        # CRITICAL: Update selected avatar immediately to prevent race conditions
+        old_avatar = self.selected_avatar
         self.selected_avatar = new_model
+        print(f"🔄 Avatar switch: {old_avatar} → {new_model}")
+        
+        # Check if we already have this model loaded
+        if hasattr(self, 'model_data') and new_model in self.model_data:
+            print(f"✅ Using cached model data for {new_model}")
+            new_model_data = self.model_data[new_model]
+            
+            # IMMEDIATE: Switch Ollama handler right away for cached models
+            self._apply_model_switch(new_model_data, new_model)
+            return
+        else:
+            print(f"🚀 Loading {new_model} model on-demand for switching...")
+            # Load the new model on-demand
+            try:
+                from utils.initialization_utils import InitializationHandler
+                
+                # Create initialization handler for the new model
+                init_handler = InitializationHandler(
+                    model_name=new_model, 
+                    device_index=self.device_index
+                )
+                
+                # Initialize all components
+                components = init_handler.initialize_all()
+                
+                # Create Ollama handler
+                ollama_handler = init_handler.create_ollama_handler()
+                
+                # Store model data
+                new_model_data = {
+                    "init_handler": init_handler,
+                    "components": components,
+                    "ollama_handler": ollama_handler,
+                    "model_name": new_model
+                }
+                
+                # Cache the model data
+                if not hasattr(self, 'model_data'):
+                    self.model_data = {}
+                self.model_data[new_model] = new_model_data
+                
+            except Exception as e:
+                print(f"❌ Error loading {new_model}: {e}")
+                return
+        
+        # Apply the model switch
+        self._apply_model_switch(new_model_data, new_model)
+    
+    def _apply_model_switch(self, new_model_data, new_model):
+        """Apply the actual model switch with new data"""
         
         # Record selection
         record_avatar_selection(new_model)
@@ -582,17 +685,35 @@ class SeamlessVbotInterface:
         
         # Update chat GUI and recreate avatar with correct model
         self.chat_gui._select_character(new_model)
-        self.chat_gui.on_send_callback = new_model_data["ollama_handler"].handle_text_input_simple
         
-        # Update ollama handler and ensure it uses the correct TTS model
+        # CRITICAL: Immediately switch the Ollama handler to stop old responses
         new_ollama_handler = new_model_data["ollama_handler"]
         new_ollama_handler.gui = self.chat_gui
+        self.chat_gui.on_send_callback = new_ollama_handler.handle_text_input_simple
+        
+        # CRITICAL: Set the correct model for the Ollama handler IMMEDIATELY
+        if hasattr(new_ollama_handler, 'set_model'):
+            print(f"🎭 Setting Ollama handler to {new_model} personality")
+            new_ollama_handler.set_model(new_model)
+        
+        # CRITICAL: Update the chat GUI's ollama handler reference IMMEDIATELY
+        if hasattr(self.chat_gui, 'ollama_handler'):
+            self.chat_gui.ollama_handler = new_ollama_handler
+            print(f"✅ Chat GUI now using {new_model} Ollama handler")
         
         # Ensure the TTS model is correct for this avatar
         new_tts_model = new_model_data["components"].get("tts_model")
         if new_tts_model:
             print(f"🔊 Updating TTS model to {new_model} voice")
             print(f"🔍 TTS model type: {type(new_tts_model).__name__}")
+            print(f"🔍 Current TTS model name: {getattr(new_tts_model, 'model_name', 'Unknown')}")
+            print(f"🔍 Current TTS repo_id: {getattr(new_tts_model, 'repo_id', 'Unknown')}")
+            
+            # Force update the TTS model to ensure it's using the correct voice
+            if hasattr(new_tts_model, 'model_name') and new_tts_model.model_name != new_model:
+                print(f"⚠️ TTS model mismatch! Expected {new_model}, got {new_tts_model.model_name}")
+                print("🔄 This explains why all voices sound like Amelia!")
+                
             new_ollama_handler.tts_model = new_tts_model
         else:
             print(f"⚠️ No TTS model found for {new_model}")
@@ -601,6 +722,16 @@ class SeamlessVbotInterface:
         # Update the chat GUI's ollama handler reference
         if hasattr(self.chat_gui, 'ollama_handler'):
             self.chat_gui.ollama_handler = new_ollama_handler
+        
+        # CRITICAL: Set up audio processor for the new Ollama handler
+        audio_processor = new_model_data["components"].get("audio_processor")
+        if audio_processor:
+            print(f"🎤 Setting up audio processor for {new_model}")
+            new_ollama_handler.audio_processor = audio_processor
+            print(f"✅ Audio processor set for {new_model}")
+        else:
+            print(f"⚠️ No audio processor found for {new_model}")
+            print(f"🔍 Available components: {list(new_model_data['components'].keys())}")
         
         # Update window title
         self.root.title(f"Vbot - {new_model}")
@@ -671,8 +802,7 @@ class SeamlessVbotInterface:
     
     def cleanup(self):
         """Clean up resources"""
-        if self.preloader:
-            self.preloader.cleanup_all()
+        # REMOVED: No more preloader to cleanup
         
         if self.chat_gui:
             self.chat_gui.cleanup()
