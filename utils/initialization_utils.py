@@ -150,6 +150,10 @@ class InitializationHandler:
             inference_handler=self.inference_handler,
             model_name=self.model_name,
         )
+        
+        # Explicitly set the model personality to ensure it's properly initialized
+        print(f"🎭 Initializing {self.model_name} personality in OllamaHandler...")
+        handler.set_model(self.model_name)
 
         return handler
 

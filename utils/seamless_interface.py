@@ -11,6 +11,14 @@ from typing import Dict, Any, Callable, Optional
 import threading
 import time
 
+# Import PIL for image handling
+try:
+    from PIL import Image, ImageTk
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+    print("⚠️ PIL/Pillow not available - using placeholder images")
+
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
@@ -34,6 +42,10 @@ class SeamlessVbotInterface:
         self.avatar_recommender = AvatarRecommender()
         self.user_prefs = get_user_preferences()
         
+        # Window size management
+        self.original_window_size = "1280x720"
+        self.selection_window_size = "1280x900"  # Taller for avatar selection
+        
         # UI components
         self.main_container = None
         self.loading_screen = None
@@ -42,22 +54,90 @@ class SeamlessVbotInterface:
         
         # Avatar selection UI
         self.avatar_frames = {}
+        self.avatar_images = {}  # Store loaded images
         self.continue_btn = None
+        
+        # Avatar image mapping
+        self.avatar_image_files = {
+            "Amelia": "ame.jpg",
+            "Gura": "gura.jpg",
+            "Eveland": "ike.jpg",  # Eveland maps to ike.jpg
+            "Shiori": "shiori.jpg",
+            "Wilson": "wilson.jpg"
+        }
+        
+    def _load_avatar_image(self, avatar_name: str, size: tuple = (120, 120)):
+        """Load and resize avatar image"""
+        if not PIL_AVAILABLE:
+            return None
+            
+        # Check if already loaded
+        cache_key = f"{avatar_name}_{size[0]}x{size[1]}"
+        if cache_key in self.avatar_images:
+            return self.avatar_images[cache_key]
+            
+        try:
+            # Get image filename
+            image_filename = self.avatar_image_files.get(avatar_name)
+            if not image_filename:
+                print(f"⚠️ No image file mapped for avatar: {avatar_name}")
+                return None
+                
+            # Build full path
+            image_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "recommender-avatar-profile",
+                image_filename
+            )
+            
+            if not os.path.exists(image_path):
+                print(f"⚠️ Image file not found: {image_path}")
+                return None
+                
+            # Load and resize image
+            with Image.open(image_path) as img:
+                # Convert to RGB if necessary
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                    
+                # Resize to fit the specified size while maintaining aspect ratio
+                img.thumbnail(size, Image.Resampling.LANCZOS)
+                
+                # Create a new image with the exact size and center the resized image
+                final_img = Image.new('RGB', size, (59, 59, 75))  # Dark background color
+                
+                # Calculate position to center the image
+                x = (size[0] - img.width) // 2
+                y = (size[1] - img.height) // 2
+                final_img.paste(img, (x, y))
+                
+                # Convert to PhotoImage
+                photo = ImageTk.PhotoImage(final_img)
+                
+                # Cache the image
+                self.avatar_images[cache_key] = photo
+                return photo
+                
+        except Exception as e:
+            print(f"❌ Error loading image for {avatar_name}: {e}")
+            return None
+            
+        return None
         
     def initialize(self):
         """Initialize the main window and start the loading process"""
-        # Create main window
+        # Create main window with taller size for avatar selection
         self.root = tk.Tk()
         self.root.title("Vbot - AI Companion")
-        self.root.geometry("1280x720")
+        self.root.geometry(self.selection_window_size)
         self.root.configure(bg="#1a1a2e")
         self.root.resizable(True, True)
         
-        # Center window
+        # Center window with selection size
         self.root.update_idletasks()
         x = (self.root.winfo_screenwidth() // 2) - (1280 // 2)
-        y = (self.root.winfo_screenheight() // 2) - (720 // 2)
-        self.root.geometry(f"1280x720+{x}+{y}")
+        y = (self.root.winfo_screenheight() // 2) - (900 // 2)  # Adjusted for taller window
+        self.root.geometry(f"{self.selection_window_size}+{x}+{y}")
         
         # Create main container
         self.main_container = tk.Frame(self.root, bg="#1a1a2e")
@@ -230,19 +310,34 @@ class SeamlessVbotInterface:
         )
         status_label.pack(anchor="ne")
         
-        # Avatar image placeholder
+        # Avatar image
         image_frame = tk.Frame(card_frame, bg="#3b3b4b", width=120, height=120)
         image_frame.pack(pady=(0, 10))
         image_frame.pack_propagate(False)
         
-        placeholder_label = tk.Label(
-            image_frame,
-            text="👤",
-            font=("Arial", 36),
-            fg=avatar_info.get("color", "#ffffff"),
-            bg="#3b3b4b"
-        )
-        placeholder_label.pack(expand=True)
+        # Try to load real avatar image
+        avatar_photo = self._load_avatar_image(avatar_name, (120, 120))
+        
+        if avatar_photo:
+            # Use real image
+            image_label = tk.Label(
+                image_frame,
+                image=avatar_photo,
+                bg="#3b3b4b"
+            )
+            image_label.pack(expand=True)
+            # Keep a reference to prevent garbage collection
+            image_label.image = avatar_photo
+        else:
+            # Fallback to placeholder emoji
+            placeholder_label = tk.Label(
+                image_frame,
+                text="👤",
+                font=("Arial", 36),
+                fg=avatar_info.get("color", "#ffffff"),
+                bg="#3b3b4b"
+            )
+            placeholder_label.pack(expand=True)
         
         # Avatar name
         name_label = tk.Label(
@@ -301,6 +396,10 @@ class SeamlessVbotInterface:
                 self._select_avatar(name)
             
             card_frame.bind("<Button-1>", on_card_click)
+            
+            # Make image clickable too if it exists
+            if 'image_label' in locals():
+                image_label.bind("<Button-1>", on_card_click)
     
     def _create_welcome_footer(self):
         """Create footer with action buttons"""
@@ -497,6 +596,15 @@ class SeamlessVbotInterface:
         os.environ["VOICE_TYPE"] = self.selected_avatar
         print(f"🔧 Set VOICE_TYPE environment variable to: {self.selected_avatar}")
         print(f"🔍 Current environment VOICE_TYPE: {os.getenv('VOICE_TYPE')}")
+        
+        # Resize window back to original size for chat interface
+        self.root.geometry(self.original_window_size)
+        
+        # Re-center window with original size
+        self.root.update_idletasks()
+        x = (self.root.winfo_screenwidth() // 2) - (1280 // 2)
+        y = (self.root.winfo_screenheight() // 2) - (720 // 2)
+        self.root.geometry(f"{self.original_window_size}+{x}+{y}")
         
         # Clear the main container completely
         for widget in self.main_container.winfo_children():
