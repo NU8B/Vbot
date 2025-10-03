@@ -60,24 +60,18 @@ class InitializationHandler:
         return docker_handler
 
     def _initialize_tts(self):
-        """Initialize TTS model with caching"""
-        cache_key = f"tts_{self.model_name}"
-
-        # Check if we have a cached TTS model
-        if model_cache.has_cached_state(self.model_name, "tts"):
-            print(f"🚀 Loading cached TTS model for {self.model_name}")
-
+        """Initialize TTS model - NO CACHING, FRESH INSTANCE EVERY TIME"""
+        
+        print(f"🔊 Creating COMPLETELY FRESH StyleTTS2Inference for model: {self.model_name}")
+        print(f"🧵 Thread: {threading.current_thread().name}")
+        print(f"🚫 NO CACHING - Fresh instance guaranteed")
+        
+        # Create completely fresh TTS model - no caching whatsoever
         tts_model = StyleTTS2Inference(model_name=self.model_name)
-
-        # Cache the model state for future use
-        if hasattr(tts_model, "model"):
-            try:
-                state_dict = {
-                    key: model.state_dict() for key, model in tts_model.model.items()
-                }
-                model_cache.cache_model_state(self.model_name, "tts", state_dict)
-            except Exception as e:
-                print(f"Warning: Could not cache TTS model state: {e}")
+        
+        print(f"✅ TTS model created - Name: {tts_model.model_name}, Repo: {tts_model.repo_id}")
+        print(f"🆔 TTS model object ID: {id(tts_model)}")
+        print(f"🔑 TTS unique ID: {getattr(tts_model, '_unique_id', 'N/A')}")
 
         return tts_model
 
@@ -88,17 +82,21 @@ class InitializationHandler:
     def _initialize_ref_style(self):
         """Initialize reference style with caching"""
         if not self.tts_model:
-            # Wait for TTS model if not ready
-            self.tts_model = startup_optimizer.lazy_loader.get("tts", timeout=10)
+            # TTS model should already be created directly - this shouldn't happen
+            print(f"⚠️ WARNING: TTS model not found for {self.model_name} during ref_style init")
+            return None
 
         # Check if all styles are cached for this model
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
+        print(f"🔍 Checking reference styles for {self.model_name}...")
+        
         for style_file in unique_styles:
             style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
-            if not self.tts_model.is_style_cached(style_path):
+            is_cached = self.tts_model.is_style_cached(style_path)
+            print(f"   {style_file}.wav: {'✅ Cached' if is_cached else '❌ Not cached'}")
+            if not is_cached:
                 self.styles_were_cached = False
-                break
 
         if self.styles_were_cached:
             print("🚀 Using cached reference styles")
@@ -152,6 +150,10 @@ class InitializationHandler:
             inference_handler=self.inference_handler,
             model_name=self.model_name,
         )
+        
+        # Explicitly set the model personality to ensure it's properly initialized
+        print(f"🎭 Initializing {self.model_name} personality in OllamaHandler...")
+        handler.set_model(self.model_name)
 
         return handler
 
@@ -204,9 +206,11 @@ class InitializationHandler:
 
         # Phase 1: Critical components first (blocking)
         performance_monitor.start_timer("critical_components")
+        
+        # REMOVE TTS FROM SHARED LOADER - Create fresh instance for each character
         critical_loaders = {
             "docker": (self._initialize_docker, [], {}),
-            "tts": (self._initialize_tts, [], {}),
+            # "tts": (self._initialize_tts, [], {}),  # REMOVED - no shared TTS
         }
 
         print("🚀 Loading critical components...")
@@ -214,7 +218,10 @@ class InitializationHandler:
 
         # Get critical components
         self.docker_handler = startup_optimizer.lazy_loader.get("docker")
-        self.tts_model = startup_optimizer.lazy_loader.get("tts")
+        
+        # ALWAYS create a fresh TTS model for each character - NO SHARING
+        print(f"🔄 Creating FRESH TTS model for {self.model_name} (NO CACHING)")
+        self.tts_model = self._initialize_tts()  # Always call directly
         critical_time = performance_monitor.end_timer("critical_components")
 
         # Set group1_time for compatibility with old reporting
@@ -517,6 +524,7 @@ class InitializationHandler:
             self.audio_processor,
             self.emotion_handler,
             self.inference_handler,
+            model_name=self.model_name,  # CRITICAL: Pass the correct model name!
         )
         self.ollama_handler.warmup_time = self.warmup_time
         return self.ollama_handler

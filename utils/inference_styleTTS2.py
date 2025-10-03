@@ -74,13 +74,40 @@ class StyleTTS2Inference:
 
         self.model_name = model_name
         self.repo_id = repo_id if repo_id else self.model_configs[model_name]
+        
+        print(f"🎤 StyleTTS2Inference initializing:")
+        print(f"   Model Name: {self.model_name}")
+        print(f"   Repo ID: {self.repo_id}")
+        print(f"   Object ID: {id(self)}")
+        
+        # Force clear any cached models to prevent sharing
+        import gc
+        import uuid
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            
+        # Add unique identifier to prevent model sharing
+        self._unique_id = str(uuid.uuid4())[:8]
+        print(f"   Unique ID: {self._unique_id}")
+        
+        # CRITICAL: Clear any global HuggingFace model cache for this repo
+        try:
+            from transformers import AutoModel
+            # Force clear transformers cache for this specific model
+            if hasattr(AutoModel, '_modules'):
+                AutoModel._modules.clear()
+        except:
+            pass
 
         # Smart device selection with cuDNN fallback
         self.device = self._select_device_with_fallback()
 
-        # Apply memory optimizations
+        # Apply memory optimizations for multiple TTS models
         if self.device == "cuda":
-            torch.cuda.set_per_process_memory_fraction(0.8)  # Use max 80% of GPU memory
+            torch.cuda.set_per_process_memory_fraction(0.5)  # Reduce to 50% to allow multiple models
+            torch.cuda.empty_cache()  # Clear cache before loading
+            print(f"🧠 GPU Memory: {torch.cuda.get_device_properties(0).total_memory // 1024**3}GB total")
 
         # Create cache directory based on model name
         self.cache_dir = Path("cache/style") / model_name
@@ -372,6 +399,25 @@ class StyleTTS2Inference:
 
         if text == "":
             return np.zeros(0), 0.0
+        
+        # CRITICAL: Limit text length to prevent tensor dimension mismatch
+        MAX_TEXT_LENGTH = 400  # Safe limit to prevent 512+ token sequences
+        if len(text) > MAX_TEXT_LENGTH:
+            print(f"⚠️ Text too long ({len(text)} chars), truncating to {MAX_TEXT_LENGTH} chars")
+            # Find the last complete sentence within the limit
+            truncated = text[:MAX_TEXT_LENGTH]
+            last_period = truncated.rfind('.')
+            last_exclamation = truncated.rfind('!')
+            last_question = truncated.rfind('?')
+            last_sentence_end = max(last_period, last_exclamation, last_question)
+            
+            if last_sentence_end > 0:
+                text = truncated[:last_sentence_end + 1]
+            else:
+                text = truncated + "..."
+            print(f"📝 Truncated text: {text[:100]}...")
+        else:
+            print(f"📝 Text length OK: {len(text)} chars")
 
         ps = self.global_phonemizer.phonemize([text])
         if not ps or not ps[0]:

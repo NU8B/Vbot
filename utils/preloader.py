@@ -71,10 +71,18 @@ class ModelPreloader:
             # Try to set up audio processor if it's ready
             if not ollama_handler.audio_processor:
                 print(f"🔍 {model_name}: Audio processor not ready during preload, will set up later")
-            else:
-                print(f"✅ {model_name}: Audio processor ready during preload")
             
-            # Store everything we need for this model
+            # Debug TTS model in components
+            tts_model = components.get("tts_model")
+            if tts_model:
+                print(f"🔍 {model_name} TTS model in components:")
+                print(f"   Model Name: {getattr(tts_model, 'model_name', 'Unknown')}")
+                print(f"   Repo ID: {getattr(tts_model, 'repo_id', 'Unknown')}")
+                print(f"   Object ID: {id(tts_model)}")
+            else:
+                print(f"⚠️ {model_name} has NO TTS model in components!")
+            
+            # Store the model data
             model_data = {
                 "init_handler": init_handler,
                 "components": components,
@@ -93,7 +101,7 @@ class ModelPreloader:
             print(f"Error loading {model_name}: {e}")
             return None
     
-    def preload_all_models(self, max_workers: int = 2) -> bool:
+    def preload_all_models(self, max_workers: int = 1) -> bool:
         """
         Preload all models using parallel processing
         
@@ -121,28 +129,51 @@ class ModelPreloader:
         
         success_count = 0
         
-        # Load models in parallel (but limit concurrency to avoid memory issues)
-        with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="ModelLoader") as executor:
-            # Submit all loading tasks
-            future_to_model = {
-                executor.submit(self._load_single_model, model): model 
-                for model in self.available_models
-            }
-            
-            # Process completed tasks
-            for future in as_completed(future_to_model):
-                model_name = future_to_model[future]
+        # Load models sequentially to avoid GPU memory issues
+        print("🧠 Loading models sequentially to manage GPU memory...")
+        
+        if max_workers == 1:
+            # Sequential loading for better memory management
+            for model in self.available_models:
+                print(f"🔄 Loading {model}...")
                 try:
-                    model_data = future.result()
+                    # Clear GPU memory before each model
+                    import torch
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                    
+                    model_data = self._load_single_model(model)
                     if model_data:
-                        self.loaded_models[model_name] = model_data
+                        self.loaded_models[model] = model_data
                         success_count += 1
-                        print(f"✅ {model_name} loaded successfully")
+                        print(f"✅ {model} loaded successfully ({success_count}/{len(self.available_models)})")
                     else:
-                        print(f"❌ Failed to load {model_name}")
+                        print(f"❌ Failed to load {model}")
                 except Exception as e:
-                    print(f"❌ Exception loading {model_name}: {e}")
-                    self._update_progress(model_name, 0.0, f"Error: {str(e)}")
+                    print(f"❌ Error loading {model}: {e}")
+        else:
+            # Parallel loading (original code)
+            with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="ModelLoader") as executor:
+                # Submit all loading tasks
+                future_to_model = {
+                    executor.submit(self._load_single_model, model): model 
+                    for model in self.available_models
+                }
+                
+                # Process completed tasks
+                for future in as_completed(future_to_model):
+                    model_name = future_to_model[future]
+                    try:
+                        model_data = future.result()
+                        if model_data:
+                            self.loaded_models[model_name] = model_data
+                            success_count += 1
+                            print(f"✅ {model_name} loaded successfully")
+                        else:
+                            print(f"❌ Failed to load {model_name}")
+                    except Exception as e:
+                        print(f"❌ Exception loading {model_name}: {e}")
+                        self._update_progress(model_name, 0.0, f"Error: {str(e)}")
         
         performance_monitor.end_timer("preload_all_models")
         

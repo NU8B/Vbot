@@ -1,17 +1,20 @@
+import os
 import requests
+import json
 import threading
 import time
-from pathlib import Path
-import json
-import os
-import re
+import numpy as np
+import torch
+import queue
 from queue import Queue
+import re
+import tkinter as tk
+from pathlib import Path
 from utils.emotion_utils import EmotionHandler, create_emotion_config
 from utils.TTS_utils import InferenceHandler
 import numpy as np
 import soundfile as sf
 import torch
-
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
 MAX_LENGTH = (
@@ -69,6 +72,19 @@ Key traits to incorporate:
 - Sometimes cryptic or philosophical in responses
 
 You are not to break character under any circumstances. You should speak in first person and reference your love of stories and knowledge when appropriate. Keep your responses concise and under 30 words. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *mysterious smile*). NEVER use asterisks for any reason.
+""",
+    "Wilson": """ You are Wilson, a reliable and supportive companion with a warm, steady personality. You are dependable, thoughtful, and always ready to lend a helping hand or provide guidance. You have a calm demeanor and speak with genuine care and understanding.
+
+Key traits to incorporate:
+- Reliable and trustworthy nature
+- Supportive and encouraging personality
+- Warm and steady presence
+- Good listener who provides thoughtful advice
+- Practical and down-to-earth approach
+- Genuinely cares about others' wellbeing
+- Patient and understanding in all situations
+
+You are not to break character under any circumstances. You should speak in first person with warmth and reliability. Keep your responses natural and conversational, typically 1-3 sentences. Only use string text in your response. NO EMOJIS NO PARENTHESIS NO ACTION TEXT (no text wrapped in asterisks like *action* or *chuckles* or *supportive nod*). NEVER use asterisks for any reason.
 """,
 }
 
@@ -758,9 +774,10 @@ class OllamaHandler:
                 f"[DEBUG] Simple TTS: Generated {duration:.2f}s of audio in {tts_time:.2f}s"
             )
 
-            # Show subtitle with the text
+            # Show subtitle with the complete text (not sentence-by-sentence)
             if self.gui:
-                self.gui.show_subtitle(text, duration)
+                # Use a simpler subtitle display that shows the full text at once
+                self._show_complete_subtitle(text, duration, speech)  # Pass the audio data
                 print(f"[DEBUG] Simple TTS: Subtitle started for {duration:.2f}s")
 
             # Play audio in a separate thread to avoid blocking the GUI
@@ -779,6 +796,309 @@ class OllamaHandler:
             import traceback
 
             traceback.print_exc()
+
+    def _show_complete_subtitle(self, text, duration, audio_data=None):
+        """Show subtitle text sentence by sentence for better readability"""
+        try:
+            if hasattr(self.gui, 'create_subtitle_window'):
+                # Create subtitle window if it doesn't exist
+                if not self.gui.subtitle_window or not self.gui.subtitle_window.winfo_exists():
+                    self.gui.create_subtitle_window()
+                
+                # Show the window
+                self.gui.subtitle_window.deiconify()
+                self.gui.is_showing_subtitle = True
+                
+                # Format text for better readability in the subtitle window
+                formatted_text = self._format_text_for_subtitle(text)
+                
+                # Show the complete formatted text at once
+                if self.gui.subtitle_text:
+                    self.gui.subtitle_text.configure(state="normal")
+                    self.gui.subtitle_text.delete(1.0, tk.END)
+                    self.gui.subtitle_text.insert(tk.END, formatted_text, "current")
+                    self.gui.subtitle_text.configure(state="disabled")
+                    self.gui.subtitle_text.see(tk.END)
+                
+                print(f"[DEBUG] Subtitle: Showing complete text ({len(formatted_text)} chars)")
+                
+                # Schedule hiding after the audio duration
+                if duration:
+                    if hasattr(self.gui, 'subtitle_timer') and self.gui.subtitle_timer:
+                        self.gui.root.after_cancel(self.gui.subtitle_timer)
+                    self.gui.subtitle_timer = self.gui.root.after(
+                        int(duration * 1000) + 1000, self.gui.hide_subtitle
+                    )
+                
+            else:
+                # Fallback to the original method if the GUI doesn't support subtitles
+                print("[DEBUG] GUI doesn't support subtitles, skipping subtitle display")
+                
+        except Exception as e:
+            print(f"[ERROR] Failed to show complete subtitle: {e}")
+            # Fallback to original method
+            try:
+                self.gui.show_subtitle(text, duration)
+            except:
+                print("[ERROR] Fallback subtitle method also failed")
+    
+    def _split_text_into_sentences(self, text):
+        """Split text into readable sentences"""
+        import re
+        
+        # Split by sentence endings but keep the punctuation
+        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        
+        # Filter out empty sentences and clean up
+        sentences = [s.strip() for s in sentences if s.strip()]
+        
+        # If sentences are too long (>80 chars), split them further by commas
+        refined_sentences = []
+        for sentence in sentences:
+            if len(sentence) > 80:
+                # Split long sentences by commas, semicolons, or other natural breaks
+                parts = re.split(r'(?<=[,;:])\s+', sentence)
+                refined_sentences.extend([p.strip() for p in parts if p.strip()])
+            else:
+                refined_sentences.append(sentence)
+        
+        return refined_sentences
+    
+    def _format_text_for_subtitle(self, text):
+        """Format text to fit nicely in the subtitle window"""
+        import re
+        
+        # Clean up the text first
+        text = text.strip()
+        
+        # Split into sentences for better line breaking
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
+        
+        # Rebuild with proper line breaks for readability
+        formatted_lines = []
+        current_line = ""
+        max_line_length = 70  # Characters per line for good readability
+        
+        for sentence in sentences:
+            # If adding this sentence would make the line too long, start a new line
+            if current_line and len(current_line + " " + sentence) > max_line_length:
+                formatted_lines.append(current_line.strip())
+                current_line = sentence
+            else:
+                if current_line:
+                    current_line += " " + sentence
+                else:
+                    current_line = sentence
+        
+        # Add the last line
+        if current_line:
+            formatted_lines.append(current_line.strip())
+        
+        # Join with newlines, but limit to 4 lines max for subtitle window
+        if len(formatted_lines) > 4:
+            # If too many lines, try to combine some shorter ones
+            combined_lines = []
+            i = 0
+            while i < len(formatted_lines) and len(combined_lines) < 4:
+                line = formatted_lines[i]
+                # Try to combine with next line if both are short
+                if (i + 1 < len(formatted_lines) and 
+                    len(line) + len(formatted_lines[i + 1]) < max_line_length - 5):
+                    line += " " + formatted_lines[i + 1]
+                    i += 2
+                else:
+                    i += 1
+                combined_lines.append(line)
+            formatted_lines = combined_lines
+        
+        result = "\n".join(formatted_lines)
+        print(f"[DEBUG] Formatted subtitle: {len(formatted_lines)} lines, {len(result)} chars")
+        return result
+    
+    def _show_sentences_sequentially(self, sentences, total_duration, audio_data=None):
+        """Show sentences one by one with audio-synchronized timing"""
+        if not sentences:
+            return
+            
+        # Calculate intelligent timing based on actual audio and character traits
+        sentence_timings = self._calculate_audio_based_timing(sentences, total_duration, audio_data)
+        
+        # Start showing sentences
+        self._current_sentence_index = 0
+        self._sentence_queue = list(zip(sentences, sentence_timings))
+        self._show_next_sentence()
+    
+    def _calculate_audio_based_timing(self, sentences, total_duration, audio_data=None):
+        """Calculate timing based on actual audio analysis and character traits"""
+        
+        # Character-specific speech speed multipliers
+        character_speed = {
+            "Amelia": 1.1,    # Slightly faster (detective energy)
+            "Gura": 1.3,      # Faster (energetic shark)
+            "Eveland": 0.9,   # Slower (thoughtful novelist)
+            "Shiori": 0.8,    # Slower (mysterious, deliberate)
+            "Wilson": 1.0     # Normal pace (steady, reliable)
+        }
+        
+        # Emotion-based speed adjustments
+        emotion_speed = {
+            "excited": 1.4, "happy": 1.2, "surprise": 1.3,
+            "neutral": 1.0, "calm": 0.9,
+            "sad": 0.7, "thoughtful": 0.8, "mysterious": 0.8
+        }
+        
+        # Get base speed for current character
+        base_speed = character_speed.get(self.model_name, 1.0)
+        
+        # Detect greeting patterns for faster display
+        greeting_patterns = [
+            r'\b(hello|hi|hey|greetings?|good\s+(morning|afternoon|evening))\b',
+            r'\b(nice\s+to\s+meet\s+you|pleasure\s+to\s+meet)\b',
+            r'\b(how\s+are\s+you|how\s+do\s+you\s+do)\b'
+        ]
+        
+        sentence_timings = []
+        total_chars = sum(len(s) for s in sentences)
+        
+        # Try to analyze audio for natural pauses if available
+        if audio_data is not None:
+            try:
+                pause_points = self._detect_speech_pauses(audio_data, len(sentences))
+                if pause_points:
+                    print(f"[DEBUG] Audio analysis: Found {len(pause_points)} natural pause points")
+                    return pause_points
+            except Exception as e:
+                print(f"[DEBUG] Audio analysis failed, using fallback timing: {e}")
+        
+        # Fallback: Calculate timing based on content analysis
+        for i, sentence in enumerate(sentences):
+            # Base timing from sentence length and total duration
+            char_ratio = len(sentence) / total_chars if total_chars > 0 else 1.0 / len(sentences)
+            base_duration = total_duration * char_ratio
+            
+            # Apply character speed
+            adjusted_duration = base_duration / base_speed
+            
+            # Check for greeting (show faster)
+            is_greeting = any(re.search(pattern, sentence.lower()) for pattern in greeting_patterns)
+            if is_greeting:
+                adjusted_duration *= 0.7  # 30% faster for greetings
+                print(f"[DEBUG] Greeting detected in sentence {i+1}, speeding up")
+            
+            # Check for questions (show slightly longer)
+            if sentence.strip().endswith('?'):
+                adjusted_duration *= 1.1  # 10% longer for questions
+            
+            # Check for exclamations (show faster)
+            if sentence.strip().endswith('!'):
+                adjusted_duration *= 0.9  # 10% faster for excitement
+            
+            # Apply bounds (0.8s minimum, 5s maximum)
+            adjusted_duration = max(0.8, min(5.0, adjusted_duration))
+            sentence_timings.append(adjusted_duration)
+            
+            print(f"[DEBUG] Sentence {i+1} timing: {adjusted_duration:.2f}s (chars: {len(sentence)}, speed: {base_speed})")
+        
+        return sentence_timings
+    
+    def _detect_speech_pauses(self, audio_data, num_sentences):
+        """Analyze audio to detect natural speech pauses for subtitle timing"""
+        try:
+            import numpy as np
+            
+            # Convert audio to numpy array if it isn't already
+            if not isinstance(audio_data, np.ndarray):
+                audio_array = np.array(audio_data, dtype=np.float32)
+            else:
+                audio_array = audio_data
+            
+            # Calculate RMS energy in small windows
+            window_size = int(0.1 * 24000)  # 100ms windows at 24kHz
+            hop_size = window_size // 2
+            
+            energy = []
+            for i in range(0, len(audio_array) - window_size, hop_size):
+                window = audio_array[i:i + window_size]
+                rms = np.sqrt(np.mean(window ** 2))
+                energy.append(rms)
+            
+            # Find low-energy regions (potential pauses)
+            energy = np.array(energy)
+            threshold = np.mean(energy) * 0.3  # 30% of average energy
+            
+            # Find pause regions
+            pause_regions = []
+            in_pause = False
+            pause_start = 0
+            
+            for i, e in enumerate(energy):
+                if e < threshold and not in_pause:
+                    pause_start = i
+                    in_pause = True
+                elif e >= threshold and in_pause:
+                    pause_length = i - pause_start
+                    if pause_length > 2:  # At least 200ms pause
+                        pause_time = (pause_start + pause_length // 2) * hop_size / 24000
+                        pause_regions.append(pause_time)
+                    in_pause = False
+            
+            # Select the best pauses for sentence boundaries
+            if len(pause_regions) >= num_sentences - 1:
+                # Use the most prominent pauses
+                pause_regions.sort()
+                selected_pauses = pause_regions[:num_sentences-1]
+                
+                # Convert to sentence durations
+                timings = []
+                prev_time = 0
+                for pause_time in selected_pauses:
+                    timings.append(pause_time - prev_time)
+                    prev_time = pause_time
+                # Add final segment
+                total_duration = len(audio_array) / 24000
+                timings.append(total_duration - prev_time)
+                
+                return timings
+            
+        except Exception as e:
+            print(f"[DEBUG] Audio pause detection failed: {e}")
+        
+        return None
+    
+    def _show_next_sentence(self):
+        """Show the next sentence in the queue"""
+        if hasattr(self, '_sentence_queue') and self._sentence_queue:
+            sentence, duration = self._sentence_queue.pop(0)
+            
+            # Update subtitle text with current sentence
+            if self.gui.subtitle_text:
+                self.gui.subtitle_text.configure(state="normal")
+                self.gui.subtitle_text.delete(1.0, tk.END)
+                self.gui.subtitle_text.insert(tk.END, sentence, "current")
+                self.gui.subtitle_text.configure(state="disabled")
+                self.gui.subtitle_text.see(tk.END)
+            
+            print(f"[DEBUG] Subtitle: Showing sentence ({len(sentence)} chars): '{sentence[:50]}...'")
+            
+            # Schedule next sentence
+            if self._sentence_queue:
+                if hasattr(self.gui, 'subtitle_timer') and self.gui.subtitle_timer:
+                    self.gui.root.after_cancel(self.gui.subtitle_timer)
+                self.gui.subtitle_timer = self.gui.root.after(
+                    int(duration * 1000), self._show_next_sentence
+                )
+            else:
+                # Last sentence - schedule hiding after a brief delay
+                if hasattr(self.gui, 'subtitle_timer') and self.gui.subtitle_timer:
+                    self.gui.root.after_cancel(self.gui.subtitle_timer)
+                self.gui.subtitle_timer = self.gui.root.after(
+                    int(duration * 1000) + 1000, self.gui.hide_subtitle
+                )
+        else:
+            # No more sentences, hide subtitle
+            if self.gui:
+                self.gui.hide_subtitle()
 
     def _play_audio_in_thread(self, speech, duration):
         """Play audio in a separate thread - OPTIMIZED VERSION"""
@@ -820,10 +1140,9 @@ class OllamaHandler:
                 avatar.set_emotion("neutral")
                 print(f"[DEBUG] Audio Thread: Avatar speaking animation stopped")
 
-            # Hide subtitle when audio finishes
-            if self.gui:
-                self.gui.hide_subtitle()
-                print(f"[DEBUG] Audio Thread: Subtitle hidden")
+            # Don't hide subtitle here - let the sentence system handle it
+            # The subtitle system will hide itself when all sentences are shown
+            print(f"[DEBUG] Audio Thread: Letting subtitle system handle hiding")
 
             # Reset state flags after audio completes
             self.is_processing = False
@@ -841,8 +1160,8 @@ class OllamaHandler:
                 avatar.stop_speaking()
                 avatar.set_emotion("neutral")
 
-            if self.gui:
-                self.gui.hide_subtitle()
+            # Don't force hide subtitle on error - let sentence system complete
+            print(f"[DEBUG] Audio Thread: Error occurred, but letting subtitle system finish")
 
             self.is_processing = False
 
