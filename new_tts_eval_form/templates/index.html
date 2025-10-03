@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Emotion Recognition Evaluation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .evaluation-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .audio-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .audio-player {
+            flex: 0 0 300px;
+        }
+        .emotion-select {
+            flex: 1;
+            max-width: 250px;
+        }
+        .naturalness-rating {
+            flex: 0 0 200px;
+        }
+        .naturalness-rating label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .rating-options {
+            display: flex;
+            gap: 5px;
+        }
+        .rating-btn {
+            flex: 1;
+            padding: 8px 5px;
+            border: 2px solid #dee2e6;
+            background-color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .rating-btn:hover {
+            border-color: #007bff;
+            background-color: #e7f3ff;
+        }
+        .rating-btn.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .audio-number {
+            flex: 0 0 60px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #6c757d;
+            text-align: center;
+        }
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #007bff;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+        .submit-section {
+            position: sticky;
+            bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 30px;
+        }
+        .progress-text {
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+        @media (max-width: 768px) {
+            .audio-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .audio-player, .emotion-select, .naturalness-rating {
+                flex: 1;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-indicator" id="progressBar"></div>
+    
+    <div class="container">
+        <div class="header-section">
+            <h1 class="mb-4">TTS Emotion Recognition Evaluation</h1>
+            <div class="instructions">
+                <h4>Instructions:</h4>
+                <p class="mb-2">Welcome to the TTS Emotion Recognition Evaluation!</p>
+                <p class="mb-2">You will listen to <strong>{{ audio_files|length }}</strong> audio samples from different TTS models.</p>
+                <p class="mb-2">For each audio sample:</p>
+                <ol class="text-start">
+                    <li>Listen to the audio carefully</li>
+                    <li>Select which emotion you think the voice is expressing</li>
+                    <li>Rate the naturalness (1=Very Unnatural, 5=Very Natural)</li>
+                    <li>You can replay the audio as many times as needed</li>
+                </ol>
+                <p class="mb-0"><strong>Available emotions:</strong> Joy, Sadness, Anger, Surprise, Neutral</p>
+            </div>
+        </div>
+
+        <div class="evaluation-container">
+            <form id="evaluationForm">
+                {% for audio in audio_files %}
+                <div class="audio-item">
+                    <div class="audio-number">{{ loop.index }}</div>
+                    <div class="audio-player">
+                        <audio controls class="w-100">
+                            <source src="{{ url_for('static', filename=audio.path) }}" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <div class="emotion-select">
+                        <select class="form-select emotion-dropdown" 
+                                data-model="{{ audio.model }}"
+                                data-file="{{ audio.filename }}"
+                                data-true-emotion="{{ audio.emotion }}"
+                                data-model-type="{{ audio.model_type }}"
+                                data-index="{{ loop.index0 }}"
+                                required>
+                            <option value="">Select emotion...</option>
+                            {% for emotion in emotions %}
+                            <option value="{{ emotion }}">{{ emotion|title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="naturalness-rating">
+                        <label>Naturalness:</label>
+                        <div class="rating-options" data-index="{{ loop.index0 }}">
+                            <button type="button" class="rating-btn" data-value="1">1</button>
+                            <button type="button" class="rating-btn" data-value="2">2</button>
+                            <button type="button" class="rating-btn" data-value="3">3</button>
+                            <button type="button" class="rating-btn" data-value="4">4</button>
+                            <button type="button" class="rating-btn" data-value="5">5</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </form>
+        </div>
+
+        <div class="submit-section">
+            <div class="progress-text" id="progressText">0 / {{ audio_files|length }} completed</div>
+            <div class="progress mb-3">
+                <div class="progress-bar" role="progressbar" id="progressBarMain" style="width: 0%"></div>
+            </div>
+            <button id="submitButton" class="btn btn-primary btn-lg" disabled>
+                Submit Evaluation
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('evaluationForm');
+            const dropdowns = document.querySelectorAll('.emotion-dropdown');
+            const ratingContainers = document.querySelectorAll('.rating-options');
+            const submitButton = document.getElementById('submitButton');
+            const progressBar = document.getElementById('progressBar');
+            const progressBarMain = document.getElementById('progressBarMain');
+            const progressText = document.getElementById('progressText');
+            const totalItems = dropdowns.length;
+
+            // Store naturalness ratings
+            const naturalnessRatings = new Array(totalItems).fill(null);
+
+            // Handle rating button clicks
+            ratingContainers.forEach(container => {
+                const index = parseInt(container.dataset.index);
+                const buttons = container.querySelectorAll('.rating-btn');
+                
+                buttons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Remove selected class from all buttons in this container
+                        buttons.forEach(btn => btn.classList.remove('selected'));
+                        // Add selected class to clicked button
+                        this.classList.add('selected');
+                        // Store the rating
+                        naturalnessRatings[index] = parseInt(this.dataset.value);
+                        // Update progress
+                        updateProgress();
+                    });
+                });
+            });
+
+            // Update progress
+            function updateProgress() {
+                const emotionsCompleted = Array.from(dropdowns).filter(dropdown => dropdown.value !== '').length;
+                const ratingsCompleted = naturalnessRatings.filter(rating => rating !== null).length;
+                const completed = Math.min(emotionsCompleted, ratingsCompleted);
+                const percentage = (completed / totalItems) * 100;
+                
+                progressBar.style.width = `${percentage}%`;
+                progressBarMain.style.width = `${percentage}%`;
+                progressText.textContent = `${completed} / ${totalItems} completed`;
+                
+                // Enable submit button when both emotions and ratings are completed
+                submitButton.disabled = emotionsCompleted < totalItems || ratingsCompleted < totalItems;
+            }
+
+            // Add change listeners to all dropdowns
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', updateProgress);
+            });
+
+            // Handle form submission
+            submitButton.addEventListener('click', async function() {
+                if (!form.checkValidity()) {
+                    alert('Please complete all emotion selections before submitting.');
+                    return;
+                }
+
+                // Check if all naturalness ratings are completed
+                if (naturalnessRatings.includes(null)) {
+                    alert('Please rate the naturalness for all audio samples.');
+                    return;
+                }
+
+                // Collect all evaluations
+                const evaluations = Array.from(dropdowns).map((dropdown, index) => ({
+                    model: dropdown.dataset.model,
+                    file: dropdown.dataset.file,
+                    true_emotion: dropdown.dataset.trueEmotion,
+                    selected_emotion: dropdown.value,
+                    model_type: dropdown.dataset.modelType,
+                    naturalness: naturalnessRatings[index]
+                }));
+
+                // Submit data
+                try {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Submitting...';
+                    
+                    const response = await fetch('/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            evaluations: evaluations
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert('Thank you for your evaluation!');
+                        window.location.href = '/results';
+                    } else {
+                        alert('Error submitting evaluation. Please try again.');
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Submit Evaluation';
+                    }
+                } catch (error) {
+                    alert('Error submitting evaluation. Please try again.');
+                    console.error('Error:', error);
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Evaluation';
+                }
+            });
+
+            // Initialize progress
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
+

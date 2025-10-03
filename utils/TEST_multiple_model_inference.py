@@ -21,7 +21,7 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 
 # List of models to test
-MODELS_TO_TEST = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
+MODELS_TO_TEST = ["Amelia"]
 
 # Base output directory
 BASE_OUTPUT_DIR = Path("asset/outputs")
@@ -50,13 +50,136 @@ def ensure_output_directory(path):
         raise RuntimeError(f"Cannot write to output directory {path}: {str(e)}")
 
 
-# Test prompts optimized for each emotion
+# Test prompts optimized for each emotion - 4 prompts per emotion per character
 EMOTION_SPECIFIC_PROMPTS = {
-    "joy": "I just got promoted at work! This is the happiest day of my life! I won't let anybody ruin it!",
-    "sadness": "I had to say goodbye to my best friend today, I'm so sad.",
-    "anger": "They completely destroyed the project I spent months working on!",
-    "surprise": "I can't believe I just won the lottery! This is unbelievable!",
-    "neutral": "The meeting is scheduled for three o'clock in the conference room.",
+    "Gura": {
+        "joy": [
+            "I just got promoted at work! This is the happiest day of my life! I won't let anybody ruin it!",
+            "I love spending time with my family! These moments bring me so much joy and warmth!",
+            "Today has been absolutely wonderful! Everything is going perfectly and I feel so happy!",
+            "This delicious meal makes me so happy! I could eat this every single day!",
+        ],
+        "sadness": [
+            "I had to say goodbye to my best friend today, I'm so sad.",
+            "I lost something very precious to me. I don't know if I'll ever feel the same again.",
+            "The news broke my heart. I just want to cry and be alone for a while.",
+            "I feel so lonely and empty inside. Nothing seems to matter anymore.",
+        ],
+        "anger": [
+            "They completely destroyed the project I spent months working on!",
+            "This is unacceptable! I've had enough of being treated this way!",
+            "How dare they betray my trust like that! I'm absolutely furious!",
+            "I'm sick and tired of these constant lies and excuses!",
+        ],
+        "surprise": [
+            "I can't believe I just won the lottery! This is unbelievable!",
+            "Wait, what? You're telling me this actually happened? I'm completely shocked!",
+            "No way! I never expected this in a million years! This is incredible!",
+            "What?! Are you serious right now? This is absolutely mind-blowing!",
+        ],
+        "neutral": [
+            "The meeting is scheduled for three o'clock in the conference room.",
+            "According to the report, the results are consistent with our previous findings.",
+            "Please ensure that all documents are submitted by the end of the week.",
+            "The system will undergo maintenance between two and four in the afternoon.",
+        ],
+    },
+    "Wilson": {
+        "joy": [
+            "The research is progressing beautifully! I'm thrilled with how smoothly everything is going!",
+            "This is exactly what I've been hoping for! My hard work finally paid off!",
+            "I feel so grateful and blessed! Life is treating me wonderfully right now!",
+            "What a beautiful day! The sunshine and fresh air make me feel alive!",
+        ],
+        "sadness": [
+            "My heart feels heavy with sorrow. I don't know how to move forward.",
+            "The disappointment is crushing me. All my efforts were for nothing.",
+            "I can't stop thinking about what went wrong. The regret is unbearable.",
+            "They're gone now, and I'll never get another chance. I'm devastated.",
+        ],
+        "anger": [
+            "This is ridiculous! I refuse to tolerate this incompetence any longer!",
+            "You broke your promise again! I'm done giving you second chances!",
+            "The injustice of this situation makes my blood boil! This isn't fair!",
+            "I warned you this would happen! Now look at the mess we're in!",
+        ],
+        "surprise": [
+            "Oh my goodness! I didn't see that coming at all! What a twist!",
+            "That's impossible! How could this even happen? I'm in complete disbelief!",
+            "You're kidding me, right? This is too extraordinary to be true!",
+            "Wow! That caught me completely off guard! I never imagined this!",
+        ],
+        "neutral": [
+            "The data shows a steady increase over the past three quarters.",
+            "We need to finalize the budget allocation before next Tuesday.",
+            "The instructions are clearly outlined in the user manual on page twelve.",
+            "Please submit your feedback using the online form provided.",
+        ],
+    },
+    "Amelia": {
+        "joy": [
+            "The investigation is going great! I'm having so much fun solving this mystery!",
+            "I love this adventure! Every moment brings me pure joy and excitement!",
+            "This is wonderful! I'm genuinely happy with how things are turning out!",
+            "Being with my friends makes me so cheerful! I cherish these happy times!",
+        ],
+        "sadness": [
+            "I miss the old days so much. Everything feels different now and it hurts.",
+            "My confidence is shattered. I thought I could do better than this.",
+            "I let everyone down. The weight of this failure is crushing my spirit.",
+            "Sometimes I feel so alone in this. Nobody understands what I'm going through.",
+        ],
+        "anger": [
+            "Are you serious right now?! I can't believe you'd do something so thoughtless!",
+            "That's it! I've been patient long enough but this is too much!",
+            "You're really testing my limits here! This behavior is completely unacceptable!",
+            "I'm fed up with this nonsense! Someone needs to take responsibility!",
+        ],
+        "surprise": [
+            "Wait, hold on! Did that really just happen?! I'm completely stunned!",
+            "What in the world?! This is beyond anything I could have imagined!",
+            "Are you telling me the truth?! I'm in total shock right now!",
+            "Holy smokes! I never would have predicted this in a hundred years!",
+        ],
+        "neutral": [
+            "The evidence suggests we should proceed with the standard protocol.",
+            "I'll need to review the case files before making any conclusions.",
+            "The schedule indicates our next appointment is at four o'clock.",
+            "Please make sure to document everything according to procedure.",
+        ],
+    },
+    "Eveland": {
+        "joy": [
+            "This novel is absolutely delightful! Reading it brings me such happiness!",
+            "I'm truly content with how everything has unfolded. Life feels fulfilling!",
+            "The performance was magnificent! I'm so pleased I attended this evening!",
+            "What a lovely conversation! I feel genuinely joyful sharing these moments!",
+        ],
+        "sadness": [
+            "The melancholy weighs on me heavily. I cannot shake this somber feeling.",
+            "I'm drowning in disappointment. My expectations have crumbled to dust.",
+            "The separation pains me deeply. I fear this emptiness will never fade.",
+            "Everything feels meaningless now. The sadness has consumed my enthusiasm.",
+        ],
+        "anger": [
+            "This is absolutely preposterous! I will not stand for such disrespect!",
+            "Your negligence is infuriating! Have you no sense of responsibility?!",
+            "I am outraged by this behavior! This crosses every line imaginable!",
+            "How utterly disgraceful! This incompetence is beyond frustrating!",
+        ],
+        "surprise": [
+            "Good heavens! I never anticipated such an extraordinary turn of events!",
+            "What?! This revelation is absolutely staggering! I'm flabbergasted!",
+            "Impossible! How could this possibly be?! I'm utterly dumbfounded!",
+            "My word! This is the most astonishing thing I've ever witnessed!",
+        ],
+        "neutral": [
+            "The manuscript requires careful editing before publication.",
+            "I shall attend the seminar on Thursday at half past two.",
+            "The library closes at eight in the evening on weekdays.",
+            "Please reference chapter seven for additional information.",
+        ],
+    },
 }
 
 # Core emotions matching our reference sound files
@@ -110,36 +233,37 @@ def test_model(model_name):
     print("\nTesting emotion-specific prompts:")
     print("-" * 80)
 
-    for emotion, text in EMOTION_SPECIFIC_PROMPTS.items():
-        print(f"\nTesting {emotion} with optimized prompt:")
-        print(f"Text: {text}")
+    for emotion, prompts in EMOTION_SPECIFIC_PROMPTS[model_name].items():
+        for idx, text in enumerate(prompts, 1):
+            print(f"\nTesting {emotion} with prompt {idx}/4:")
+            print(f"Text: {text}")
 
-        # Generate speech using parameters from emotion_config
-        start = time.time()
-        print("Generating speech...")
+            # Generate speech using parameters from emotion_config
+            start = time.time()
+            print("Generating speech...")
 
-        ref_path = f"asset/ref_sound/{emotion_config[emotion]['file'][model_name]}"
-        # Compute style for each inference to avoid cross-model contamination
-        ref_style = tts.compute_style(ref_path)
-        audio = tts.inference(
-            text=text,
-            ref_s=ref_style,
-            alpha=emotion_config[emotion]["alpha"],
-            beta=emotion_config[emotion]["beta"],
-            diffusion_steps=DIFFUSION_STEPS,
-            embedding_scale=emotion_config[emotion]["embedding_scale"],
-        )
+            ref_path = f"asset/ref_sound/{emotion_config[emotion]['file'][model_name]}"
+            # Compute style for each inference to avoid cross-model contamination
+            ref_style = tts.compute_style(ref_path)
+            audio = tts.inference(
+                text=text,
+                ref_s=ref_style,
+                alpha=emotion_config[emotion]["alpha"],
+                beta=emotion_config[emotion]["beta"],
+                diffusion_steps=DIFFUSION_STEPS,
+                embedding_scale=emotion_config[emotion]["embedding_scale"],
+            )
 
-        duration = time.time() - start
-        print(f"Time taken: {duration:.2f}s")
+            duration = time.time() - start
+            print(f"Time taken: {duration:.2f}s")
 
-        # Save audio
-        output_path = output_dir / f"specific_{emotion}.wav"
-        sf.write(str(output_path), audio, 24000)
-        if output_path.exists():
-            print(f"Successfully saved to: {output_path}")
-        else:
-            print(f"Failed to save to: {output_path}")
+            # Save audio
+            output_path = output_dir / f"specific_{emotion}_{idx}.wav"
+            sf.write(str(output_path), audio, 24000)
+            if output_path.exists():
+                print(f"Successfully saved to: {output_path}")
+            else:
+                print(f"Failed to save to: {output_path}")
 
     # Test 2: Same text with core emotions only
     print("\nTesting generic text with core emotions:")

@@ -1,0 +1,22 @@
+# This directory should contain audio files organized by model
+# 
+# Expected structure:
+# audio/
+# ├── Amelia/
+# │   ├── specific_joy_1.wav
+# │   ├── specific_joy_2.wav
+# │   ├── specific_joy_3.wav
+# │   ├── specific_joy_4.wav
+# │   ├── generic_joy.wav
+# │   ├── specific_sadness_1.wav through specific_sadness_4.wav
+# │   ├── generic_sadness.wav
+# │   └── ... (25 files total: 20 specific + 5 generic)
+# ├── Eveland/
+# │   └── ... (25 files total)
+# ├── Gura/
+# │   └── ... (25 files total)
+# └── Amelia_new/
+#     └── ... (25 files total)
+#
+# Total: 100 audio files (4 models × 25 files each)
+
