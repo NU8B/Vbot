@@ -9,19 +9,33 @@ from pathlib import Path
 import threading
 import os
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_cache_path, get_ref_sound_path, get_output_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 
 class AudioProcessor:
     def __init__(self, device_index=None):
-        cache_dir = Path("./cache/style_tts2_ft")
-        cache_dir.mkdir(exist_ok=True)
-
-        # Create outputs directory if it doesn't exist
-        self.output_dir = Path("asset/outputs")
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        # Use resource path management if available
+        if RESOURCE_PATH_AVAILABLE:
+            cache_dir = get_cache_path("style_tts2_ft")
+            self.output_dir = get_output_path()
+        else:
+            # Fallback for development mode
+            cache_dir = Path("./cache/style_tts2_ft")
+            cache_dir.mkdir(exist_ok=True)
+            self.output_dir = Path("asset/outputs")
+            self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Use correct path for neutral.wav
         model_name = os.getenv("VOICE_TYPE", "amelia_watson")
-        self.ref_audio_path = f"asset/ref_sound/{model_name}/neutral.wav"
+        if RESOURCE_PATH_AVAILABLE:
+            self.ref_audio_path = str(get_ref_sound_path(model_name, "neutral.wav"))
+        else:
+            self.ref_audio_path = f"asset/ref_sound/{model_name}/neutral.wav"
 
         # Performance optimization: Use smallest model and optimized settings
         # Smart device selection with cuDNN fallback

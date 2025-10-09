@@ -1,6 +1,13 @@
 from transformers import pipeline
 import torch
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_ref_sound_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 # Emotion model settings
 EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
 

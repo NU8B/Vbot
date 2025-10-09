@@ -20,6 +20,13 @@ from tha4.app.animations.idle_animation import IdleAnimation
 from tha4.app.animations.base_animation import BaseAnimation
 from tha4.app.animations.surprise_animation import SurpriseAnimation
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_model_path, get_background_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 # Import AI upscaler - DISABLED FOR PERFORMANCE
 # try:
 #     from .ai_upscaler import AIUpscaler
@@ -68,9 +75,15 @@ class AnimatedCharacter:
             self.bg_color = model_colors.get(self.model_name, "#2b2b3b")
 
         # Update model path to match the new structure
-        self.model_path = model_path or Path(
-            f"asset/model/{self.model_name}/character_model/character_model.yaml"
-        )
+        if model_path:
+            self.model_path = model_path
+        elif RESOURCE_PATH_AVAILABLE:
+            self.model_path = get_model_path(self.model_name, "character_model", "character_model.yaml")
+        else:
+            # Fallback for development mode
+            self.model_path = Path(
+                f"asset/model/{self.model_name}/character_model/character_model.yaml"
+            )
 
         print(f"Looking for model at: {self.model_path.absolute()}")
         print(f"Using background color: {self.bg_color}")

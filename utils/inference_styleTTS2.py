@@ -18,6 +18,13 @@ import re
 import contextlib
 from utils.emotion_utils import EMOTION_CONFIG
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_styletts2_path, get_cache_path, get_ref_sound_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 # Suppress all warnings
 warnings.filterwarnings("ignore")
 logging.getLogger("phonemizer").setLevel(logging.ERROR)
@@ -36,9 +43,13 @@ if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
 # Add StyleTTS2 directory to Python path
-styletts2_path = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "StyleTTS2"
-)
+if RESOURCE_PATH_AVAILABLE:
+    styletts2_path = str(get_styletts2_path())
+else:
+    # Fallback for development mode
+    styletts2_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "StyleTTS2"
+    )
 sys.path.append(styletts2_path)
 
 
@@ -83,8 +94,12 @@ class StyleTTS2Inference:
             torch.cuda.set_per_process_memory_fraction(0.8)  # Use max 80% of GPU memory
 
         # Create cache directory based on model name
-        self.cache_dir = Path("cache/style") / model_name
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        if RESOURCE_PATH_AVAILABLE:
+            self.cache_dir = get_cache_path("style", model_name)
+        else:
+            # Fallback for development mode
+            self.cache_dir = Path("cache/style") / model_name
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Add style cache
         self._style_cache = {}

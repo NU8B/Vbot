@@ -12,6 +12,13 @@ import numpy as np
 import soundfile as sf
 import torch
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_output_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 # Ollama settings
 MAX_HISTORY = 10  # Maximum number of conversation turns to keep
 MAX_LENGTH = (
@@ -122,8 +129,11 @@ class OllamaHandler:
         )
 
         # Create outputs directory if it doesn't exist
-        self.output_dir = Path("asset/outputs")
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        if RESOURCE_PATH_AVAILABLE:
+            self.output_dir = get_output_path()
+        else:
+            self.output_dir = Path("asset/outputs")
+            self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.emotion_handler = EmotionHandler()  # Initialize emotion handler
 

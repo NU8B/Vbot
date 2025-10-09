@@ -16,6 +16,13 @@ from .performance_boost import (
     MemoryManager,
 )
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_cache_path, get_ref_sound_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 
 class InitializationHandler:
     def __init__(self, model_name="Amelia", device_index=None):
@@ -95,14 +102,20 @@ class InitializationHandler:
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                style_path = str(get_ref_sound_path(self.model_name, f"{style_file}.wav"))
+            else:
+                style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
             if not self.tts_model.is_style_cached(style_path):
                 self.styles_were_cached = False
                 break
 
         if self.styles_were_cached:
             print("🚀 Using cached reference styles")
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                neutral_path = str(get_ref_sound_path(self.model_name, "neutral.wav"))
+            else:
+                neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
             return self.tts_model.get_cached_style(neutral_path)
         else:
             print("⏳ Computing reference styles...")
@@ -200,7 +213,11 @@ class InitializationHandler:
         performance_monitor.start_timer("total_initialization")
 
         # Create cache directory
-        Path("./cache").mkdir(exist_ok=True)
+        if RESOURCE_PATH_AVAILABLE:
+            cache_dir = get_cache_path()
+        else:
+            cache_dir = Path("./cache")
+            cache_dir.mkdir(exist_ok=True)
 
         # Phase 1: Critical components first (blocking)
         performance_monitor.start_timer("critical_components")
@@ -311,7 +328,10 @@ class InitializationHandler:
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                style_path = str(get_ref_sound_path(self.model_name, f"{style_file}.wav"))
+            else:
+                style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
             if not self.tts_model.is_style_cached(style_path):
                 self.styles_were_cached = False
                 break
@@ -328,7 +348,10 @@ class InitializationHandler:
 
         if self.styles_were_cached:
             # When styles are cached, we can load and use them directly
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                neutral_path = str(get_ref_sound_path(self.model_name, "neutral.wav"))
+            else:
+                neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
             cached_style = self.tts_model.get_cached_style(neutral_path)
 
             def warmup_task():
@@ -396,7 +419,10 @@ class InitializationHandler:
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                style_path = str(get_ref_sound_path(self.model_name, f"{style_file}.wav"))
+            else:
+                style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
             if not self.tts_model.is_style_cached(style_path):
                 self.styles_were_cached = False
                 break
@@ -414,7 +440,10 @@ class InitializationHandler:
 
         if self.styles_were_cached:
             # When styles are cached, we can load and use them directly
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                neutral_path = str(get_ref_sound_path(self.model_name, "neutral.wav"))
+            else:
+                neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
             cached_style = self.tts_model.get_cached_style(neutral_path)
 
             def warmup_task():
@@ -476,14 +505,20 @@ class InitializationHandler:
             all_cached = True
             for style_file in unique_styles:
                 # Add .wav extension to the style file
-                style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+                if RESOURCE_PATH_AVAILABLE:
+                    style_path = str(get_ref_sound_path(self.model_name, f"{style_file}.wav"))
+                else:
+                    style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
                 if not self.tts_model.is_style_cached(style_path):
                     all_cached = False
                     break
 
             if all_cached:
                 # Just load and return neutral style without computation
-                neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+                if RESOURCE_PATH_AVAILABLE:
+                    neutral_path = str(get_ref_sound_path(self.model_name, "neutral.wav"))
+                else:
+                    neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
                 return self.tts_model.get_cached_style(neutral_path)
 
             # If not all cached, compute missing styles
@@ -491,7 +526,10 @@ class InitializationHandler:
             for style_file in unique_styles:
                 try:
                     # Add .wav extension to the style file
-                    style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+                    if RESOURCE_PATH_AVAILABLE:
+                        style_path = str(get_ref_sound_path(self.model_name, f"{style_file}.wav"))
+                    else:
+                        style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
                     if not self.tts_model.is_style_cached(style_path):
                         self.tts_model.compute_style(style_path)
                 except Exception as e:
@@ -499,7 +537,10 @@ class InitializationHandler:
                     continue
 
             self.results["style_computation"] = {"time": time.time() - style_start}
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            if RESOURCE_PATH_AVAILABLE:
+                neutral_path = str(get_ref_sound_path(self.model_name, "neutral.wav"))
+            else:
+                neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
             return self.tts_model.compute_style(neutral_path)
         except Exception as e:
             print(f"⚠️ Style computation failed: {e}")

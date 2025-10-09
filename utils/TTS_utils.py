@@ -4,6 +4,13 @@ import soundfile as sf
 from pathlib import Path
 from .emotion_utils import DIFFUSION_STEPS, create_emotion_config
 
+# Import resource path management
+try:
+    from vbot_launcher.resource_path import get_output_path, get_ref_sound_path
+    RESOURCE_PATH_AVAILABLE = True
+except ImportError:
+    RESOURCE_PATH_AVAILABLE = False
+
 
 class InferenceHandler:
     def __init__(self, tts_model, emotion_handler, model_name="Amelia"):
@@ -17,8 +24,11 @@ class InferenceHandler:
         self.emotion_config = create_emotion_config(model_name)
 
         # Create outputs directory if it doesn't exist
-        self.output_dir = Path("asset/outputs")
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        if RESOURCE_PATH_AVAILABLE:
+            self.output_dir = get_output_path()
+        else:
+            self.output_dir = Path("asset/outputs")
+            self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def process_text(self, text, response, timings=None):
         """Process text and generate speech with emotion - OPTIMIZED VERSION."""
@@ -32,7 +42,12 @@ class InferenceHandler:
 
             # Get style file and parameters for emotion
             emotion_params = self.emotion_config[detected_emotion]
-            style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
+            
+            # Get style path
+            if RESOURCE_PATH_AVAILABLE:
+                style_path = str(get_ref_sound_path(emotion_params['file'][self.model_name]))
+            else:
+                style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
 
             # Get cached style
             current_ref_style = self.tts_model.get_cached_style(style_path)
