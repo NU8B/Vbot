@@ -32,7 +32,17 @@ class InferenceHandler:
 
             # Get style file and parameters for emotion
             emotion_params = self.emotion_config[detected_emotion]
-            style_path = f"asset/ref_sound/{emotion_params['file'][self.model_name]}"
+            # Get project root for path construction
+            import os
+
+            project_root = os.getenv(
+                "PROJECT_ROOT",
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            )
+            style_path = os.path.join(
+                project_root,
+                f"asset/ref_sound/{emotion_params['file'][self.model_name]}",
+            )
 
             # Get cached style
             current_ref_style = self.tts_model.get_cached_style(style_path)

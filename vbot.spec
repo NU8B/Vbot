@@ -21,6 +21,9 @@ datas = [
     # Asset files
     ('asset', 'asset'),
     
+    # Avatar profile images
+    ('recommender-avatar-profile', 'recommender-avatar-profile'),
+    
     # StyleTTS2 files
     ('StyleTTS2', 'StyleTTS2'),
     
@@ -55,7 +58,7 @@ except Exception as e:
 # Note: unittest will be handled via pathex in Analysis
 
 # Collect other package data
-for package in ['phonemizer', 'gruut', 'num2words']:
+for package in ['phonemizer', 'gruut', 'num2words', 'language_tags', 'segments', 'csvw']:
     try:
         datas += collect_data_files(package)
     except Exception:
@@ -81,6 +84,11 @@ hiddenimports = [
     'phonemizer',
     'gruut',
     'num2words',
+    'language_tags',
+    'segments',
+    'csvw',
+    'einops',
+    'einops_exts',
     
     # Audio processing
     'librosa',
@@ -109,9 +117,13 @@ hiddenimports = [
     'docker',
     'requests',
     
-    # Emotion detection
+    # Emotion detection & Scientific computing
     'sklearn',
     'sklearn.preprocessing',
+    'scipy',
+    'scipy.stats',
+    'scipy.sparse',
+    'numpy.testing',
     
     # Utilities
     'yaml',
@@ -196,34 +208,29 @@ if cuda_path:
 # ============================================================================
 
 excludes = [
-    # Development tools
+    # Development tools (minimal exclusions to avoid breaking dependencies)
     'pytest',
     'IPython',
     'jupyter',
     'notebook',
     
-    # Unused matplotlib backends
-    'matplotlib',
+    # Unused matplotlib backends (but keep matplotlib itself as tha4 needs it)
     'matplotlib.backends.backend_gtk3',
     'matplotlib.backends.backend_qt5',
     
-    # Data science (not needed)
-    'pandas',
-    'numpy.testing',
-    
-    # Docs and tests
-    'test',
-    'tests',
-    'testing',
-    'unittest',
-    
-    # Unused GUI toolkits
+    # Unused GUI toolkits (but keep wx as it's needed for avatar)
     'PyQt5',
     'PyQt6',
     'PySide2',
     'PySide6',
     'gtk',
-    'wx',
+    
+    # Notes on what we're keeping:
+    # - unittest: needed by torch
+    # - wx: needed for avatar system
+    # - matplotlib: needed by tha4 avatar system
+    # - numpy.testing: needed by scipy (used by transformers)
+    # - pandas: would exclude but might break dependencies, keeping it in for safety
 ]
 
 # ============================================================================
@@ -231,7 +238,7 @@ excludes = [
 # ============================================================================
 
 a = Analysis(
-    ['vbot_launcher/launcher.py'],  # Main entry point (using launcher!)
+    ['Vbot.py'],  # Main entry point
     pathex=[
         project_root,
         r'C:\ProgramData\Anaconda3\Lib',  # Add base Anaconda for unittest

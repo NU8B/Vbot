@@ -61,15 +61,19 @@ class InitializationHandler:
 
     def _initialize_tts(self):
         """Initialize TTS model - NO CACHING, FRESH INSTANCE EVERY TIME"""
-        
-        print(f"🔊 Creating COMPLETELY FRESH StyleTTS2Inference for model: {self.model_name}")
+
+        print(
+            f"🔊 Creating COMPLETELY FRESH StyleTTS2Inference for model: {self.model_name}"
+        )
         print(f"🧵 Thread: {threading.current_thread().name}")
         print(f"🚫 NO CACHING - Fresh instance guaranteed")
-        
+
         # Create completely fresh TTS model - no caching whatsoever
         tts_model = StyleTTS2Inference(model_name=self.model_name)
-        
-        print(f"✅ TTS model created - Name: {tts_model.model_name}, Repo: {tts_model.repo_id}")
+
+        print(
+            f"✅ TTS model created - Name: {tts_model.model_name}, Repo: {tts_model.repo_id}"
+        )
         print(f"🆔 TTS model object ID: {id(tts_model)}")
         print(f"🔑 TTS unique ID: {getattr(tts_model, '_unique_id', 'N/A')}")
 
@@ -83,24 +87,37 @@ class InitializationHandler:
         """Initialize reference style with caching"""
         if not self.tts_model:
             # TTS model should already be created directly - this shouldn't happen
-            print(f"⚠️ WARNING: TTS model not found for {self.model_name} during ref_style init")
+            print(
+                f"⚠️ WARNING: TTS model not found for {self.model_name} during ref_style init"
+            )
             return None
+
+        # Get project root for path construction
+        project_root = os.getenv(
+            "PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
 
         # Check if all styles are cached for this model
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         print(f"🔍 Checking reference styles for {self.model_name}...")
-        
+
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            style_path = os.path.join(
+                project_root, f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            )
             is_cached = self.tts_model.is_style_cached(style_path)
-            print(f"   {style_file}.wav: {'✅ Cached' if is_cached else '❌ Not cached'}")
+            print(
+                f"   {style_file}.wav: {'✅ Cached' if is_cached else '❌ Not cached'}"
+            )
             if not is_cached:
                 self.styles_were_cached = False
 
         if self.styles_were_cached:
             print("🚀 Using cached reference styles")
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            neutral_path = os.path.join(
+                project_root, f"asset/ref_sound/{self.model_name}/neutral.wav"
+            )
             return self.tts_model.get_cached_style(neutral_path)
         else:
             print("⏳ Computing reference styles...")
@@ -150,7 +167,7 @@ class InitializationHandler:
             inference_handler=self.inference_handler,
             model_name=self.model_name,
         )
-        
+
         # Explicitly set the model personality to ensure it's properly initialized
         print(f"🎭 Initializing {self.model_name} personality in OllamaHandler...")
         handler.set_model(self.model_name)
@@ -206,7 +223,7 @@ class InitializationHandler:
 
         # Phase 1: Critical components first (blocking)
         performance_monitor.start_timer("critical_components")
-        
+
         # REMOVE TTS FROM SHARED LOADER - Create fresh instance for each character
         critical_loaders = {
             "docker": (self._initialize_docker, [], {}),
@@ -218,7 +235,7 @@ class InitializationHandler:
 
         # Get critical components
         self.docker_handler = startup_optimizer.lazy_loader.get("docker")
-        
+
         # ALWAYS create a fresh TTS model for each character - NO SHARING
         print(f"🔄 Creating FRESH TTS model for {self.model_name} (NO CACHING)")
         self.tts_model = self._initialize_tts()  # Always call directly
@@ -477,20 +494,32 @@ class InitializationHandler:
     def _cache_all_styles(self):
         """Cache all unique style files with error handling"""
         try:
+            # Get project root for path construction
+            import os
+
+            project_root = os.getenv(
+                "PROJECT_ROOT",
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            )
+
             unique_styles = set(EMOTION_MAPPING.values())
 
             # Quick check if all styles are cached
             all_cached = True
             for style_file in unique_styles:
                 # Add .wav extension to the style file
-                style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+                style_path = os.path.join(
+                    project_root, f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+                )
                 if not self.tts_model.is_style_cached(style_path):
                     all_cached = False
                     break
 
             if all_cached:
                 # Just load and return neutral style without computation
-                neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+                neutral_path = os.path.join(
+                    project_root, f"asset/ref_sound/{self.model_name}/neutral.wav"
+                )
                 return self.tts_model.get_cached_style(neutral_path)
 
             # If not all cached, compute missing styles
@@ -498,7 +527,10 @@ class InitializationHandler:
             for style_file in unique_styles:
                 try:
                     # Add .wav extension to the style file
-                    style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+                    style_path = os.path.join(
+                        project_root,
+                        f"asset/ref_sound/{self.model_name}/{style_file}.wav",
+                    )
                     if not self.tts_model.is_style_cached(style_path):
                         self.tts_model.compute_style(style_path)
                 except Exception as e:
@@ -506,7 +538,9 @@ class InitializationHandler:
                     continue
 
             self.results["style_computation"] = {"time": time.time() - style_start}
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            neutral_path = os.path.join(
+                project_root, f"asset/ref_sound/{self.model_name}/neutral.wav"
+            )
             return self.tts_model.compute_style(neutral_path)
         except Exception as e:
             print(f"⚠️ Style computation failed: {e}")

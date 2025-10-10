@@ -16,8 +16,18 @@ import queue
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add the project root directory to Python path
-project_root = os.path.dirname(os.path.abspath(__file__))
+# Handle PyInstaller bundled environment
+if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    # Running in PyInstaller bundle
+    project_root = sys._MEIPASS
+else:
+    # Running in normal Python environment
+    project_root = os.path.dirname(os.path.abspath(__file__))
+
 sys.path.append(project_root)
+
+# Set environment variable for other modules to use
+os.environ["PROJECT_ROOT"] = project_root
 
 from utils.gui import ChatGUI
 from utils.initialization_utils import InitializationHandler
@@ -911,10 +921,10 @@ class ModernChatGUI(ChatGUI):
             command=self._add_new_background,
             font=("Arial", 11, "italic"),
         )
-        
+
         # Add separator
         menu.add_separator()
-        
+
         # Add "Change Avatar" option
         menu.add_command(
             label="  🔄 Change Avatar",
@@ -1038,34 +1048,34 @@ class ModernChatGUI(ChatGUI):
     def set_model_switch_callback(self, callback):
         """Set callback for model switching"""
         self.on_model_switch = callback
-    
+
     def _show_avatar_selection(self):
         """Show avatar selection dialog"""
         if self.is_processing:
             return
-        
+
         try:
             from utils.welcome_screen import show_welcome_screen
             from utils.user_preferences import record_avatar_selection
-            
+
             def on_avatar_selected(selected_avatar: str):
                 """Handle avatar selection from welcome screen"""
                 if selected_avatar != self.model_name:
                     # Record the selection
                     record_avatar_selection(selected_avatar)
-                    
+
                     # Switch to the new avatar
                     self._select_character(selected_avatar)
-            
+
             # Hide current window temporarily
             self.root.withdraw()
-            
+
             # Show welcome screen
             show_welcome_screen(on_avatar_selected)
-            
+
             # Restore window when done
             self.root.deiconify()
-            
+
         except Exception as e:
             print(f"Error showing avatar selection: {e}")
             # Restore window if error occurred
@@ -1309,7 +1319,7 @@ def main():
 
     # Determine whether to show welcome screen
     show_welcome = should_show_welcome_screen()
-    
+
     # If model is specified via command line or skip-welcome flag, launch directly
     if args.model or args.skip_welcome:
         model_name = args.model or "Amelia"
@@ -1324,12 +1334,12 @@ def main():
     else:
         # Show welcome screen for new users or when requested
         print("👋 Welcome to Vbot! Please select your AI companion...")
-        
+
         def on_avatar_selected(selected_avatar: str):
             """Callback when user selects an avatar from welcome screen"""
             print(f"✨ Selected avatar: {selected_avatar}")
             launch_main_app(selected_avatar, args.device_index)
-        
+
         # Show the welcome screen
         show_welcome_screen(on_avatar_selected)
 

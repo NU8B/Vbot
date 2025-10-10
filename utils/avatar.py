@@ -53,8 +53,15 @@ class AnimatedCharacter:
         print(f"🎭 AnimatedCharacter initializing with model: {self.model_name}")
         print(f"🔍 VOICE_TYPE environment variable: {os.getenv('VOICE_TYPE')}")
 
+        # Get project root (handles PyInstaller bundled environment)
+        project_root = os.getenv(
+            "PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
+
         # Get background color from bg_color.txt or use model-specific defaults
-        bg_color_path = Path(f"asset/model/{self.model_name}/bg_color.txt")
+        bg_color_path = (
+            Path(project_root) / f"asset/model/{self.model_name}/bg_color.txt"
+        )
         try:
             with open(bg_color_path, "r") as f:
                 self.bg_color = f.read().strip()
@@ -70,8 +77,10 @@ class AnimatedCharacter:
             self.bg_color = model_colors.get(self.model_name, "#2b2b3b")
 
         # Update model path to match the new structure
-        self.model_path = model_path or Path(
-            f"asset/model/{self.model_name}/character_model/character_model.yaml"
+        self.model_path = (
+            model_path
+            or Path(project_root)
+            / f"asset/model/{self.model_name}/character_model/character_model.yaml"
         )
 
         print(f"Looking for model at: {self.model_path.absolute()}")
@@ -126,7 +135,7 @@ class AnimatedCharacter:
         self.memory_clear_interval = 30  # Clear memory every 30 frames
 
         # --- Multi-background support ---
-        self.bg_dir = "asset/Background"
+        self.bg_dir = str(Path(project_root) / "asset/Background")
         Path(self.bg_dir).mkdir(parents=True, exist_ok=True)
 
         # Gather all backgrounds in asset/Background/
@@ -138,11 +147,11 @@ class AnimatedCharacter:
 
         # Set per-character default background if it exists
         char_bg_map = {
-            "Amelia": "asset/Background/Amelia/back.png",
-            "Gura": "asset/Background/Gura/back.png",
-            "Eveland": "asset/Background/Eveland/back.jpg",
-            "Shiori": "asset/Background/Shiori/back.png",
-            "Wilson": "asset/Background/Wilson/back.png",
+            "Amelia": str(Path(project_root) / "asset/Background/Amelia/back.png"),
+            "Gura": str(Path(project_root) / "asset/Background/Gura/back.png"),
+            "Eveland": str(Path(project_root) / "asset/Background/Eveland/back.jpg"),
+            "Shiori": str(Path(project_root) / "asset/Background/Shiori/back.png"),
+            "Wilson": str(Path(project_root) / "asset/Background/Wilson/back.png"),
         }
         default_bg = char_bg_map.get(self.model_name)
         self.bg_files = []
@@ -213,42 +222,54 @@ class AnimatedCharacter:
             self.cached_character_image = self.character_model.get_character_image(
                 self.device
             )
-            
+
             # Load poser with error handling
             try:
                 print(f"Loading poser for model at: {self.model_path}")
-                print(f"Face morpher file: {self.character_model.face_morpher_file_name}")
-                print(f"Body morpher file: {self.character_model.body_morpher_file_name}")
-                
+                print(
+                    f"Face morpher file: {self.character_model.face_morpher_file_name}"
+                )
+                print(
+                    f"Body morpher file: {self.character_model.body_morpher_file_name}"
+                )
+
                 # Check if morpher files exist
                 import os
-                face_exists = os.path.exists(self.character_model.face_morpher_file_name)
-                body_exists = os.path.exists(self.character_model.body_morpher_file_name)
+
+                face_exists = os.path.exists(
+                    self.character_model.face_morpher_file_name
+                )
+                body_exists = os.path.exists(
+                    self.character_model.body_morpher_file_name
+                )
                 print(f"Face morpher exists: {face_exists}")
                 print(f"Body morpher exists: {body_exists}")
-                
+
                 if not face_exists or not body_exists:
                     print("❌ Missing morpher files - cannot create poser")
                     self.poser = None
                     return
-                
+
                 self.poser = self.character_model.get_poser(self.device)
-                
+
                 if self.poser is None:
                     print("❌ Poser creation returned None")
                     return
-                    
+
                 print("Character image and poser loaded successfully")
-                
+
                 # Verify that the poser has the required modules
-                if hasattr(self.poser, 'modules') and self.poser.modules is not None:
+                if hasattr(self.poser, "modules") and self.poser.modules is not None:
                     print(f"Poser modules loaded: {list(self.poser.modules.keys())}")
                 else:
-                    print("Warning: Poser does not have modules attribute or modules is None")
-                    
+                    print(
+                        "Warning: Poser does not have modules attribute or modules is None"
+                    )
+
             except Exception as e:
                 print(f"Error loading poser: {e}")
                 import traceback
+
                 traceback.print_exc()
                 print("Attempting to continue without poser...")
                 self.poser = None
@@ -264,96 +285,96 @@ class AnimatedCharacter:
                     "head_y": self.get_parameter_index(
                         PoseParameterCategory.FACE_ROTATION, "head_y"
                     ),
-                "neck_z": self.get_parameter_index(
-                    PoseParameterCategory.FACE_ROTATION, "neck_z"
-                ),
-                # Body rotation
-                "body_y": self.get_parameter_index(
-                    PoseParameterCategory.BODY_ROTATION, "body_y"
-                ),
-                "body_z": self.get_parameter_index(
-                    PoseParameterCategory.BODY_ROTATION, "body_z"
-                ),
-                # Eyes
-                "eye_wink": self.get_parameter_index(
-                    PoseParameterCategory.EYE, "eye_wink"
-                ),
-                "eye_happy_wink": self.get_parameter_index(
-                    PoseParameterCategory.EYE, "eye_happy_wink"
-                ),
-                "eye_surprised": self.get_parameter_index(
-                    PoseParameterCategory.EYE, "eye_surprised"
-                ),
-                "eye_relaxed": self.get_parameter_index(
-                    PoseParameterCategory.EYE, "eye_relaxed"
-                ),
-                "eye_unimpressed": self.get_parameter_index(
-                    PoseParameterCategory.EYE, "eye_unimpressed"
-                ),
-                "eye_raised_lower_eyelid": self.get_parameter_index(
-                    PoseParameterCategory.EYE, "eye_raised_lower_eyelid"
-                ),
-                # Iris
-                "iris_small": self.get_parameter_index(
-                    PoseParameterCategory.IRIS_MORPH, "iris_small"
-                ),
-                "iris_rotation_x": self.get_parameter_index(
-                    PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x"
-                ),
-                "iris_rotation_y": self.get_parameter_index(
-                    PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y"
-                ),
-                # Eyebrows
-                "eyebrow_happy": self.get_parameter_index(
-                    PoseParameterCategory.EYEBROW, "eyebrow_happy"
-                ),
-                "eyebrow_angry": self.get_parameter_index(
-                    PoseParameterCategory.EYEBROW, "eyebrow_angry"
-                ),
-                "eyebrow_troubled": self.get_parameter_index(
-                    PoseParameterCategory.EYEBROW, "eyebrow_troubled"
-                ),
-                "eyebrow_lowered": self.get_parameter_index(
-                    PoseParameterCategory.EYEBROW, "eyebrow_lowered"
-                ),
-                "eyebrow_raised": self.get_parameter_index(
-                    PoseParameterCategory.EYEBROW, "eyebrow_raised"
-                ),
-                "eyebrow_serious": self.get_parameter_index(
-                    PoseParameterCategory.EYEBROW, "eyebrow_serious"
-                ),
-                # Mouth
-                "mouth_aaa": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_aaa"
-                ),
-                "mouth_iii": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_iii"
-                ),
-                "mouth_uuu": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_uuu"
-                ),
-                "mouth_eee": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_eee"
-                ),
-                "mouth_ooo": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_ooo"
-                ),
-                "mouth_delta": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_delta"
-                ),
-                "mouth_lowered_corner": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_lowered_corner"
-                ),
-                "mouth_raised_corner": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_raised_corner"
-                ),
-                "mouth_smirk": self.get_parameter_index(
-                    PoseParameterCategory.MOUTH, "mouth_smirk"
-                ),
-                # Breathing
-                "breathing": self.get_parameter_index(
-                    PoseParameterCategory.BREATHING, "breathing"
-                ),
+                    "neck_z": self.get_parameter_index(
+                        PoseParameterCategory.FACE_ROTATION, "neck_z"
+                    ),
+                    # Body rotation
+                    "body_y": self.get_parameter_index(
+                        PoseParameterCategory.BODY_ROTATION, "body_y"
+                    ),
+                    "body_z": self.get_parameter_index(
+                        PoseParameterCategory.BODY_ROTATION, "body_z"
+                    ),
+                    # Eyes
+                    "eye_wink": self.get_parameter_index(
+                        PoseParameterCategory.EYE, "eye_wink"
+                    ),
+                    "eye_happy_wink": self.get_parameter_index(
+                        PoseParameterCategory.EYE, "eye_happy_wink"
+                    ),
+                    "eye_surprised": self.get_parameter_index(
+                        PoseParameterCategory.EYE, "eye_surprised"
+                    ),
+                    "eye_relaxed": self.get_parameter_index(
+                        PoseParameterCategory.EYE, "eye_relaxed"
+                    ),
+                    "eye_unimpressed": self.get_parameter_index(
+                        PoseParameterCategory.EYE, "eye_unimpressed"
+                    ),
+                    "eye_raised_lower_eyelid": self.get_parameter_index(
+                        PoseParameterCategory.EYE, "eye_raised_lower_eyelid"
+                    ),
+                    # Iris
+                    "iris_small": self.get_parameter_index(
+                        PoseParameterCategory.IRIS_MORPH, "iris_small"
+                    ),
+                    "iris_rotation_x": self.get_parameter_index(
+                        PoseParameterCategory.IRIS_ROTATION, "iris_rotation_x"
+                    ),
+                    "iris_rotation_y": self.get_parameter_index(
+                        PoseParameterCategory.IRIS_ROTATION, "iris_rotation_y"
+                    ),
+                    # Eyebrows
+                    "eyebrow_happy": self.get_parameter_index(
+                        PoseParameterCategory.EYEBROW, "eyebrow_happy"
+                    ),
+                    "eyebrow_angry": self.get_parameter_index(
+                        PoseParameterCategory.EYEBROW, "eyebrow_angry"
+                    ),
+                    "eyebrow_troubled": self.get_parameter_index(
+                        PoseParameterCategory.EYEBROW, "eyebrow_troubled"
+                    ),
+                    "eyebrow_lowered": self.get_parameter_index(
+                        PoseParameterCategory.EYEBROW, "eyebrow_lowered"
+                    ),
+                    "eyebrow_raised": self.get_parameter_index(
+                        PoseParameterCategory.EYEBROW, "eyebrow_raised"
+                    ),
+                    "eyebrow_serious": self.get_parameter_index(
+                        PoseParameterCategory.EYEBROW, "eyebrow_serious"
+                    ),
+                    # Mouth
+                    "mouth_aaa": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_aaa"
+                    ),
+                    "mouth_iii": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_iii"
+                    ),
+                    "mouth_uuu": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_uuu"
+                    ),
+                    "mouth_eee": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_eee"
+                    ),
+                    "mouth_ooo": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_ooo"
+                    ),
+                    "mouth_delta": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_delta"
+                    ),
+                    "mouth_lowered_corner": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_lowered_corner"
+                    ),
+                    "mouth_raised_corner": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_raised_corner"
+                    ),
+                    "mouth_smirk": self.get_parameter_index(
+                        PoseParameterCategory.MOUTH, "mouth_smirk"
+                    ),
+                    # Breathing
+                    "breathing": self.get_parameter_index(
+                        PoseParameterCategory.BREATHING, "breathing"
+                    ),
                 }
                 print("Parameter mapping initialized successfully")
             else:
@@ -785,7 +806,7 @@ class AnimatedCharacter:
                 output_image = output_image[0].detach().cpu()
                 output_image = convert_output_image_from_torch_to_numpy(output_image)
         except KeyError as e:
-            if 'body_morpher' in str(e):
+            if "body_morpher" in str(e):
                 print(f"Error in animation update: {e}")
                 print("This indicates a problem with the character model files.")
                 print("Using fallback: returning cached character image")
@@ -841,11 +862,11 @@ class AnimatedCharacter:
         try:
             if self.cached_character_image is None:
                 return
-                
+
             # Convert cached character image to displayable format
             static_image = self.cached_character_image[0].detach().cpu()
             output_image = convert_output_image_from_torch_to_numpy(static_image)
-            
+
             # Convert to bitmap
             if len(output_image.shape) == 3 and output_image.shape[2] == 4:
                 output_image = output_image.copy(order="C")
@@ -869,7 +890,7 @@ class AnimatedCharacter:
 
                 # Request redraw
                 self.panel.Refresh()
-                
+
         except Exception as e:
             print(f"Error displaying static image: {e}")
 
@@ -1040,24 +1061,26 @@ class AnimatedCharacter:
                     # Scale background maintaining aspect ratio to avoid stretching
                     window_w, window_h = self.width, self.height
                     img_w, img_h = img.GetWidth(), img.GetHeight()
-                    
+
                     # Calculate scaling to fit while maintaining aspect ratio
                     scale_w = window_w / img_w
                     scale_h = window_h / img_h
                     scale = max(scale_w, scale_h)  # Scale to cover the entire window
-                    
+
                     new_w = int(img_w * scale)
                     new_h = int(img_h * scale)
-                    
+
                     # Scale the image
                     img = img.Scale(new_w, new_h, wx.IMAGE_QUALITY_HIGH)
-                    
+
                     # Center crop if needed
                     if new_w > window_w or new_h > window_h:
                         crop_x = max(0, (new_w - window_w) // 2)
                         crop_y = max(0, (new_h - window_h) // 2)
-                        img = img.GetSubImage(wx.Rect(crop_x, crop_y, window_w, window_h))
-                    
+                        img = img.GetSubImage(
+                            wx.Rect(crop_x, crop_y, window_w, window_h)
+                        )
+
                     self.background_bitmap = wx.Bitmap(img)
                 else:
                     self.background_bitmap = None
