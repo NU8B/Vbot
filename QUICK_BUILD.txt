@@ -1,0 +1,61 @@
+════════════════════════════════════════════════════════════════
+                    VBOT - QUICK BUILD COMMANDS
+════════════════════════════════════════════════════════════════
+
+📋 SETUP (One-time)
+────────────────────────────────────────────────────────────────
+1. cd C:\Users\[YourUsername]\Desktop\Project\college-project\senior-project\Vbot
+2. conda create -n vbot python=3.10 -y
+3. conda activate vbot
+4. pip install -r requirements.txt
+5. pip install pyinstaller pywin32-ctypes pywin32 wxPython PyOpenGL glfw gruut
+
+
+🔨 BUILD (Every time you want to create .exe)
+────────────────────────────────────────────────────────────────
+conda activate vbot
+cd C:\Users\[YourUsername]\Desktop\Project\college-project\senior-project\Vbot
+Remove-Item -Recurse -Force .\dist
+python -m PyInstaller vbot.spec --clean --noconfirm
+
+
+✅ TEST
+────────────────────────────────────────────────────────────────
+cd dist\Vbot
+.\Vbot.exe
+
+
+🔄 REBUILD (after code changes)
+────────────────────────────────────────────────────────────────
+# From project root
+python -m PyInstaller vbot.spec --noconfirm
+cd dist\Vbot
+.\Vbot.exe
+
+
+🐛 TROUBLESHOOT: unittest Error
+────────────────────────────────────────────────────────────────
+# Option 1: Manual copy (as Administrator)
+cd C:\Users\[YourUsername]\Desktop\Project\college-project\senior-project\Vbot\dist\Vbot\_internal
+xcopy "C:\ProgramData\Anaconda3\Lib\unittest" ".\unittest\" /E /I /Y
+
+# Option 2: Rebuild with debug
+python -m PyInstaller vbot.spec --clean --noconfirm --log-level=DEBUG > build_debug.log
+
+
+📊 CHECK BUILD SIZE
+────────────────────────────────────────────────────────────────
+Get-ChildItem .\dist\Vbot -Recurse | Measure-Object -Property Length -Sum
+
+
+🚀 FULL AUTOMATION (Recommended)
+────────────────────────────────────────────────────────────────
+.\build_with_logs.ps1
+
+
+════════════════════════════════════════════════════════════════
+NOTES:
+- Build takes 5-10 minutes
+- Output: dist\Vbot\ (~3-4 GB)
+- Distribute entire Vbot\ folder
+════════════════════════════════════════════════════════════════
