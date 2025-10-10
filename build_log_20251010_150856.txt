@@ -1,0 +1,1031 @@
+╔════════════════════════════════════════════════════════╗
+║              Vbot Build Log                            ║
+╚════════════════════════════════════════════════════════╝
+
+Build Started: 2025-10-10 15:08:56
+Project Root: C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot
+
+290 INFO: PyInstaller: 6.16.0, contrib hooks: 2025.9
+290 INFO: Python: 3.10.18 (conda)
+308 INFO: Platform: Windows-10-10.0.26100-SP0
+308 INFO: Python environment: C:\Users\peepz\.conda\envs\vbot
+311 INFO: Removing temporary files and cleaning cache in C:\Users\peepz\AppData\Local\pyinstaller
+3090 WARNING: collect_data_files - skipping data collection for module 'gruut' as it is not a package.
+4140 INFO: PyTorch version 2.5.1+cu121 available.
+4819 WARNING: Failed to collect submodules for 'transformers.kernels.falcon_mamba' because importing 'transformers.kernels.falcon_mamba' raised: ModuleNotFoundError: No module named 'mamba_ssm'
+2810 WARNING: Failed to collect submodules for 'torch.testing._internal.opinfo' because importing 'torch.testing._internal.opinfo' raised: ModuleNotFoundError: No module named 'expecttest'
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `TorchScript` support for functional optimizers is deprecated and will be removed in a future PyTorch release. Consider using the `torch.compile` optimizer instead.
+  __import__(name)
+W1010 15:09:08.813000 436788 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+  __import__(name)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+  __import__(name)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+  __import__(name)
+15202 INFO: Module search paths (PYTHONPATH):
+['C:\\Users\\peepz\\Desktop\\Project\\college-project\\senior-project\\Vbot',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\python310.zip',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\DLLs',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot',
+ 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\win32',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\win32\\lib',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\Pythonwin',
+ 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\setuptools\\_vendor',
+ 'C:\\Users\\peepz\\Desktop\\Project\\college-project\\senior-project\\Vbot',
+ 'C:\\Users\\peepz\\Desktop\\Project\\college-project\\senior-project\\Vbot']
+16057 INFO: Appending 'binaries' from .spec
+16059 INFO: Appending 'datas' from .spec
+16110 INFO: checking Analysis
+16110 INFO: Building Analysis because Analysis-00.toc is non existent
+16110 INFO: Looking for Python shared library...
+16110 INFO: Using Python shared library: C:\Users\peepz\.conda\envs\vbot\python310.dll
+16110 INFO: Running Analysis Analysis-00.toc
+16110 INFO: Target bytecode optimization level: 0
+16111 INFO: Initializing module dependency graph...
+16111 INFO: Initializing module graph hook caches...
+16125 INFO: Analyzing modules for base_library.zip ...
+17051 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+17090 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+18155 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+18837 INFO: Caching module dependency graph...
+18869 INFO: Analyzing C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\vbot_launcher\launcher.py
+18889 INFO: Processing standard module hook 'hook-platform.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+18934 INFO: Processing standard module hook 'hook-psutil.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+18954 INFO: Processing standard module hook 'hook-_ctypes.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+18994 INFO: Processing standard module hook 'hook-torch.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+3204 WARNING: Failed to collect submodules for 'torch.testing._internal.opinfo' because importing 'torch.testing._internal.opinfo' raised: ModuleNotFoundError: No module named 'expecttest'
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `TorchScript` support for functional optimizers is deprecated and will be removed in a future PyTorch release. Consider using the `torch.compile` optimizer instead.
+  __import__(name)
+W1010 15:09:23.800000 432080 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+  __import__(name)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+  __import__(name)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+  __import__(name)
+28556 INFO: hook-torch: this torch build does not depend on MKL...
+28565 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+28566 INFO: SetuptoolsInfo: initializing cached setuptools info...
+31844 INFO: Processing standard module hook 'hook-numpy.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+32404 INFO: Processing standard module hook 'hook-sysconfig.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+33614 INFO: Processing standard module hook 'hook-difflib.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+38482 INFO: Processing standard module hook 'hook-scipy.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+38555 INFO: Processing standard module hook 'hook-pycparser.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+38941 INFO: Processing standard module hook 'hook-setuptools.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+38947 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+38947 INFO: Processing pre-find-module-path hook 'hook-distutils.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+39166 INFO: Processing standard module hook 'hook-distutils.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+39177 INFO: Processing standard module hook 'hook-distutils.util.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+39194 INFO: Processing standard module hook 'hook-_osx_support.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+39206 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39276 INFO: Processing pre-safe-import-module hook 'hook-jaraco.text.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39277 INFO: Setuptools: 'jaraco.text' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.text'!
+39281 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+39288 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39290 INFO: Processing pre-safe-import-module hook 'hook-jaraco.functools.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39291 INFO: Setuptools: 'jaraco.functools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.functools'!
+39295 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39343 INFO: Processing pre-safe-import-module hook 'hook-jaraco.context.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39343 INFO: Setuptools: 'jaraco.context' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.context'!
+39348 INFO: Processing pre-safe-import-module hook 'hook-backports.tarfile.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39348 INFO: Setuptools: 'backports.tarfile' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.backports.tarfile'!
+39387 INFO: Processing standard module hook 'hook-backports.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+39422 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39422 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+39432 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+39434 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39435 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+39556 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39819 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+39951 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+40188 INFO: Processing standard module hook 'hook-xml.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+40403 INFO: Processing standard module hook 'hook-scipy.linalg.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+40838 INFO: Processing standard module hook 'hook-scipy.sparse.csgraph.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+40880 INFO: Processing standard module hook 'hook-scipy.special._ufuncs.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+40943 INFO: Processing standard module hook 'hook-scipy.special._ellip_harm_2.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+41320 INFO: Processing standard module hook 'hook-scipy.spatial._ckdtree.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+41508 INFO: Processing standard module hook 'hook-scipy.spatial.transform.rotation.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+42214 INFO: Processing standard module hook 'hook-scipy.stats._stats.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+43737 INFO: Processing standard module hook 'hook-PIL.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+43784 INFO: Processing standard module hook 'hook-PIL.Image.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+44257 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+44276 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+45688 INFO: Processing standard module hook 'hook-xml.dom.domreg.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+45823 INFO: Processing standard module hook 'hook-lxml.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+46268 INFO: Processing standard module hook 'hook-lxml.etree.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+47577 INFO: Processing standard module hook 'hook-sqlite3.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+50311 INFO: Processing standard module hook 'hook-shelve.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+50982 INFO: Processing standard module hook 'hook-transformers.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+53299 INFO: Processing standard module hook 'hook-urllib3.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+53816 INFO: Processing standard module hook 'hook-charset_normalizer.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+54255 INFO: Processing standard module hook 'hook-certifi.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+55510 INFO: Processing standard module hook 'hook-jinja2.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+56336 INFO: Processing standard module hook 'hook-soundfile.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+56344 INFO: Processing standard module hook 'hook-boto3.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+58766 INFO: Processing standard module hook 'hook-botocore.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+59936 INFO: Processing standard module hook 'hook-dateutil.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+59980 INFO: Processing pre-safe-import-module hook 'hook-six.moves.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+60851 INFO: Processing pre-safe-import-module hook 'hook-tensorflow.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\pre_safe_import_module'
+60931 INFO: Processing standard module hook 'hook-fsspec.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+61896 INFO: Processing standard module hook 'hook-bitsandbytes.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+62054 INFO: Processing standard module hook 'hook-datasets.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+62352 INFO: Processing standard module hook 'hook-pyarrow.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+63362 INFO: Processing standard module hook 'hook-scipy.io.matlab.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+63659 INFO: Processing standard module hook 'hook-regex.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+63798 INFO: Processing standard module hook 'hook-librosa.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+64600 INFO: Processing standard module hook 'hook-sqlalchemy.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+67200 INFO: Processing standard module hook 'hook-torchvision.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+68051 INFO: Processing standard module hook 'hook-onnxruntime.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+68415 INFO: Processing standard module hook 'hook-pygments.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+73329 INFO: Processing pre-safe-import-module hook 'hook-win32com.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\pre_safe_import_module'
+73401 INFO: Processing standard module hook 'hook-win32com.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+73403 INFO: Processing standard module hook 'hook-pythoncom.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+73483 INFO: Processing standard module hook 'hook-pywintypes.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+74118 INFO: Processing standard module hook 'hook-numba.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+74130 INFO: Processing standard module hook 'hook-llvmlite.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+78497 INFO: Processing standard module hook 'hook-torchvision.io.image.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+78505 INFO: Processing standard module hook 'hook-av.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+79794 INFO: Processing standard module hook 'hook-torchaudio.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+93755 INFO: Processing standard module hook 'hook-nltk.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+95358 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+95359 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+95519 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+96998 INFO: Processing standard module hook 'hook-sklearn.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97554 INFO: Processing standard module hook 'hook-sklearn.utils.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97622 INFO: Processing standard module hook 'hook-sklearn.externals.array_api_compat.numpy.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97644 INFO: Processing standard module hook 'hook-sklearn.externals.array_api_compat.cupy.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97650 INFO: Processing standard module hook 'hook-sklearn.externals.array_api_compat.torch.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97666 INFO: Processing standard module hook 'hook-sklearn.externals.array_api_compat.dask.array.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97751 INFO: Processing standard module hook 'hook-sklearn.metrics.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+99956 INFO: Processing standard module hook 'hook-sklearn.metrics.cluster.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+100038 INFO: Processing standard module hook 'hook-sklearn.cluster.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+100070 INFO: Processing standard module hook 'hook-sklearn.metrics.pairwise.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+100195 INFO: Processing standard module hook 'hook-sklearn.neighbors.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+100248 INFO: Processing standard module hook 'hook-sklearn.linear_model.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+105961 INFO: Processing standard module hook 'hook-babel.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+106174 INFO: Processing standard module hook 'hook-pytz.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+106297 INFO: Processing standard module hook 'hook-zoneinfo.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+106319 INFO: Processing standard module hook 'hook-jsonschema.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+106396 INFO: Processing standard module hook 'hook-jsonschema_specifications.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+106448 INFO: Processing standard module hook 'hook-rdflib.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+109714 INFO: Processing standard module hook 'hook-mako.codegen.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+110766 INFO: Processing standard module hook 'hook-grpc.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+115559 INFO: Processing standard module hook 'hook-sounddevice.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+115658 INFO: Processing standard module hook 'hook-pkg_resources.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+116122 INFO: Processing pre-safe-import-module hook 'hook-platformdirs.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+116126 INFO: Processing standard module hook 'hook-platformdirs.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+116709 INFO: Analyzing hidden import 'gruut'
+116710 ERROR: Hidden import 'gruut' not found
+116710 INFO: Analyzing hidden import 'num2words'
+116875 INFO: Analyzing hidden import 'pydub'
+116913 INFO: Analyzing hidden import 'customtkinter'
+116915 INFO: Processing standard module hook 'hook-customtkinter.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+117192 INFO: Analyzing hidden import 'PIL._tkinter_finder'
+117194 INFO: Analyzing hidden import 'wx.core'
+117194 ERROR: Hidden import 'wx.core' not found
+117194 INFO: Analyzing hidden import 'wx.lib'
+117194 ERROR: Hidden import 'wx.lib' not found
+117194 INFO: Analyzing hidden import 'wx.lib.agw'
+117194 ERROR: Hidden import 'wx.lib.agw' not found
+117194 INFO: Analyzing hidden import 'OpenGL'
+117196 ERROR: Hidden import 'OpenGL' not found
+117196 INFO: Analyzing hidden import 'OpenGL.GL'
+117196 ERROR: Hidden import 'OpenGL.GL' not found
+117196 INFO: Analyzing hidden import 'OpenGL.GLU'
+117198 ERROR: Hidden import 'OpenGL.GLU' not found
+117198 INFO: Analyzing hidden import 'glfw'
+117199 ERROR: Hidden import 'glfw' not found
+117199 INFO: Analyzing hidden import 'unittest.mock'
+117199 ERROR: Hidden import 'unittest.mock' not found
+117199 INFO: Analyzing hidden import 'transformers.agents.evaluate_agent'
+117205 INFO: Analyzing hidden import 'transformers.commands'
+117206 INFO: Analyzing hidden import 'transformers.commands.add_new_model_like'
+117240 INFO: Analyzing hidden import 'transformers.commands.convert'
+117256 INFO: Analyzing hidden import 'transformers.commands.download'
+117257 INFO: Analyzing hidden import 'transformers.commands.env'
+117260 INFO: Analyzing hidden import 'transformers.commands.lfs'
+117263 INFO: Analyzing hidden import 'transformers.commands.pt_to_tf'
+117264 INFO: Analyzing hidden import 'transformers.commands.run'
+117267 INFO: Analyzing hidden import 'transformers.commands.serving'
+117271 INFO: Analyzing hidden import 'transformers.commands.train'
+117274 INFO: Analyzing hidden import 'transformers.commands.transformers_cli'
+117278 INFO: Analyzing hidden import 'transformers.convert_graph_to_onnx'
+117723 INFO: Analyzing hidden import 'transformers.convert_pytorch_checkpoint_to_tf2'
+117731 INFO: Analyzing hidden import 'transformers.convert_slow_tokenizers_checkpoints_to_fast'
+117734 INFO: Analyzing hidden import 'transformers.convert_tf_hub_seq_to_seq_bert_to_pytorch'
+117735 INFO: Analyzing hidden import 'transformers.data.metrics.squad_metrics'
+117747 INFO: Analyzing hidden import 'transformers.models.align.convert_align_tf_to_hf'
+117755 INFO: Analyzing hidden import 'transformers.models.audio_spectrogram_transformer.convert_audio_spectrogram_transformer_original_to_pytorch'
+117760 INFO: Analyzing hidden import 'transformers.models.bark.convert_suno_to_hf'
+117764 INFO: Analyzing hidden import 'transformers.models.bart.convert_bart_original_pytorch_checkpoint_to_pytorch'
+117767 INFO: Analyzing hidden import 'transformers.models.beit.convert_beit_unilm_to_pytorch'
+117776 INFO: Analyzing hidden import 'transformers.models.bert.convert_bert_original_tf2_checkpoint_to_pytorch'
+117781 INFO: Analyzing hidden import 'transformers.models.bert.convert_bert_pytorch_checkpoint_to_original_tf'
+117784 INFO: Analyzing hidden import 'transformers.models.bert.convert_bert_token_dropping_original_tf2_checkpoint_to_pytorch'
+117786 INFO: Analyzing hidden import 'transformers.models.big_bird.convert_bigbird_original_tf_checkpoint_to_pytorch'
+117788 INFO: Analyzing hidden import 'transformers.models.bigbird_pegasus.convert_bigbird_pegasus_tf_to_pytorch'
+117791 INFO: Analyzing hidden import 'transformers.models.biogpt.convert_biogpt_original_pytorch_checkpoint_to_pytorch'
+117796 INFO: Analyzing hidden import 'transformers.models.bit.convert_bit_to_pytorch'
+117799 INFO: Analyzing hidden import 'transformers.models.blenderbot.convert_blenderbot_original_pytorch_checkpoint_to_pytorch'
+117801 INFO: Analyzing hidden import 'transformers.models.blip.convert_blip_original_pytorch_to_hf'
+117805 INFO: Analyzing hidden import 'transformers.models.blip_2.convert_blip_2_original_to_pytorch'
+117811 INFO: Analyzing hidden import 'transformers.models.bloom.convert_bloom_original_checkpoint_to_pytorch'
+117816 INFO: Analyzing hidden import 'transformers.models.bros.convert_bros_to_pytorch'
+117819 INFO: Analyzing hidden import 'transformers.models.byt5.convert_byt5_original_tf_checkpoint_to_pytorch'
+117825 INFO: Analyzing hidden import 'transformers.models.canine.convert_canine_original_tf_checkpoint_to_pytorch'
+117828 INFO: Analyzing hidden import 'transformers.models.chameleon.convert_chameleon_weights_to_hf'
+117843 INFO: Analyzing hidden import 'transformers.models.chinese_clip.convert_chinese_clip_original_pytorch_to_hf'
+117848 INFO: Analyzing hidden import 'transformers.models.clap.convert_clap_original_pytorch_to_hf'
+117854 INFO: Analyzing hidden import 'transformers.models.clip.convert_clip_original_pytorch_to_hf'
+117860 INFO: Analyzing hidden import 'transformers.models.clipseg.convert_clipseg_original_pytorch_to_hf'
+117865 INFO: Analyzing hidden import 'transformers.models.clvp.convert_clvp_to_hf'
+117869 INFO: Analyzing hidden import 'transformers.models.conditional_detr.convert_conditional_detr_original_pytorch_checkpoint_to_pytorch'
+117880 INFO: Analyzing hidden import 'transformers.models.convbert.convert_convbert_original_tf1_checkpoint_to_pytorch_and_tf2'
+117881 INFO: Analyzing hidden import 'transformers.models.convnext.convert_convnext_to_pytorch'
+117886 INFO: Analyzing hidden import 'transformers.models.convnextv2.convert_convnextv2_to_pytorch'
+117891 INFO: Analyzing hidden import 'transformers.models.cvt.convert_cvt_original_pytorch_checkpoint_to_pytorch'
+117897 INFO: Analyzing hidden import 'transformers.models.dac.convert_dac_checkpoint'
+117901 INFO: Analyzing hidden import 'transformers.models.data2vec.convert_data2vec_audio_original_pytorch_checkpoint_to_pytorch'
+117906 INFO: Analyzing hidden import 'transformers.models.data2vec.convert_data2vec_text_original_pytorch_checkpoint_to_pytorch'
+117910 INFO: Analyzing hidden import 'transformers.models.data2vec.convert_data2vec_vision_original_pytorch_checkpoint_to_pytorch'
+117917 INFO: Analyzing hidden import 'transformers.models.deformable_detr.convert_deformable_detr_to_pytorch'
+117922 INFO: Analyzing hidden import 'transformers.models.deformable_detr.load_custom'
+117923 INFO: Analyzing hidden import 'transformers.models.deit.convert_deit_timm_to_pytorch'
+117928 INFO: Analyzing hidden import 'transformers.models.deprecated.bort'
+117928 INFO: Analyzing hidden import 'transformers.models.deprecated.bort.convert_bort_original_gluonnlp_checkpoint_to_pytorch'
+117933 INFO: Analyzing hidden import 'transformers.models.deprecated.deta.convert_deta_resnet_to_pytorch'
+117940 INFO: Analyzing hidden import 'transformers.models.deprecated.deta.convert_deta_swin_to_pytorch'
+117949 INFO: Analyzing hidden import 'transformers.models.deprecated.efficientformer.convert_efficientformer_original_pytorch_checkpoint_to_pytorch'
+117952 INFO: Analyzing hidden import 'transformers.models.deprecated.gptsan_japanese.convert_gptsan_tf_checkpoint_to_pytorch'
+117958 INFO: Analyzing hidden import 'transformers.models.deprecated.graphormer.collating_graphormer'
+117967 INFO: Analyzing hidden import 'transformers.models.deprecated.jukebox.convert_jukebox'
+117976 INFO: Analyzing hidden import 'transformers.models.deprecated.mega.convert_mega_original_pytorch_checkpoint_to_pytorch'
+117982 INFO: Analyzing hidden import 'transformers.models.deprecated.realm.tokenization_realm_fast'
+117986 INFO: Analyzing hidden import 'transformers.models.deprecated.trajectory_transformer.convert_trajectory_transformer_original_pytorch_checkpoint_to_pytorch'
+117988 INFO: Analyzing hidden import 'transformers.models.deprecated.transfo_xl.convert_transfo_xl_original_tf_checkpoint_to_pytorch'
+117991 INFO: Analyzing hidden import 'transformers.models.deprecated.van.convert_van_to_pytorch'
+117997 INFO: Analyzing hidden import 'transformers.models.deprecated.vit_hybrid.convert_vit_hybrid_timm_to_pytorch'
+118004 INFO: Analyzing hidden import 'transformers.models.depth_anything.convert_depth_anything_to_hf'
+118013 INFO: Analyzing hidden import 'transformers.models.detr.convert_detr_original_pytorch_checkpoint_to_pytorch'
+118019 INFO: Analyzing hidden import 'transformers.models.detr.convert_detr_to_pytorch'
+118031 INFO: Analyzing hidden import 'transformers.models.dialogpt.convert_dialogpt_original_pytorch_checkpoint_to_pytorch'
+118033 INFO: Analyzing hidden import 'transformers.models.dinov2.convert_dinov2_to_hf'
+118038 INFO: Analyzing hidden import 'transformers.models.dit.convert_dit_unilm_to_pytorch'
+118043 INFO: Analyzing hidden import 'transformers.models.donut.convert_donut_to_pytorch'
+118048 INFO: Analyzing hidden import 'transformers.models.dpr.convert_dpr_original_checkpoint_to_pytorch'
+118051 INFO: Analyzing hidden import 'transformers.models.dpt.convert_dinov2_depth_to_hf'
+118058 INFO: Analyzing hidden import 'transformers.models.dpt.convert_dpt_beit_to_hf'
+118063 INFO: Analyzing hidden import 'transformers.models.dpt.convert_dpt_hybrid_to_pytorch'
+118069 INFO: Analyzing hidden import 'transformers.models.dpt.convert_dpt_swinv2_to_hf'
+118075 INFO: Analyzing hidden import 'transformers.models.dpt.convert_dpt_to_pytorch'
+118080 INFO: Analyzing hidden import 'transformers.models.efficientnet.convert_efficientnet_to_pytorch'
+118085 INFO: Analyzing hidden import 'transformers.models.electra.convert_electra_original_tf_checkpoint_to_pytorch'
+118086 INFO: Analyzing hidden import 'transformers.models.encodec.convert_encodec_checkpoint_to_pytorch'
+118091 INFO: Analyzing hidden import 'transformers.models.esm.convert_esm'
+118099 INFO: Analyzing hidden import 'transformers.models.falcon.convert_custom_code_checkpoint'
+118100 INFO: Analyzing hidden import 'transformers.models.fastspeech2_conformer.convert_fastspeech2_conformer_original_pytorch_checkpoint_to_pytorch'
+118104 INFO: Analyzing hidden import 'transformers.models.fastspeech2_conformer.convert_hifigan'
+118106 INFO: Analyzing hidden import 'transformers.models.fastspeech2_conformer.convert_model_with_hifigan'
+118108 INFO: Analyzing hidden import 'transformers.models.flava.convert_dalle_to_flava_codebook'
+118110 INFO: Analyzing hidden import 'transformers.models.flava.convert_flava_original_pytorch_to_hf'
+118113 INFO: Analyzing hidden import 'transformers.models.fnet.convert_fnet_original_flax_checkpoint_to_pytorch'
+118115 INFO: Analyzing hidden import 'transformers.models.focalnet.convert_focalnet_to_hf_format'
+118119 INFO: Analyzing hidden import 'transformers.models.fsmt.convert_fsmt_original_pytorch_checkpoint_to_pytorch'
+118125 INFO: Analyzing hidden import 'transformers.models.fuyu.convert_fuyu_model_weights_to_hf'
+118127 INFO: Analyzing hidden import 'transformers.models.gemma.convert_gemma_weights_to_hf'
+118130 INFO: Analyzing hidden import 'transformers.models.gemma.modular_gemma'
+118143 INFO: Analyzing hidden import 'transformers.models.gemma2.convert_gemma2_weights_to_hf'
+118147 INFO: Analyzing hidden import 'transformers.models.gemma2.modular_gemma2'
+118158 INFO: Analyzing hidden import 'transformers.models.git.convert_git_to_pytorch'
+118166 INFO: Analyzing hidden import 'transformers.models.glm.convert_glm_weights_to_hf'
+118169 INFO: Analyzing hidden import 'transformers.models.glm.modular_glm'
+118172 INFO: Analyzing hidden import 'transformers.models.glpn.convert_glpn_to_pytorch'
+118176 INFO: Analyzing hidden import 'transformers.models.gpt_neo.convert_gpt_neo_mesh_tf_to_pytorch'
+118177 INFO: Analyzing hidden import 'transformers.models.gpt_sw3.convert_megatron_to_pytorch'
+118182 INFO: Analyzing hidden import 'transformers.models.grounding_dino.convert_grounding_dino_to_hf'
+118190 INFO: Analyzing hidden import 'transformers.models.groupvit.convert_groupvit_nvlab_to_hf'
+118193 INFO: Analyzing hidden import 'transformers.models.hiera.convert_hiera_to_hf'
+118200 INFO: Analyzing hidden import 'transformers.models.hubert.convert_distilhubert_original_s3prl_checkpoint_to_pytorch'
+118205 INFO: Analyzing hidden import 'transformers.models.hubert.convert_hubert_original_pytorch_checkpoint_to_pytorch'
+118210 INFO: Analyzing hidden import 'transformers.models.hubert.convert_hubert_original_s3prl_checkpoint_to_pytorch'
+118211 INFO: Analyzing hidden import 'transformers.models.idefics2.convert_idefics2_weights_to_hf'
+118214 INFO: Analyzing hidden import 'transformers.models.idefics3.convert_idefics3_weights_to_hf'
+118217 INFO: Analyzing hidden import 'transformers.models.imagegpt.convert_imagegpt_original_tf2_to_pytorch'
+118219 INFO: Analyzing hidden import 'transformers.models.instructblip.convert_instructblip_original_to_pytorch'
+118224 INFO: Analyzing hidden import 'transformers.models.instructblipvideo.convert_instructblipvideo_original_to_pytorch'
+118229 INFO: Analyzing hidden import 'transformers.models.instructblipvideo.modular_instructblipvideo'
+118236 INFO: Analyzing hidden import 'transformers.models.kosmos2.convert_kosmos2_original_pytorch_checkpoint_to_pytorch'
+118236 INFO: Analyzing hidden import 'transformers.models.levit.convert_levit_timm_to_pytorch'
+118240 INFO: Analyzing hidden import 'transformers.models.llama.convert_llama_weights_to_hf'
+118248 INFO: Analyzing hidden import 'transformers.models.llava.convert_llava_weights_to_hf'
+118251 INFO: Analyzing hidden import 'transformers.models.llava_next.convert_llava_next_weights_to_hf'
+118258 INFO: Analyzing hidden import 'transformers.models.llava_next_video.convert_llava_next_video_weights_to_hf'
+118261 INFO: Analyzing hidden import 'transformers.models.llava_next_video.modular_llava_next_video'
+118270 INFO: Analyzing hidden import 'transformers.models.llava_onevision.convert_llava_onevision_weights_to_hf'
+118276 INFO: Analyzing hidden import 'transformers.models.longformer.convert_longformer_original_pytorch_lightning_to_pytorch'
+118297 INFO: Processing standard module hook 'hook-lightning.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+121620 INFO: Analyzing hidden import 'transformers.models.longt5.convert_longt5x_checkpoint_to_flax'
+121626 INFO: Analyzing hidden import 'transformers.models.luke.convert_luke_original_pytorch_checkpoint_to_pytorch'
+121629 INFO: Analyzing hidden import 'transformers.models.m2m_100.convert_m2m100_original_checkpoint_to_pytorch'
+121630 INFO: Analyzing hidden import 'transformers.models.mamba.convert_mamba_ssm_checkpoint_to_pytorch'
+121633 INFO: Analyzing hidden import 'transformers.models.mamba2.convert_mamba2_ssm_checkpoint_to_pytorch'
+121636 INFO: Analyzing hidden import 'transformers.models.marian.convert_marian_tatoeba_to_pytorch'
+121662 INFO: Analyzing hidden import 'transformers.models.mask2former.convert_mask2former_original_pytorch_checkpoint_to_pytorch'
+121679 INFO: Analyzing hidden import 'transformers.models.maskformer.convert_maskformer_original_pytorch_checkpoint_to_pytorch'
+121693 INFO: Analyzing hidden import 'transformers.models.maskformer.convert_maskformer_resnet_to_pytorch'
+121700 INFO: Analyzing hidden import 'transformers.models.maskformer.convert_maskformer_swin_to_pytorch'
+121708 INFO: Analyzing hidden import 'transformers.models.mbart.convert_mbart_original_checkpoint_to_pytorch'
+121709 INFO: Analyzing hidden import 'transformers.models.megatron_bert.convert_megatron_bert_checkpoint'
+121713 INFO: Analyzing hidden import 'transformers.models.megatron_gpt2.checkpoint_reshaping_and_interoperability'
+121726 INFO: Analyzing hidden import 'transformers.models.megatron_gpt2.convert_megatron_gpt2_checkpoint'
+121730 INFO: Analyzing hidden import 'transformers.models.mimi.convert_mimi_checkpoint_to_pytorch'
+121733 INFO: Analyzing hidden import 'transformers.models.mistral.convert_mistral_weights_to_hf'
+121740 INFO: Analyzing hidden import 'transformers.models.mixtral.convert_mixtral_weights_to_hf'
+121743 INFO: Analyzing hidden import 'transformers.models.mllama.convert_mllama_weights_to_hf'
+121752 INFO: Analyzing hidden import 'transformers.models.mluke.convert_mluke_original_pytorch_checkpoint_to_pytorch'
+121757 INFO: Analyzing hidden import 'transformers.models.mobilebert.convert_mobilebert_original_tf_checkpoint_to_pytorch'
+121759 INFO: Analyzing hidden import 'transformers.models.mobilenet_v1.convert_original_tf_checkpoint_to_pytorch'
+121761 INFO: Analyzing hidden import 'transformers.models.mobilenet_v2.convert_original_tf_checkpoint_to_pytorch'
+121765 INFO: Analyzing hidden import 'transformers.models.mobilevit.convert_mlcvnets_to_pytorch'
+121771 INFO: Analyzing hidden import 'transformers.models.mobilevitv2.convert_mlcvnets_to_pytorch'
+121777 INFO: Analyzing hidden import 'transformers.models.moshi.convert_moshi_transformers'
+121782 INFO: Analyzing hidden import 'transformers.models.mra.convert_mra_pytorch_to_pytorch'
+121784 INFO: Analyzing hidden import 'transformers.models.musicgen.convert_musicgen_transformers'
+121789 INFO: Analyzing hidden import 'transformers.models.musicgen_melody.convert_musicgen_melody_transformers'
+121794 INFO: Analyzing hidden import 'transformers.models.myt5.convert_myt5_original_tf_checkpoint_to_pytorch'
+121795 INFO: Analyzing hidden import 'transformers.models.nemotron.convert_nemotron_nemo_to_hf'
+121802 INFO: Analyzing hidden import 'transformers.models.nllb_moe.convert_nllb_moe_sharded_original_checkpoint_to_pytorch'
+121805 INFO: Analyzing hidden import 'transformers.models.nougat.convert_nougat_to_hf'
+121810 INFO: Analyzing hidden import 'transformers.models.nystromformer.convert_nystromformer_original_pytorch_checkpoint_to_pytorch'
+121811 INFO: Analyzing hidden import 'transformers.models.olmo.convert_olmo_weights_to_hf'
+121815 INFO: Analyzing hidden import 'transformers.models.olmoe.convert_olmoe_weights_to_hf'
+121822 INFO: Analyzing hidden import 'transformers.models.omdet_turbo.convert_omdet_turbo_to_hf'
+121828 INFO: Analyzing hidden import 'transformers.models.oneformer.convert_to_hf_oneformer'
+121847 INFO: Analyzing hidden import 'transformers.models.opt.convert_opt_original_pytorch_checkpoint_to_pytorch'
+121849 INFO: Analyzing hidden import 'transformers.models.owlv2.convert_owlv2_to_hf'
+121858 INFO: Analyzing hidden import 'transformers.models.owlvit.convert_owlvit_original_flax_to_hf'
+121863 INFO: Analyzing hidden import 'transformers.models.paligemma.convert_paligemma_weights_to_hf'
+121870 INFO: Analyzing hidden import 'transformers.models.pegasus.convert_pegasus_tf_to_pytorch'
+121873 INFO: Analyzing hidden import 'transformers.models.perceiver.convert_perceiver_haiku_to_pytorch'
+121881 INFO: Analyzing hidden import 'transformers.models.persimmon.convert_persimmon_weights_to_hf'
+121884 INFO: Analyzing hidden import 'transformers.models.phi.convert_phi_weights_to_hf'
+121887 INFO: Analyzing hidden import 'transformers.models.pix2struct.convert_pix2struct_original_pytorch_to_hf'
+121889 INFO: Analyzing hidden import 'transformers.models.pixtral.convert_pixtral_weights_to_hf'
+121895 INFO: Analyzing hidden import 'transformers.models.plbart.convert_plbart_original_checkpoint_to_torch'
+121896 INFO: Analyzing hidden import 'transformers.models.poolformer.convert_poolformer_original_to_pytorch'
+121901 INFO: Analyzing hidden import 'transformers.models.pop2piano.convert_pop2piano_weights_to_hf'
+121905 INFO: Analyzing hidden import 'transformers.models.prophetnet.convert_prophetnet_original_pytorch_checkpoint_to_pytorch'
+121908 INFO: Analyzing hidden import 'transformers.models.pvt.convert_pvt_to_pytorch'
+121911 INFO: Analyzing hidden import 'transformers.models.pvt_v2.convert_pvt_v2_to_pytorch'
+121919 INFO: Analyzing hidden import 'transformers.models.recurrent_gemma.convert_recurrent_gemma_to_hf'
+121922 INFO: Analyzing hidden import 'transformers.models.reformer.convert_reformer_trax_checkpoint_to_pytorch'
+121926 INFO: Analyzing hidden import 'transformers.models.regnet.convert_regnet_seer_10b_to_pytorch'
+121933 INFO: Analyzing hidden import 'transformers.models.regnet.convert_regnet_to_pytorch'
+121940 INFO: Analyzing hidden import 'transformers.models.resnet.convert_resnet_to_pytorch'
+121945 INFO: Analyzing hidden import 'transformers.models.roberta.convert_roberta_original_pytorch_checkpoint_to_pytorch'
+121948 INFO: Analyzing hidden import 'transformers.models.roberta_prelayernorm.convert_roberta_prelayernorm_original_pytorch_checkpoint_to_pytorch'
+121950 INFO: Analyzing hidden import 'transformers.models.roformer.convert_roformer_original_tf_checkpoint_to_pytorch'
+121951 INFO: Analyzing hidden import 'transformers.models.rt_detr.convert_rt_detr_original_pytorch_checkpoint_to_hf'
+121963 INFO: Analyzing hidden import 'transformers.models.rwkv.convert_rwkv_checkpoint_to_hf'
+121966 INFO: Analyzing hidden import 'transformers.models.sam.convert_sam_to_hf'
+121971 INFO: Analyzing hidden import 'transformers.models.seamless_m4t.convert_fairseq2_to_hf'
+121978 INFO: Analyzing hidden import 'transformers.models.seamless_m4t_v2.convert_fairseq2_to_hf'
+121984 INFO: Analyzing hidden import 'transformers.models.segformer.convert_segformer_original_to_pytorch'
+121992 INFO: Analyzing hidden import 'transformers.models.seggpt.convert_seggpt_to_hf'
+121996 INFO: Analyzing hidden import 'transformers.models.sew.convert_sew_original_pytorch_checkpoint_to_pytorch'
+122003 INFO: Analyzing hidden import 'transformers.models.sew_d.convert_sew_d_original_pytorch_checkpoint_to_pytorch'
+122009 INFO: Analyzing hidden import 'transformers.models.siglip.convert_siglip_to_hf'
+122017 INFO: Analyzing hidden import 'transformers.models.speech_encoder_decoder.convert_mbart_wav2vec2_seq2seq_original_to_pytorch'
+122023 INFO: Analyzing hidden import 'transformers.models.speech_encoder_decoder.convert_speech_to_text_wav2vec2_seq2seq_original_to_pytorch'
+122029 INFO: Analyzing hidden import 'transformers.models.speech_to_text.convert_s2t_fairseq_to_tfms'
+122031 INFO: Analyzing hidden import 'transformers.models.speecht5.convert_hifigan'
+122033 INFO: Analyzing hidden import 'transformers.models.speecht5.convert_speecht5_original_pytorch_checkpoint_to_pytorch'
+122039 INFO: Analyzing hidden import 'transformers.models.superpoint.convert_superpoint_to_pytorch'
+122042 INFO: Analyzing hidden import 'transformers.models.swiftformer.convert_swiftformer_original_to_hf'
+122045 INFO: Analyzing hidden import 'transformers.models.swin.convert_swin_simmim_to_pytorch'
+122048 INFO: Analyzing hidden import 'transformers.models.swin.convert_swin_timm_to_pytorch'
+122051 INFO: Analyzing hidden import 'transformers.models.swin2sr.convert_swin2sr_original_to_pytorch'
+122057 INFO: Analyzing hidden import 'transformers.models.swinv2.convert_swinv2_timm_to_pytorch'
+122061 INFO: Analyzing hidden import 'transformers.models.switch_transformers.convert_big_switch'
+122069 INFO: Analyzing hidden import 'transformers.models.t5.convert_t5x_checkpoint_to_flax'
+122074 INFO: Analyzing hidden import 'transformers.models.t5.convert_t5x_checkpoint_to_pytorch'
+122079 INFO: Analyzing hidden import 'transformers.models.table_transformer.convert_table_transformer_to_hf'
+122085 INFO: Analyzing hidden import 'transformers.models.table_transformer.convert_table_transformer_to_hf_no_timm'
+122093 INFO: Analyzing hidden import 'transformers.models.tapas.convert_tapas_original_tf_checkpoint_to_pytorch'
+122096 INFO: Analyzing hidden import 'transformers.models.timesformer.convert_timesformer_to_pytorch'
+122100 INFO: Analyzing hidden import 'transformers.models.trocr.convert_trocr_unilm_to_pytorch'
+122105 INFO: Analyzing hidden import 'transformers.models.udop.convert_udop_to_hf'
+122116 INFO: Analyzing hidden import 'transformers.models.umt5.convert_umt5_checkpoint_to_pytorch'
+122122 INFO: Analyzing hidden import 'transformers.models.unispeech.convert_unispeech_original_pytorch_checkpoint_to_pytorch'
+122126 INFO: Analyzing hidden import 'transformers.models.unispeech_sat.convert_unispeech_original_s3prl_checkpoint_to_pytorch'
+122129 INFO: Analyzing hidden import 'transformers.models.unispeech_sat.convert_unispeech_sat_original_pytorch_checkpoint_to_pytorch'
+122133 INFO: Analyzing hidden import 'transformers.models.univnet.convert_univnet'
+122136 INFO: Analyzing hidden import 'transformers.models.upernet.convert_convnext_upernet_to_pytorch'
+122140 INFO: Analyzing hidden import 'transformers.models.upernet.convert_swin_upernet_to_pytorch'
+122146 INFO: Analyzing hidden import 'transformers.models.video_llava.convert_video_llava_weights_to_hf'
+122149 INFO: Analyzing hidden import 'transformers.models.video_llava.processing_video_llava'
+122152 INFO: Analyzing hidden import 'transformers.models.videomae.convert_videomae_to_pytorch'
+122158 INFO: Analyzing hidden import 'transformers.models.vilt.convert_vilt_original_to_pytorch'
+122163 INFO: Analyzing hidden import 'transformers.models.vipllava.convert_vipllava_weights_to_hf'
+122165 INFO: Analyzing hidden import 'transformers.models.visual_bert.convert_visual_bert_original_pytorch_checkpoint_to_pytorch'
+122167 INFO: Analyzing hidden import 'transformers.models.vit.convert_dino_to_pytorch'
+122172 INFO: Analyzing hidden import 'transformers.models.vit.convert_vit_timm_to_pytorch'
+122177 INFO: Analyzing hidden import 'transformers.models.vit_mae.convert_vit_mae_to_pytorch'
+122180 INFO: Analyzing hidden import 'transformers.models.vit_msn.convert_msn_to_pytorch'
+122184 INFO: Analyzing hidden import 'transformers.models.vitmatte.convert_vitmatte_to_hf'
+122187 INFO: Analyzing hidden import 'transformers.models.vits.convert_original_checkpoint'
+122193 INFO: Analyzing hidden import 'transformers.models.vivit.convert_vivit_flax_to_pytorch'
+122197 INFO: Analyzing hidden import 'transformers.models.wav2vec2.convert_wav2vec2_original_pytorch_checkpoint_to_pytorch'
+122202 INFO: Analyzing hidden import 'transformers.models.wav2vec2.convert_wav2vec2_original_s3prl_checkpoint_to_pytorch'
+122205 INFO: Analyzing hidden import 'transformers.models.wav2vec2.modeling_flax_wav2vec2'
+122223 INFO: Analyzing hidden import 'transformers.models.wav2vec2_bert.convert_wav2vec2_seamless_checkpoint'
+122227 INFO: Analyzing hidden import 'transformers.models.wav2vec2_conformer.convert_wav2vec2_conformer_original_pytorch_checkpoint_to_pytorch'
+122232 INFO: Analyzing hidden import 'transformers.models.wavlm.convert_wavlm_original_pytorch_checkpoint_to_pytorch'
+122236 INFO: Analyzing hidden import 'transformers.models.wavlm.convert_wavlm_original_s3prl_checkpoint_to_pytorch'
+122238 INFO: Analyzing hidden import 'transformers.models.whisper.convert_openai_to_hf'
+122244 INFO: Analyzing hidden import 'transformers.models.x_clip.convert_x_clip_original_pytorch_to_hf'
+122252 INFO: Analyzing hidden import 'transformers.models.xglm.convert_xglm_original_ckpt_to_trfms'
+122254 INFO: Analyzing hidden import 'transformers.models.xlm_roberta_xl.convert_xlm_roberta_xl_original_pytorch_checkpoint_to_pytorch'
+122258 INFO: Analyzing hidden import 'transformers.models.xmod.convert_xmod_original_pytorch_checkpoint_to_pytorch'
+122261 INFO: Analyzing hidden import 'transformers.models.yolos.convert_yolos_to_pytorch'
+122267 INFO: Analyzing hidden import 'transformers.models.yoso.convert_yoso_pytorch_to_pytorch'
+122269 INFO: Analyzing hidden import 'transformers.models.zoedepth.convert_zoedepth_to_hf'
+122276 INFO: Analyzing hidden import 'transformers.onnx.__main__'
+122279 INFO: Analyzing hidden import 'transformers.sagemaker'
+122282 INFO: Analyzing hidden import 'transformers.testing_utils'
+122316 INFO: Analyzing hidden import 'transformers.utils.bitsandbytes'
+122317 INFO: Analyzing hidden import 'transformers.utils.dummy_detectron2_objects'
+122318 INFO: Analyzing hidden import 'transformers.utils.dummy_music_objects'
+122318 INFO: Analyzing hidden import 'transformers.utils.dummy_speech_objects'
+122320 INFO: Analyzing hidden import 'transformers.utils.fx'
+122343 INFO: Analyzing hidden import 'transformers.utils.hp_naming'
+122346 INFO: Analyzing hidden import 'torch._custom_op.functional'
+122349 INFO: Analyzing hidden import 'torch._deploy'
+122351 INFO: Analyzing hidden import 'torch._dynamo.backends.cudagraphs'
+122356 INFO: Analyzing hidden import 'torch._dynamo.backends.inductor'
+122356 INFO: Analyzing hidden import 'torch._dynamo.backends.onnxrt'
+122356 INFO: Analyzing hidden import 'torch._dynamo.backends.tensorrt'
+122357 INFO: Analyzing hidden import 'torch._dynamo.backends.torchxla'
+122358 INFO: Analyzing hidden import 'torch._dynamo.backends.tvm'
+122361 INFO: Analyzing hidden import 'torch._dynamo.profiler'
+122365 INFO: Analyzing hidden import 'torch._dynamo.test_case'
+122367 INFO: Analyzing hidden import 'torch._dynamo.test_minifier_common'
+122530 INFO: Analyzing hidden import 'torch._export.db.examples.assume_constant_result'
+122532 INFO: Analyzing hidden import 'torch._export.db.examples.autograd_function'
+122532 INFO: Analyzing hidden import 'torch._export.db.examples.class_method'
+122534 INFO: Analyzing hidden import 'torch._export.db.examples.cond_branch_class_method'
+122534 INFO: Analyzing hidden import 'torch._export.db.examples.cond_branch_nested_function'
+122535 INFO: Analyzing hidden import 'torch._export.db.examples.cond_branch_nonlocal_variables'
+122536 INFO: Analyzing hidden import 'torch._export.db.examples.cond_closed_over_variable'
+122536 INFO: Analyzing hidden import 'torch._export.db.examples.cond_operands'
+122537 INFO: Analyzing hidden import 'torch._export.db.examples.cond_predicate'
+122539 INFO: Analyzing hidden import 'torch._export.db.examples.constrain_as_size_example'
+122539 INFO: Analyzing hidden import 'torch._export.db.examples.constrain_as_value_example'
+122540 INFO: Analyzing hidden import 'torch._export.db.examples.decorator'
+122541 INFO: Analyzing hidden import 'torch._export.db.examples.dictionary'
+122541 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_assert'
+122542 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_constructor'
+122542 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_if_guard'
+122543 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_map'
+122544 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_round'
+122545 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_slicing'
+122546 INFO: Analyzing hidden import 'torch._export.db.examples.dynamic_shape_view'
+122547 INFO: Analyzing hidden import 'torch._export.db.examples.fn_with_kwargs'
+122548 INFO: Analyzing hidden import 'torch._export.db.examples.list_contains'
+122549 INFO: Analyzing hidden import 'torch._export.db.examples.list_unpack'
+122550 INFO: Analyzing hidden import 'torch._export.db.examples.model_attr_mutation'
+122551 INFO: Analyzing hidden import 'torch._export.db.examples.nested_function'
+122551 INFO: Analyzing hidden import 'torch._export.db.examples.null_context_manager'
+122553 INFO: Analyzing hidden import 'torch._export.db.examples.optional_input'
+122554 INFO: Analyzing hidden import 'torch._export.db.examples.pytree_flatten'
+122554 INFO: Analyzing hidden import 'torch._export.db.examples.scalar_output'
+122556 INFO: Analyzing hidden import 'torch._export.db.examples.specialized_attribute'
+122556 INFO: Analyzing hidden import 'torch._export.db.examples.static_for_loop'
+122557 INFO: Analyzing hidden import 'torch._export.db.examples.static_if'
+122558 INFO: Analyzing hidden import 'torch._export.db.examples.tensor_setattr'
+122558 INFO: Analyzing hidden import 'torch._export.db.examples.type_reflection_method'
+122559 INFO: Analyzing hidden import 'torch._export.db.examples.unsupported_operator'
+122560 INFO: Analyzing hidden import 'torch._export.db.examples.user_input_mutation'
+122560 INFO: Analyzing hidden import 'torch._export.db.gen_example'
+122561 INFO: Analyzing hidden import 'torch._export.passes.constant_folding'
+122566 INFO: Analyzing hidden import 'torch._export.passes.functionalize_side_effectful_ops_pass'
+122568 INFO: Analyzing hidden import 'torch._export.passes.remove_runtime_assertions'
+122569 INFO: Analyzing hidden import 'torch._export.serde.dynamic_shapes'
+122574 INFO: Analyzing hidden import 'torch._export.serde.schema_check'
+122580 INFO: Analyzing hidden import 'torch._export.tools'
+122583 INFO: Analyzing hidden import 'torch._functorch.benchmark_utils'
+122586 INFO: Analyzing hidden import 'torch._functorch.pytree_hacks'
+122586 INFO: Analyzing hidden import 'torch._functorch.top_operators_github_usage'
+122593 INFO: Analyzing hidden import 'torch._higher_order_ops.executorch_call_delegate'
+122596 INFO: Analyzing hidden import 'torch._higher_order_ops.run_const_graph'
+122598 INFO: Analyzing hidden import 'torch._inductor.aoti_eager'
+122604 INFO: Analyzing hidden import 'torch._inductor.autoheuristic.artifacts'
+122604 INFO: Analyzing hidden import 'torch._inductor.autoheuristic.artifacts._MMRankingA100'
+122613 INFO: Analyzing hidden import 'torch._inductor.autoheuristic.artifacts._MMRankingH100'
+122624 INFO: Analyzing hidden import 'torch._inductor.autoheuristic.artifacts._MixedMMA100'
+122627 INFO: Analyzing hidden import 'torch._inductor.autoheuristic.artifacts._MixedMMH100'
+122631 INFO: Analyzing hidden import 'torch._inductor.autoheuristic.artifacts._PadMMA100'
+122632 INFO: Analyzing hidden import 'torch._inductor.codegen.cuda.cutlass_epilogue_gen'
+122638 INFO: Analyzing hidden import 'torch._inductor.codegen.cuda.cutlass_lib_extensions'
+122638 INFO: Analyzing hidden import 'torch._inductor.codegen.cuda.cutlass_lib_extensions.gemm_operation_extensions'
+122641 INFO: Analyzing hidden import 'torch._inductor.compile_worker.__main__'
+122642 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns'
+122642 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_1'
+122647 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_10'
+122652 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_11'
+122657 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_12'
+122663 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_13'
+122666 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_14'
+122671 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_15'
+122677 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_16'
+122692 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_17'
+122700 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_18'
+122713 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_19'
+122719 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_2'
+122724 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_3'
+122729 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_4'
+122735 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_5'
+122739 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_6'
+122745 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_7'
+122752 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_8'
+122764 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns._sfdp_pattern_9'
+122772 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns.addmm_pattern'
+122773 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns.bmm_pattern'
+122774 INFO: Analyzing hidden import 'torch._inductor.fx_passes.serialized_patterns.mm_pattern'
+122776 INFO: Analyzing hidden import 'torch._inductor.runtime.halide_helpers'
+122779 INFO: Analyzing hidden import 'torch._inductor.runtime.triton_helpers'
+122786 INFO: Analyzing hidden import 'torch._inductor.test_case'
+122788 INFO: Analyzing hidden import 'torch._lazy.computation'
+122788 INFO: Analyzing hidden import 'torch._lazy.config'
+122789 INFO: Analyzing hidden import 'torch._lazy.debug'
+122791 INFO: Analyzing hidden import 'torch._lazy.extract_compiled_graph'
+122795 INFO: Analyzing hidden import 'torch._lazy.ir_cache'
+122796 INFO: Analyzing hidden import 'torch._logging.scribe'
+122797 INFO: Analyzing hidden import 'torch._numpy.testing'
+122819 INFO: Analyzing hidden import 'torch._python_dispatcher'
+122822 INFO: Analyzing hidden import 'torch.ao.ns._numeric_suite'
+122828 INFO: Analyzing hidden import 'torch.ao.pruning'
+122845 INFO: Analyzing hidden import 'torch.ao.pruning._experimental'
+122846 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.activation_sparsifier'
+122846 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.activation_sparsifier.activation_sparsifier'
+122851 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.data_scheduler'
+122861 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.data_sparsifier.lightning'
+122863 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.data_sparsifier.lightning.callbacks'
+122863 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.data_sparsifier.lightning.callbacks._data_sparstity_utils'
+122864 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.data_sparsifier.lightning.callbacks.data_sparsity'
+122866 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.data_sparsifier.quantization_utils'
+122868 INFO: Analyzing hidden import 'torch.ao.pruning._experimental.pruner'
+122886 INFO: Analyzing hidden import 'torch.ao.quantization._correct_bias'
+122889 INFO: Analyzing hidden import 'torch.ao.quantization._equalize'
+122892 INFO: Analyzing hidden import 'torch.ao.quantization._learnable_fake_quantize'
+122896 INFO: Analyzing hidden import 'torch.ao.quantization.backend_config._qnnpack_pt2e'
+122897 INFO: Analyzing hidden import 'torch.ao.quantization.backend_config.observation_type'
+122898 INFO: Analyzing hidden import 'torch.ao.quantization.backend_config.x86'
+122900 INFO: Analyzing hidden import 'torch.ao.quantization.fx._model_report'
+122900 INFO: Analyzing hidden import 'torch.ao.quantization.fx._model_report.detector'
+122919 INFO: Analyzing hidden import 'torch.ao.quantization.fx._model_report.model_report'
+122929 INFO: Analyzing hidden import 'torch.ao.quantization.fx.lower_to_qnnpack'
+122931 INFO: Analyzing hidden import 'torch.ao.quantization.fx.lstm_utils'
+122935 INFO: Analyzing hidden import 'torch.ao.quantization.pt2e.duplicate_dq_pass'
+122936 INFO: Analyzing hidden import 'torch.ao.quantization.pt2e.graph_utils'
+122940 INFO: Analyzing hidden import 'torch.ao.quantization.pt2e.port_metadata_pass'
+122943 INFO: Analyzing hidden import 'torch.ao.quantization.pt2e.prepare'
+122950 INFO: Analyzing hidden import 'torch.ao.quantization.pt2e.qat_utils'
+122961 INFO: Analyzing hidden import 'torch.ao.quantization.pt2e.representation'
+122971 INFO: Analyzing hidden import 'torch.ao.quantization.quantize_pt2e'
+122974 INFO: Analyzing hidden import 'torch.ao.quantization.quantizer.composable_quantizer'
+122976 INFO: Analyzing hidden import 'torch.ao.quantization.quantizer.embedding_quantizer'
+122994 INFO: Analyzing hidden import 'torch.ao.quantization.quantizer.x86_inductor_quantizer'
+123014 INFO: Analyzing hidden import 'torch.ao.quantization.quantizer.xnnpack_quantizer'
+123020 INFO: Analyzing hidden import 'torch.autograd._functions.utils'
+123021 INFO: Analyzing hidden import 'torch.backends._coreml'
+123022 INFO: Analyzing hidden import 'torch.backends._coreml.preprocess'
+123025 INFO: Analyzing hidden import 'torch.backends._nnapi'
+123026 INFO: Analyzing hidden import 'torch.backends._nnapi.prepare'
+123064 INFO: Analyzing hidden import 'torch.backends.xeon'
+123065 INFO: Analyzing hidden import 'torch.backends.xeon.run_cpu'
+123076 INFO: Analyzing hidden import 'torch.contrib'
+123077 INFO: Analyzing hidden import 'torch.contrib._tensorboard_vis'
+123080 INFO: Analyzing hidden import 'torch.cuda.comm'
+123080 INFO: Analyzing hidden import 'torch.cuda.error'
+123080 INFO: Analyzing hidden import 'torch.distributed._checkpointable'
+123082 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint'
+123082 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._checkpointer'
+123082 ERROR: Hidden import 'torch.distributed._shard.checkpoint._checkpointer' not found
+123082 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._dedup_save_plans'
+123082 ERROR: Hidden import 'torch.distributed._shard.checkpoint._dedup_save_plans' not found
+123082 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._dedup_tensors'
+123082 ERROR: Hidden import 'torch.distributed._shard.checkpoint._dedup_tensors' not found
+123082 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._fsspec_filesystem'
+123083 ERROR: Hidden import 'torch.distributed._shard.checkpoint._fsspec_filesystem' not found
+123083 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._nested_dict'
+123083 ERROR: Hidden import 'torch.distributed._shard.checkpoint._nested_dict' not found
+123083 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._sharded_tensor_utils'
+123083 ERROR: Hidden import 'torch.distributed._shard.checkpoint._sharded_tensor_utils' not found
+123083 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._storage_utils'
+123083 ERROR: Hidden import 'torch.distributed._shard.checkpoint._storage_utils' not found
+123083 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._traverse'
+123083 ERROR: Hidden import 'torch.distributed._shard.checkpoint._traverse' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint._version'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint._version' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.api'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.api' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.default_planner'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.default_planner' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.filesystem'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.filesystem' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.format_utils'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.format_utils' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.logger'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.logger' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.logging_handlers'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.logging_handlers' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.metadata'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.metadata' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.optimizer'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.optimizer' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.planner'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.planner' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.planner_helpers'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.planner_helpers' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.resharding'
+123084 ERROR: Hidden import 'torch.distributed._shard.checkpoint.resharding' not found
+123084 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.staging'
+123085 ERROR: Hidden import 'torch.distributed._shard.checkpoint.staging' not found
+123085 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.state_dict'
+123085 ERROR: Hidden import 'torch.distributed._shard.checkpoint.state_dict' not found
+123085 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.state_dict_loader'
+123085 ERROR: Hidden import 'torch.distributed._shard.checkpoint.state_dict_loader' not found
+123085 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.state_dict_saver'
+123086 ERROR: Hidden import 'torch.distributed._shard.checkpoint.state_dict_saver' not found
+123086 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.stateful'
+123086 ERROR: Hidden import 'torch.distributed._shard.checkpoint.stateful' not found
+123086 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.storage'
+123086 ERROR: Hidden import 'torch.distributed._shard.checkpoint.storage' not found
+123086 INFO: Analyzing hidden import 'torch.distributed._shard.checkpoint.utils'
+123086 ERROR: Hidden import 'torch.distributed._shard.checkpoint.utils' not found
+123086 INFO: Analyzing hidden import 'torch.distributed._shard.sharded_optim'
+123089 INFO: Analyzing hidden import 'torch.distributed._shard.sharded_tensor.logger'
+123090 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor'
+123091 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor._ops'
+123091 ERROR: Hidden import 'torch.distributed._sharded_tensor._ops' not found
+123091 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor._ops._common'
+123091 ERROR: Hidden import 'torch.distributed._sharded_tensor._ops._common' not found
+123091 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor._ops.binary_cmp'
+123091 ERROR: Hidden import 'torch.distributed._sharded_tensor._ops.binary_cmp' not found
+123091 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor._ops.init'
+123091 ERROR: Hidden import 'torch.distributed._sharded_tensor._ops.init' not found
+123091 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor._ops.misc_ops'
+123091 ERROR: Hidden import 'torch.distributed._sharded_tensor._ops.misc_ops' not found
+123091 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor._ops.tensor_ops'
+123092 ERROR: Hidden import 'torch.distributed._sharded_tensor._ops.tensor_ops' not found
+123092 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.api'
+123092 ERROR: Hidden import 'torch.distributed._sharded_tensor.api' not found
+123092 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.logger'
+123092 ERROR: Hidden import 'torch.distributed._sharded_tensor.logger' not found
+123093 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.logging_handlers'
+123093 ERROR: Hidden import 'torch.distributed._sharded_tensor.logging_handlers' not found
+123093 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.metadata'
+123093 ERROR: Hidden import 'torch.distributed._sharded_tensor.metadata' not found
+123093 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.reshard'
+123093 ERROR: Hidden import 'torch.distributed._sharded_tensor.reshard' not found
+123093 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.shard'
+123093 ERROR: Hidden import 'torch.distributed._sharded_tensor.shard' not found
+123093 INFO: Analyzing hidden import 'torch.distributed._sharded_tensor.utils'
+123093 ERROR: Hidden import 'torch.distributed._sharded_tensor.utils' not found
+123093 INFO: Analyzing hidden import 'torch.distributed._sharding_spec'
+123093 INFO: Analyzing hidden import 'torch.distributed._sharding_spec._internals'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec._internals' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._sharding_spec.api'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec.api' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops._common'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops._common' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops.embedding'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops.embedding' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops.embedding_bag'
+123094 ERROR: Hidden import 'torch.distributed._sharding_spec.chunk_sharding_spec_ops.embedding_bag' not found
+123094 INFO: Analyzing hidden import 'torch.distributed._tensor.api'
+123094 INFO: Analyzing hidden import 'torch.distributed._tensor.placement_types'
+123096 INFO: Analyzing hidden import 'torch.distributed._tools'
+123132 INFO: Analyzing hidden import 'torch.distributed.algorithms._quantization'
+123132 INFO: Analyzing hidden import 'torch.distributed.algorithms._quantization.quantization'
+123136 INFO: Analyzing hidden import 'torch.distributed.algorithms.ddp_comm_hooks.ddp_zero_hook'
+123140 INFO: Analyzing hidden import 'torch.distributed.algorithms.model_averaging.hierarchical_model_averager'
+123141 INFO: Analyzing hidden import 'torch.distributed.argparse_util'
+123143 INFO: Analyzing hidden import 'torch.distributed.checkpoint._checkpointer'
+123144 INFO: Analyzing hidden import 'torch.distributed.checkpoint._dedup_tensors'
+123146 INFO: Analyzing hidden import 'torch.distributed.collective_utils'
+123149 INFO: Analyzing hidden import 'torch.distributed.elastic.control_plane'
+123150 INFO: Analyzing hidden import 'torch.distributed.elastic.rendezvous.etcd_server'
+123153 INFO: Analyzing hidden import 'torch.distributed.elastic.utils.data'
+123156 INFO: Analyzing hidden import 'torch.distributed.fsdp._trace_utils'
+123158 INFO: Analyzing hidden import 'torch.distributed.launch'
+123166 INFO: Analyzing hidden import 'torch.distributed.rpc._testing'
+123168 INFO: Analyzing hidden import 'torch.distributed.rpc.rref_proxy'
+123171 INFO: Analyzing hidden import 'torch.distributed.tensor._shards_wrapper'
+123175 INFO: Analyzing hidden import 'torch.distributed.tensor.debug'
+123189 INFO: Analyzing hidden import 'torch.distributed.tensor.debug._op_coverage'
+123191 INFO: Analyzing hidden import 'torch.distributed.tensor.experimental'
+123197 INFO: Analyzing hidden import 'torch.distributed.tensor.experimental._attention'
+123210 INFO: Analyzing hidden import 'torch.distributed.tensor.experimental._tp_transform'
+123218 INFO: Analyzing hidden import 'torch.distributed.tensor.parallel.input_reshard'
+123221 INFO: Analyzing hidden import 'torch.export._remove_auto_functionalized_pass'
+123223 INFO: Analyzing hidden import 'torch.export.custom_obj'
+123223 INFO: Analyzing hidden import 'torch.export.experimental'
+123225 INFO: Analyzing hidden import 'torch.export.passes'
+123227 INFO: Analyzing hidden import 'torch.fx.annotate'
+123227 INFO: Analyzing hidden import 'torch.fx.experimental.accelerator_partitioner'
+123417 INFO: Analyzing hidden import 'torch.fx.experimental.debug'
+123418 INFO: Analyzing hidden import 'torch.fx.experimental.graph_gradual_typechecker'
+123458 INFO: Analyzing hidden import 'torch.fx.experimental.merge_matmul'
+123459 INFO: Analyzing hidden import 'torch.fx.experimental.meta_tracer'
+123465 INFO: Analyzing hidden import 'torch.fx.experimental.migrate_gradual_types'
+123466 INFO: Analyzing hidden import 'torch.fx.experimental.migrate_gradual_types.constraint'
+123474 INFO: Analyzing hidden import 'torch.fx.experimental.migrate_gradual_types.constraint_generator'
+123497 INFO: Analyzing hidden import 'torch.fx.experimental.migrate_gradual_types.constraint_transformation'
+123513 INFO: Analyzing hidden import 'torch.fx.experimental.migrate_gradual_types.transform_to_z3'
+123520 INFO: Analyzing hidden import 'torch.fx.experimental.normalize'
+123526 INFO: Analyzing hidden import 'torch.fx.experimental.rewriter'
+123528 INFO: Analyzing hidden import 'torch.fx.experimental.unification.match'
+123531 INFO: Analyzing hidden import 'torch.fx.experimental.unify_refinements'
+123533 INFO: Analyzing hidden import 'torch.fx.passes.annotate_getitem_nodes'
+123535 INFO: Analyzing hidden import 'torch.fx.passes.backends'
+123536 INFO: Analyzing hidden import 'torch.fx.passes.backends.cudagraphs'
+123536 INFO: Analyzing hidden import 'torch.fx.passes.dialect'
+123537 INFO: Analyzing hidden import 'torch.fx.passes.dialect.common'
+123538 INFO: Analyzing hidden import 'torch.fx.passes.dialect.common.cse_pass'
+123541 INFO: Analyzing hidden import 'torch.fx.passes.pass_manager'
+123543 INFO: Analyzing hidden import 'torch.fx.passes.tests'
+123544 INFO: Analyzing hidden import 'torch.fx.passes.tests.test_pass_manager'
+123546 INFO: Analyzing hidden import 'torch.jit._decompositions'
+123547 INFO: Analyzing hidden import 'torch.jit._passes'
+123549 INFO: Analyzing hidden import 'torch.jit._passes._property_propagation'
+123551 INFO: Analyzing hidden import 'torch.jit._pickle'
+123551 INFO: Analyzing hidden import 'torch.jit._shape_functions'
+123574 INFO: Analyzing hidden import 'torch.jit.generate_bytecode'
+123575 INFO: Analyzing hidden import 'torch.jit.mobile'
+123578 INFO: Analyzing hidden import 'torch.jit.supported_ops'
+123582 INFO: Analyzing hidden import 'torch.jit.unsupported_tensor_ops'
+123584 INFO: Analyzing hidden import 'torch.multiprocessing.pool'
+123586 INFO: Analyzing hidden import 'torch.nn.attention.bias'
+123590 INFO: Analyzing hidden import 'torch.nn.backends'
+123590 INFO: Analyzing hidden import 'torch.nn.backends.thnn'
+123591 INFO: Analyzing hidden import 'torch.nn.cpp'
+123592 INFO: Analyzing hidden import 'torch.nn.quantizable.modules.activation'
+123593 INFO: Analyzing hidden import 'torch.nn.quantizable.modules.rnn'
+123593 INFO: Analyzing hidden import 'torch.nn.quantized._reference'
+123595 INFO: Analyzing hidden import 'torch.nn.quantized._reference.modules.conv'
+123596 INFO: Analyzing hidden import 'torch.nn.quantized._reference.modules.linear'
+123596 INFO: Analyzing hidden import 'torch.nn.quantized._reference.modules.rnn'
+123597 INFO: Analyzing hidden import 'torch.nn.quantized._reference.modules.sparse'
+123597 INFO: Analyzing hidden import 'torch.nn.quantized._reference.modules.utils'
+123598 INFO: Analyzing hidden import 'torch.nn.quantized.dynamic.modules'
+123599 INFO: Analyzing hidden import 'torch.nn.quantized.dynamic.modules.conv'
+123599 INFO: Analyzing hidden import 'torch.nn.quantized.dynamic.modules.linear'
+123599 INFO: Analyzing hidden import 'torch.nn.quantized.dynamic.modules.rnn'
+123601 INFO: Analyzing hidden import 'torch.nn.quantized.modules.activation'
+123601 INFO: Analyzing hidden import 'torch.nn.quantized.modules.batchnorm'
+123602 INFO: Analyzing hidden import 'torch.nn.quantized.modules.conv'
+123602 INFO: Analyzing hidden import 'torch.nn.quantized.modules.dropout'
+123602 INFO: Analyzing hidden import 'torch.nn.quantized.modules.embedding_ops'
+123603 INFO: Analyzing hidden import 'torch.nn.quantized.modules.functional_modules'
+123604 INFO: Analyzing hidden import 'torch.nn.quantized.modules.linear'
+123605 INFO: Analyzing hidden import 'torch.nn.quantized.modules.normalization'
+123605 INFO: Analyzing hidden import 'torch.nn.quantized.modules.rnn'
+123606 INFO: Analyzing hidden import 'torch.nn.quantized.modules.utils'
+123606 INFO: Analyzing hidden import 'torch.nn.utils._deprecation_utils'
+123607 INFO: Analyzing hidden import 'torch.nn.utils._expanded_weights'
+123630 INFO: Analyzing hidden import 'torch.nn.utils._per_sample_grad'
+123632 INFO: Analyzing hidden import 'torch.onnx._experimental'
+123634 INFO: Analyzing hidden import 'torch.onnx._internal.exporter._isolated'
+123636 INFO: Analyzing hidden import 'torch.onnx._onnx_supported_ops'
+123638 INFO: Analyzing hidden import 'torch.onnx.verification'
+123660 INFO: Analyzing hidden import 'torch.optim._multi_tensor'
+123661 INFO: Analyzing hidden import 'torch.package._mock'
+123663 INFO: Analyzing hidden import 'torch.profiler._pattern_matcher'
+123720 INFO: Analyzing hidden import 'torch.profiler.python_tracer'
+123721 INFO: Analyzing hidden import 'torch.quantization._numeric_suite'
+123721 INFO: Analyzing hidden import 'torch.quantization._numeric_suite_fx'
+123722 INFO: Analyzing hidden import 'torch.quantization._quantized_conversions'
+123725 INFO: Analyzing hidden import 'torch.quantization.fx'
+123725 INFO: Analyzing hidden import 'torch.quantization.fx._equalize'
+123726 INFO: Analyzing hidden import 'torch.quantization.fx.convert'
+123727 INFO: Analyzing hidden import 'torch.quantization.fx.fuse'
+123727 INFO: Analyzing hidden import 'torch.quantization.fx.fusion_patterns'
+123728 INFO: Analyzing hidden import 'torch.quantization.fx.graph_module'
+123728 INFO: Analyzing hidden import 'torch.quantization.fx.match_utils'
+123729 INFO: Analyzing hidden import 'torch.quantization.fx.pattern_utils'
+123729 INFO: Analyzing hidden import 'torch.quantization.fx.prepare'
+123730 INFO: Analyzing hidden import 'torch.quantization.fx.quantization_patterns'
+123730 INFO: Analyzing hidden import 'torch.quantization.fx.quantization_types'
+123730 INFO: Analyzing hidden import 'torch.quantization.fx.utils'
+123731 INFO: Analyzing hidden import 'torch.quantization.quantize_fx'
+123732 INFO: Analyzing hidden import 'torch.quantization.utils'
+123733 INFO: Analyzing hidden import 'torch.testing._internal.autocast_test_lists'
+123746 INFO: Analyzing hidden import 'torch.testing._internal.autograd_function_db'
+124637 INFO: Analyzing hidden import 'torch.testing._internal.check_kernel_launches'
+124639 INFO: Analyzing hidden import 'torch.testing._internal.codegen'
+124640 INFO: Analyzing hidden import 'torch.testing._internal.common_dist_composable'
+124641 INFO: Analyzing hidden import 'torch.testing._internal.common_distributed'
+124671 INFO: Analyzing hidden import 'torch.testing._internal.common_fsdp'
+124691 INFO: Analyzing hidden import 'torch.testing._internal.common_mkldnn'
+124693 INFO: Analyzing hidden import 'torch.testing._internal.common_modules'
+124819 INFO: Analyzing hidden import 'torch.testing._internal.common_optimizers'
+124838 INFO: Analyzing hidden import 'torch.testing._internal.common_pruning'
+124846 INFO: Analyzing hidden import 'torch.testing._internal.common_quantization'
+124909 INFO: Analyzing hidden import 'torch.testing._internal.common_subclass'
+124913 INFO: Analyzing hidden import 'torch.testing._internal.composite_compliance'
+124922 INFO: Analyzing hidden import 'torch.testing._internal.custom_op_db'
+124934 INFO: Analyzing hidden import 'torch.testing._internal.custom_tensor'
+124937 INFO: Analyzing hidden import 'torch.testing._internal.data'
+124937 INFO: Analyzing hidden import 'torch.testing._internal.data.network1'
+124937 INFO: Analyzing hidden import 'torch.testing._internal.data.network2'
+124939 INFO: Analyzing hidden import 'torch.testing._internal.dist_utils'
+124943 INFO: Analyzing hidden import 'torch.testing._internal.distributed._shard'
+124943 INFO: Analyzing hidden import 'torch.testing._internal.distributed._shard.test_common'
+124945 INFO: Analyzing hidden import 'torch.testing._internal.distributed._tensor'
+124945 INFO: Analyzing hidden import 'torch.testing._internal.distributed._tensor.common_dtensor'
+124955 INFO: Analyzing hidden import 'torch.testing._internal.distributed.checkpoint_utils'
+124957 INFO: Analyzing hidden import 'torch.testing._internal.distributed.common_state_dict'
+124960 INFO: Analyzing hidden import 'torch.testing._internal.distributed.ddp_under_dist_autograd_test'
+124972 INFO: Analyzing hidden import 'torch.testing._internal.distributed.distributed_test'
+125307 INFO: Analyzing hidden import 'torch.testing._internal.distributed.distributed_utils'
+125308 INFO: Analyzing hidden import 'torch.testing._internal.distributed.nn'
+125309 INFO: Analyzing hidden import 'torch.testing._internal.distributed.nn.api'
+125310 INFO: Analyzing hidden import 'torch.testing._internal.distributed.nn.api.remote_module_test'
+125322 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.dist_autograd_test'
+125363 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.dist_optimizer_test'
+125369 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.examples'
+125370 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.examples.parameter_server_test'
+125372 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.examples.reinforcement_learning_rpc_test'
+125377 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.faulty_agent_rpc_test'
+125383 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.faulty_rpc_agent_test_fixture'
+125384 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.jit'
+125384 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.jit.dist_autograd_test'
+125388 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.jit.rpc_test'
+125410 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.jit.rpc_test_faulty'
+125415 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.rpc_test'
+125692 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc.tensorpipe_rpc_agent_test_fixture'
+125693 INFO: Analyzing hidden import 'torch.testing._internal.distributed.rpc_utils'
+125696 INFO: Analyzing hidden import 'torch.testing._internal.generated'
+125696 INFO: Analyzing hidden import 'torch.testing._internal.generated.annotated_fn_args'
+125860 INFO: Analyzing hidden import 'torch.testing._internal.hop_db'
+125864 INFO: Analyzing hidden import 'torch.testing._internal.hypothesis_utils'
+125869 INFO: Analyzing hidden import 'torch.testing._internal.inductor_utils'
+125872 INFO: Analyzing hidden import 'torch.testing._internal.jit_metaprogramming_utils'
+125891 INFO: Analyzing hidden import 'torch.testing._internal.logging_utils'
+125894 INFO: Analyzing hidden import 'torch.testing._internal.quantization_torch_package_models'
+125896 INFO: Analyzing hidden import 'torch.testing._internal.static_module'
+125897 INFO: Analyzing hidden import 'torch.testing._internal.test_module'
+125897 INFO: Analyzing hidden import 'torch.testing._internal.test_module.future_div'
+125898 INFO: Analyzing hidden import 'torch.testing._internal.test_module.no_future_div'
+125899 INFO: Analyzing hidden import 'torch.testing._internal.torchbind_impls'
+125901 INFO: Analyzing hidden import 'torch.testing._internal.triton_utils'
+125908 INFO: Analyzing hidden import 'torch.testing._internal.two_tensor'
+125910 INFO: Analyzing hidden import 'torch.utils._freeze'
+125913 INFO: Analyzing hidden import 'torch.utils._get_clean_triton'
+125916 INFO: Analyzing hidden import 'torch.utils._strobelight'
+125916 INFO: Analyzing hidden import 'torch.utils._strobelight.cli_function_profiler'
+125919 INFO: Analyzing hidden import 'torch.utils._zip'
+125922 INFO: Analyzing hidden import 'torch.utils.benchmark.examples'
+125922 INFO: Analyzing hidden import 'torch.utils.benchmark.examples.blas_compare_setup'
+125926 INFO: Analyzing hidden import 'torch.utils.benchmark.examples.compare'
+125928 INFO: Analyzing hidden import 'torch.utils.benchmark.examples.fuzzer'
+125929 INFO: Analyzing hidden import 'torch.utils.benchmark.examples.op_benchmark'
+125936 INFO: Analyzing hidden import 'torch.utils.benchmark.examples.simple_timeit'
+125938 INFO: Analyzing hidden import 'torch.utils.benchmark.examples.spectral_ops_fuzz_test'
+125942 INFO: Analyzing hidden import 'torch.utils.benchmark.op_fuzzers.sparse_binary'
+125945 INFO: Analyzing hidden import 'torch.utils.benchmark.op_fuzzers.sparse_unary'
+125946 INFO: Analyzing hidden import 'torch.utils.benchmark.utils.compile'
+125949 INFO: Analyzing hidden import 'torch.utils.bottleneck'
+125949 INFO: Analyzing hidden import 'torch.utils.bottleneck.__main__'
+125954 INFO: Analyzing hidden import 'torch.utils.bundled_inputs'
+125959 INFO: Analyzing hidden import 'torch.utils.data.backward_compatibility'
+125960 INFO: Analyzing hidden import 'torch.utils.data.datapipes.gen_pyi'
+125965 INFO: Analyzing hidden import 'torch.utils.data.datapipes.utils.snapshot'
+125966 INFO: Analyzing hidden import 'torch.utils.jit'
+125966 INFO: Analyzing hidden import 'torch.utils.jit.log_extract'
+125970 INFO: Analyzing hidden import 'torch.utils.mobile_optimizer'
+125972 INFO: Analyzing hidden import 'torch.utils.model_dump'
+125981 INFO: Analyzing hidden import 'torch.utils.model_dump.__main__'
+125982 INFO: Analyzing hidden import 'torch.utils.viz'
+125982 INFO: Analyzing hidden import 'torch.utils.viz._cycles'
+125989 INFO: Analyzing hidden import 'torch.xpu._gpu_trace'
+125991 INFO: Analyzing hidden import 'torchaudio.lib.libctc_prefix_decoder'
+125992 INFO: Analyzing hidden import 'torchaudio.lib.libtorchaudio'
+125992 INFO: Analyzing hidden import 'torchaudio.lib.pybind11_prefixctc'
+125993 INFO: Analyzing hidden import 'torchaudio.models.decoder'
+126001 INFO: Analyzing hidden import 'torchaudio.prototype'
+126001 INFO: Analyzing hidden import 'torchaudio.prototype.datasets'
+126004 INFO: Analyzing hidden import 'torchaudio.prototype.functional'
+126015 INFO: Analyzing hidden import 'torchaudio.prototype.models'
+126052 INFO: Analyzing hidden import 'torchaudio.prototype.pipelines'
+126060 INFO: Analyzing hidden import 'torchaudio.prototype.transforms'
+126065 INFO: Analyzing hidden import 'torchaudio.utils.ffmpeg_utils'
+126065 INFO: Processing module hooks (post-graph stage)...
+126561 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+126854 INFO: Processing standard module hook 'hook-lxml.isoschematron.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+127908 INFO: Processing standard module hook 'hook-sklearn.tree.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+128450 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+129472 WARNING: Hidden import "scipy.special._cdflib" not found!
+129860 INFO: Processing standard module hook 'hook-sqlalchemy.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+130154 WARNING: Hidden import "pysqlite2" not found!
+130155 WARNING: Hidden import "MySQLdb" not found!
+130163 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks'
+130164 INFO: Processing standard module hook 'hook-lxml.objectify.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+130164 INFO: Processing standard module hook 'hook-tzdata.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+130883 INFO: Performing binary vs. data reclassification (7237 entries)
+131424 INFO: Looking for ctypes DLLs
+131469 WARNING: Ignoring /usr/lib64/libgomp.so.1 imported from C:\Users\peepz\.conda\envs\vbot\lib\site-packages\torch\_inductor\codecache.py - only basenames are supported with ctypes imports!
+131577 WARNING: Library _name.dll required via ctypes not found
+131580 WARNING: Library _handle.dll required via ctypes not found
+131592 WARNING: Ignoring AppKit.framework/AppKit imported from C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\darkdetect\_mac_detect.py - only basenames are supported with ctypes imports!
+131656 INFO: Analyzing run-time hooks ...
+131692 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\rthooks'
+131694 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\rthooks'
+131696 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\rthooks'
+131698 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\rthooks'
+131699 INFO: Including run-time hook 'pyi_rth_pywintypes.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\rthooks'
+131700 INFO: Including run-time hook 'pyi_rth_pythoncom.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\rthooks'
+131702 INFO: Including run-time hook 'pyi_rth_nltk.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\_pyinstaller_hooks_contrib\\rthooks'
+131703 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\rthooks'
+131705 INFO: Including run-time hook 'pyi_rth_pkgres.py' from 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\PyInstaller\\hooks\\rthooks'
+132009 INFO: Creating base_library.zip...
+132036 INFO: Looking for dynamic libraries
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\building\build_main.py:227: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__(package)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\building\build_main.py:227: UserWarning: The numpy.array_api submodule is still experimental. See NEP 47.
+  __import__(package)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `TorchScript` support for functional optimizers is deprecated and will be removed in a future PyTorch release. Consider using the `torch.compile` optimizer instead.
+  __import__(package)
+W1010 15:11:15.221000 436184 site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+  __import__(package)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+  __import__(package)
+C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+  __import__(package)
+142681 INFO: Extra DLL search directories (AddDllDirectory): ['C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\numpy.libs', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\scipy.libs', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\pandas.libs', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\torch\\lib', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\Library\\bin', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\torchvision', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\torchvision', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\torchvision', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\torchvision', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\av.libs', 'C:\\Users\\peepz\\.conda\\envs\\vbot\\lib\\site-packages\\ctranslate2']
+142681 INFO: Extra DLL search directories (PATH): []
+148028 WARNING: Library not found: could not resolve 'cublasLt64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117.dll'.
+148028 WARNING: Library not found: could not resolve 'cusparse64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117.dll'.
+148028 WARNING: Library not found: could not resolve 'cudart64_110.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117.dll'.
+148028 WARNING: Library not found: could not resolve 'cublas64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117.dll'.
+148029 WARNING: Library not found: could not resolve 'cusparse64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117_nocublaslt.dll'.
+148029 WARNING: Library not found: could not resolve 'cudart64_110.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117_nocublaslt.dll'.
+148029 WARNING: Library not found: could not resolve 'cublas64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda117_nocublaslt.dll'.
+148029 WARNING: Library not found: could not resolve 'cublasLt64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118.dll'.
+148029 WARNING: Library not found: could not resolve 'cusparse64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118.dll'.
+148029 WARNING: Library not found: could not resolve 'cudart64_110.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118.dll'.
+148030 WARNING: Library not found: could not resolve 'cublas64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118.dll'.
+148030 WARNING: Library not found: could not resolve 'cusparse64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118_nocublaslt.dll'.
+148030 WARNING: Library not found: could not resolve 'cudart64_110.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118_nocublaslt.dll'.
+148030 WARNING: Library not found: could not resolve 'cublas64_11.dll', dependency of 'C:\\Users\\peepz\\AppData\\Roaming\\Python\\Python310\\site-packages\\bitsandbytes\\libbitsandbytes_cuda118_nocublaslt.dll'.
+148485 INFO: Warnings written to C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\build\vbot\warn-vbot.txt
+149595 INFO: Graph cross-reference written to C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\build\vbot\xref-vbot.html
+150016 INFO: checking PYZ
+150017 INFO: Building PYZ because PYZ-00.toc is non existent
+150017 INFO: Building PYZ (ZlibArchive) C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\build\vbot\PYZ-00.pyz
+154052 INFO: Building PYZ (ZlibArchive) C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\build\vbot\PYZ-00.pyz completed successfully.
+154230 INFO: checking PKG
+154230 INFO: Building PKG because PKG-00.toc is non existent
+154231 INFO: Building PKG (CArchive) Vbot.pkg
+154277 INFO: Building PKG (CArchive) Vbot.pkg completed successfully.
+154278 INFO: Bootloader C:\Users\peepz\AppData\Roaming\Python\Python310\site-packages\PyInstaller\bootloader\Windows-64bit-intel\run.exe
+154278 INFO: checking EXE
+154278 INFO: Building EXE because EXE-00.toc is non existent
+154278 INFO: Building EXE from EXE-00.toc
+154278 INFO: Copying bootloader EXE to C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\build\vbot\Vbot.exe
+154313 INFO: Copying icon to EXE
+154346 INFO: Copying 0 resources to EXE
+154346 INFO: Embedding manifest in EXE
+154379 INFO: Appending PKG archive to EXE
+154453 INFO: Fixing EXE headers
+157811 INFO: Building EXE from EXE-00.toc completed successfully.
+158098 INFO: checking COLLECT
+158099 INFO: Building COLLECT because COLLECT-00.toc is non existent
+ERROR: The output directory "C:\Users\peepz\Desktop\Project\college-project\senior-project\Vbot\dist\Vbot" is not empty. Please remove all its contents or use the -y option (remove output directory without confirmation).
+Using CUDA from: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+WARNING: cublas64_12.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\cublas64_12.dll
+WARNING: cublasLt64_12.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\cublasLt64_12.dll
+WARNING: cudart64_12.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\cudart64_12.dll
+WARNING: cufft64_11.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\cufft64_11.dll
+WARNING: curand64_10.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\curand64_10.dll
+WARNING: cusparse64_12.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\cusparse64_12.dll
+WARNING: nvrtc64_120_0.dll not found at C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\nvrtc64_120_0.dll
+
+╔════════════════════════════════════════════════════════╗
+║              Build Completed                           ║
+╚════════════════════════════════════════════════════════╝
+
+Build Finished: 2025-10-10 15:11:35
+Exit Code: 1
+
