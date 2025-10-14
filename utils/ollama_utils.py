@@ -1345,8 +1345,8 @@ class OllamaHandler:
                     {"role": "assistant", "content": filtered_response}
                 )
 
-                # Play the response using simple TTS
-                success = self._simple_tts_playback(response)
+                # Play the response using simple TTS (use filtered text!)
+                success = self._simple_tts_playback(filtered_response)
                 if not success:
                     print("[ERROR] Simple TTS playback failed")
                     # If TTS failed, reset state immediately
