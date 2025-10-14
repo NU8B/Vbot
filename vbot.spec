@@ -240,7 +240,7 @@ excludes = [
 # ============================================================================
 
 a = Analysis(
-    ['Vbot.py'],  # Main entry point
+    ['VbotSeamless.py'],  # Main entry point - Seamless interface
     pathex=[
         project_root,
         r'C:\ProgramData\Anaconda3\Lib',  # Add base Anaconda for unittest
@@ -308,6 +308,8 @@ coll = COLLECT(
 """
 BUILD INSTRUCTIONS:
 
+Entry Point: VbotSeamless.py (Seamless interface with parallel model loading)
+
 1. Install PyInstaller:
    pip install pyinstaller
 
@@ -321,18 +323,21 @@ BUILD INSTRUCTIONS:
    cd dist/Vbot
    ./Vbot.exe
 
-5. For one-file build (slower startup, easier distribution):
-   - Change 'onefile=False' to 'onefile=True' in EXE()
-   - Remove COLLECT() section
-   
+FEATURES:
+- Seamless interface with parallel model loading
+- Instant character switching (all models pre-loaded)
+- Welcome screen with avatar selection
+- All 5 characters supported: Amelia, Eveland, Gura, Shiori, Wilson
+
 SIZE OPTIMIZATION:
-- Current config: ~2-3GB (includes all models and dependencies)
-- One-file mode: Same size, but single .exe
-- To reduce size: Exclude unused model files from 'asset' folder
+- Current config: ~3-4GB (includes all models and dependencies)
+- Includes all character models for instant switching
+- Asset files: backgrounds, models, reference audio
 
 TROUBLESHOOTING:
 - If build fails: Check hiddenimports and datas
 - If exe crashes: Run with console=True to see errors
 - If CUDA errors: Verify CUDA DLLs are included in binaries
+- If path errors: Check get_base_path() in all utility files
 - If import errors: Add missing modules to hiddenimports
 """
