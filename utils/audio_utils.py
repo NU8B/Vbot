@@ -8,20 +8,36 @@ import torch
 from pathlib import Path
 import threading
 import os
+import sys
+
+
+def get_base_path():
+    """Get the base path for the application, handling PyInstaller bundled exe"""
+    if getattr(sys, "frozen", False):
+        # Running as compiled executable
+        return sys._MEIPASS
+    else:
+        # Running as script
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class AudioProcessor:
     def __init__(self, device_index=None):
-        cache_dir = Path("./cache/style_tts2_ft")
-        cache_dir.mkdir(exist_ok=True)
+        # Get base path for PyInstaller compatibility
+        base_path = get_base_path()
+
+        cache_dir = Path(base_path) / "cache" / "style_tts2_ft"
+        cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Create outputs directory if it doesn't exist
-        self.output_dir = Path("asset/outputs")
+        self.output_dir = Path(base_path) / "asset" / "outputs"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Use correct path for neutral.wav
         model_name = os.getenv("VOICE_TYPE", "amelia_watson")
-        self.ref_audio_path = f"asset/ref_sound/{model_name}/neutral.wav"
+        self.ref_audio_path = os.path.join(
+            base_path, f"asset/ref_sound/{model_name}/neutral.wav"
+        )
 
         # Performance optimization: Use smallest model and optimized settings
         # Smart device selection with cuDNN fallback

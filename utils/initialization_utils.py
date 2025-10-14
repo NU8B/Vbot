@@ -343,11 +343,16 @@ class InitializationHandler:
         group2_start = time.time()
         print("\nInitializing emotion classifier...")
 
+        # Get project root for path construction (handles PyInstaller)
+        project_root = get_base_path()
+
         # Check if all styles are cached for this model
         self.styles_were_cached = True
         unique_styles = set(EMOTION_MAPPING.values())
         for style_file in unique_styles:
-            style_path = f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            style_path = os.path.join(
+                project_root, f"asset/ref_sound/{self.model_name}/{style_file}.wav"
+            )
             if not self.tts_model.is_style_cached(style_path):
                 self.styles_were_cached = False
                 break
@@ -364,7 +369,9 @@ class InitializationHandler:
 
         if self.styles_were_cached:
             # When styles are cached, we can load and use them directly
-            neutral_path = f"asset/ref_sound/{self.model_name}/neutral.wav"
+            neutral_path = os.path.join(
+                project_root, f"asset/ref_sound/{self.model_name}/neutral.wav"
+            )
             cached_style = self.tts_model.get_cached_style(neutral_path)
 
             def warmup_task():
