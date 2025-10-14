@@ -32,7 +32,9 @@ class DockerHandler:
                     # runtime="nvidia",  # Comment out GPU support
                     # environment=["NVIDIA_VISIBLE_DEVICES=all"],  # Comment out GPU environment
                     volumes={"ollama": {"bind": "/root/.ollama", "mode": "rw"}},
-                    ports={"11434/tcp": 11434},
+                    ports={
+                        "11434/tcp": 11500
+                    },  # Map container port 11434 to host port 11500
                     network_mode="bridge",  # Changed to bridge mode for better Docker networking
                 )
 
@@ -90,13 +92,13 @@ class DockerHandler:
         while time.time() - start_time < timeout:
             try:
                 # Try the root endpoint first (this should always work if server is up)
-                response = requests.get("http://localhost:11434")
+                response = requests.get("http://localhost:11500")
                 if response.status_code == 200:
                     print("Ollama API is ready")
                     return
 
                 # If root fails, try a model list request as fallback
-                response = requests.get("http://localhost:11434/api/tags")
+                response = requests.get("http://localhost:11500/api/tags")
                 if response.status_code == 200:
                     print("Ollama API is ready (via tags endpoint)")
                     return
