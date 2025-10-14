@@ -18,8 +18,10 @@ project_root = os.path.abspath('.')
 # ============================================================================
 
 datas = [
-    # Asset files
-    ('asset', 'asset'),
+    # Asset files - explicitly include all subdirectories
+    ('asset/Background', 'asset/Background'),
+    ('asset/model', 'asset/model'),
+    ('asset/ref_sound', 'asset/ref_sound'),  # CRITICAL: Reference audio for TTS
     
     # Avatar profile images
     ('recommender-avatar-profile', 'recommender-avatar-profile'),

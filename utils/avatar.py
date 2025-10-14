@@ -5,11 +5,24 @@ import math
 import random
 import threading
 import os
+import sys
 import numpy as np
 from pathlib import Path
 from typing import Optional, Dict
 
 from tha4.charmodel.character_model import CharacterModel
+
+
+def get_base_path():
+    """Get the base path for the application, handling PyInstaller bundled exe"""
+    if getattr(sys, "frozen", False):
+        # Running as compiled executable
+        return sys._MEIPASS
+    else:
+        # Running as script
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 from tha4.poser.modes.mode_14 import create_poser
 from tha4.poser.poser import PoseParameterCategory
 from tha4.image_util import convert_output_image_from_torch_to_numpy
@@ -54,9 +67,7 @@ class AnimatedCharacter:
         print(f"🔍 VOICE_TYPE environment variable: {os.getenv('VOICE_TYPE')}")
 
         # Get project root (handles PyInstaller bundled environment)
-        project_root = os.getenv(
-            "PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        project_root = get_base_path()
 
         # Get background color from bg_color.txt or use model-specific defaults
         bg_color_path = (

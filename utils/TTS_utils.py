@@ -3,6 +3,18 @@ import time
 import soundfile as sf
 from pathlib import Path
 from .emotion_utils import DIFFUSION_STEPS, create_emotion_config
+import sys
+import os
+
+
+def get_base_path():
+    """Get the base path for the application, handling PyInstaller bundled exe"""
+    if getattr(sys, 'frozen', False):
+        # Running as compiled executable
+        return sys._MEIPASS
+    else:
+        # Running as script
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class InferenceHandler:
@@ -32,13 +44,8 @@ class InferenceHandler:
 
             # Get style file and parameters for emotion
             emotion_params = self.emotion_config[detected_emotion]
-            # Get project root for path construction
-            import os
-
-            project_root = os.getenv(
-                "PROJECT_ROOT",
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            )
+            # Get project root for path construction (handles PyInstaller)
+            project_root = get_base_path()
             style_path = os.path.join(
                 project_root,
                 f"asset/ref_sound/{emotion_params['file'][self.model_name]}",

@@ -1,5 +1,7 @@
 import time
 import threading
+import sys
+import os
 from pathlib import Path
 from .audio_utils import AudioProcessor
 from .inference_styleTTS2 import StyleTTS2Inference
@@ -15,6 +17,16 @@ from .performance_boost import (
     LazyLoader,
     MemoryManager,
 )
+
+
+def get_base_path():
+    """Get the base path for the application, handling PyInstaller bundled exe"""
+    if getattr(sys, "frozen", False):
+        # Running as compiled executable
+        return sys._MEIPASS
+    else:
+        # Running as script
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class InitializationHandler:
@@ -92,10 +104,8 @@ class InitializationHandler:
             )
             return None
 
-        # Get project root for path construction
-        project_root = os.getenv(
-            "PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        # Get project root for path construction (handles PyInstaller)
+        project_root = get_base_path()
 
         # Check if all styles are cached for this model
         self.styles_were_cached = True
@@ -218,8 +228,9 @@ class InitializationHandler:
         """Initialize all components with optimized startup sequence"""
         performance_monitor.start_timer("total_initialization")
 
-        # Create cache directory
-        Path("./cache").mkdir(exist_ok=True)
+        # Create cache directory (handles PyInstaller)
+        cache_path = Path(get_base_path()) / "cache"
+        cache_path.mkdir(exist_ok=True)
 
         # Phase 1: Critical components first (blocking)
         performance_monitor.start_timer("critical_components")
@@ -292,8 +303,9 @@ class InitializationHandler:
 
     def initialize_for_character_switch(self):
         """Initialize only components needed for character switching (no AudioProcessor)"""
-        # Create cache directory
-        Path("./cache").mkdir(exist_ok=True)
+        # Create cache directory (handles PyInstaller)
+        cache_path = Path(get_base_path()) / "cache"
+        cache_path.mkdir(exist_ok=True)
 
         # Group 1: Ollama warmup and StyleTTS2 init
         self._initialize_group1()
@@ -494,13 +506,8 @@ class InitializationHandler:
     def _cache_all_styles(self):
         """Cache all unique style files with error handling"""
         try:
-            # Get project root for path construction
-            import os
-
-            project_root = os.getenv(
-                "PROJECT_ROOT",
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            )
+            # Get project root for path construction (handles PyInstaller)
+            project_root = get_base_path()
 
             unique_styles = set(EMOTION_MAPPING.values())
 

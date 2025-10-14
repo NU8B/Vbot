@@ -794,7 +794,7 @@ class ModernChatGUI(ChatGUI):
 
         # Get available characters from the asset/model directory
         character_dirs = []
-        model_path = Path("asset/model")
+        model_path = Path(project_root) / "asset" / "model"
         if model_path.exists():
             for item in model_path.iterdir():
                 if (
@@ -805,7 +805,7 @@ class ModernChatGUI(ChatGUI):
 
         # If no characters found, use default list
         if not character_dirs:
-            character_dirs = ["Amelia", "Eveland", "Gura", "Shiori"]
+            character_dirs = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
 
         # Add character options to menu
         for character in character_dirs:
@@ -1137,6 +1137,9 @@ def launch_main_app(selected_model: str, device_index: int = None):
             print(f"- {model}")
         return
 
+    # Set the VOICE_TYPE environment variable BEFORE initializing components
+    os.environ["VOICE_TYPE"] = MODEL_NAME
+
     # Initialize components with optimized startup
     print(f"🚀 Starting Vbot with {MODEL_NAME} model...")
     performance_monitor.start_timer("main_initialization")
@@ -1302,7 +1305,7 @@ def main():
         "--model",
         type=str,
         default=None,  # Changed to None to force welcome screen
-        help="Name of the model to use (e.g., Amelia, Eveland, Gura, Shiori). If not specified, welcome screen will be shown.",
+        help="Name of the model to use (e.g., Amelia, Eveland, Gura, Shiori, Wilson). If not specified, welcome screen will be shown.",
     )
     parser.add_argument(
         "--device-index",
