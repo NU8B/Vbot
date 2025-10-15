@@ -4,7 +4,7 @@ import torch
 # Emotion model settings
 EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
 
-DIFFUSION_STEPS = 10  # Further reduced for much faster TTS generation (was 5)
+DIFFUSION_STEPS = 10
 
 # Model-specific parameters
 MODEL_PARAMS = {
