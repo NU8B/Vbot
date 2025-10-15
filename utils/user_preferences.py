@@ -201,10 +201,51 @@ class UserPreferences:
             self.set_preference("user_profile.preferred_gender", profile_data["gender"])
         
         if "personality" in profile_data:
-            self.set_preference("user_profile.preferred_personality_traits", profile_data["personality"])
+            # Clean and validate personality traits to prevent conflicts
+            new_traits = profile_data["personality"]
+            cleaned_traits = self._clean_personality_traits(new_traits)
+            self.set_preference("user_profile.preferred_personality_traits", cleaned_traits)
         
         if "interaction_style" in profile_data:
             self.set_preference("user_profile.interaction_style", profile_data["interaction_style"])
+    
+    def _clean_personality_traits(self, traits: list) -> list:
+        """Clean personality traits to prevent conflicts and limit to reasonable number"""
+        if not traits:
+            return []
+        
+        # Define conflicting trait pairs
+        conflicts = {
+            "energetic": ["calm", "steady"],
+            "calm": ["energetic", "playful"],
+            "playful": ["serious", "calm", "intellectual"],
+            "intellectual": ["playful", "casual"],
+            "mysterious": ["friendly", "open"],
+            "friendly": ["mysterious", "reserved"],
+            "sophisticated": ["casual", "simple"],
+            "reliable": [],  # Doesn't conflict with others
+        }
+        
+        cleaned = []
+        for trait in traits:
+            trait_lower = trait.lower()
+            
+            # Check if this trait conflicts with already added traits
+            has_conflict = False
+            for existing_trait in cleaned:
+                existing_lower = existing_trait.lower()
+                
+                # Check both directions of conflict
+                if (trait_lower in conflicts.get(existing_lower, []) or 
+                    existing_lower in conflicts.get(trait_lower, [])):
+                    has_conflict = True
+                    break
+            
+            if not has_conflict:
+                cleaned.append(trait)
+        
+        # Limit to maximum 3 traits to prevent over-specification
+        return cleaned[:3]
     
     def get_app_settings(self) -> Dict[str, Any]:
         """Get application settings"""

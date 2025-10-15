@@ -86,65 +86,114 @@ class AvatarRecommender:
 
     def recommend_avatar(self, preferences: Dict) -> str:
         """Recommend an avatar based on user preferences"""
-        # Enhanced recommendation logic with user history
+        # Enhanced recommendation logic with better balance
         preferred_gender = preferences.get("gender", "").lower()
         preferred_personality = preferences.get("personality", [])
         favorite_avatar = preferences.get("favorite_avatar")
         selection_history = preferences.get("selection_history", [])
+        
+        # Check if this is a fresh recommendation (no explicit preferences)
+        has_explicit_preferences = bool(preferred_gender or preferred_personality)
 
         scores = {}
         for avatar_name, profile in self.avatar_profiles.items():
             score = 0
 
-            # Gender preference (STRONG weight: 10) - This should be the primary factor
+            # Gender preference (STRONG weight: 15) - This should be the primary factor
             if preferred_gender and profile["gender"].lower() == preferred_gender:
-                score += 10
+                score += 15
             # Gender mismatch penalty - strongly discourage wrong gender
             elif preferred_gender and profile["gender"].lower() != preferred_gender:
-                score -= 5
+                score -= 8
 
-            # Personality tags matching (weight: 2 per match)
+            # Personality tags matching - improved logic to handle contradictions
             avatar_tags = profile["tags"]
+            personality_matches = 0
             for pref in preferred_personality:
                 pref_lower = pref.lower()
                 # Check if preference matches any tag or is in the personality/description
                 if pref_lower in [tag.lower() for tag in avatar_tags]:
-                    score += 2
+                    score += 3
+                    personality_matches += 1
                 elif pref_lower in profile["personality"].lower():
-                    score += 1.5
+                    score += 2
+                    personality_matches += 1
                 elif pref_lower in profile["description"].lower():
                     score += 1
+                    personality_matches += 1
 
-            # Favorite avatar bonus (weight: 4)
+            # Apply personality match bonus for good fits
+            if personality_matches >= 2:
+                score += 2  # Bonus for multiple personality matches
+
+            # Favorite avatar bonus (reduced weight and only when no explicit preferences)
             if favorite_avatar and avatar_name == favorite_avatar:
-                score += 4
+                if has_explicit_preferences:
+                    score += 1  # Minimal bonus when user has explicit preferences
+                else:
+                    score += 2  # Larger bonus only when no explicit preferences
 
-            # Recent usage penalty (to encourage variety, but not too strong)
+            # Recent usage penalty (to encourage variety)
             recent_selections = [record["avatar"] for record in selection_history[-3:]]
             if avatar_name in recent_selections:
-                score -= 0.5
+                score -= 1
 
             scores[avatar_name] = score
 
         # Return avatar with highest score
         if scores:
-            recommended = max(
-                scores.items(), key=lambda x: (x[1], x[0])
-            )  # Sort by score, then name for consistency
-            # If all scores are negative or zero, try to find any gender match first
-            if recommended[1] <= 0 and preferred_gender:
-                gender_matches = [
-                    (name, score)
-                    for name, score in scores.items()
-                    if self.avatar_profiles[name]["gender"].lower() == preferred_gender
-                ]
-                if gender_matches:
-                    recommended = max(gender_matches, key=lambda x: (x[1], x[0]))
-                    return recommended[0]
-            return recommended[0]
+            # Sort by score (descending), then by name for consistency
+            sorted_scores = sorted(scores.items(), key=lambda x: (-x[1], x[0]))
+            top_score = sorted_scores[0][1]
+            
+            # If all scores are very low or negative, use better fallback logic
+            if top_score <= 0:
+                if preferred_gender:
+                    # Find the best gender match
+                    gender_matches = [
+                        (name, score)
+                        for name, score in scores.items()
+                        if self.avatar_profiles[name]["gender"].lower() == preferred_gender
+                    ]
+                    if gender_matches:
+                        best_gender_match = max(gender_matches, key=lambda x: (x[1], x[0]))
+                        return best_gender_match[0]
+                
+                # If no gender preference or no gender matches, use balanced fallback
+                return self._get_balanced_fallback(selection_history)
+            
+            return sorted_scores[0][0]
 
         # Absolute fallback (should never happen)
-        return list(self.avatar_profiles.keys())[0]
+        return self._get_balanced_fallback(selection_history)
+        
+    def _get_balanced_fallback(self, selection_history: list) -> str:
+        """Get a balanced fallback avatar that hasn't been used recently"""
+        # Get avatars sorted by least recent usage
+        recent_avatars = [record["avatar"] for record in selection_history[-5:]]
+        
+        # Find avatars not used recently
+        all_avatars = list(self.avatar_profiles.keys())
+        unused_avatars = [avatar for avatar in all_avatars if avatar not in recent_avatars]
+        
+        if unused_avatars:
+            # Return first unused avatar alphabetically for consistency
+            return sorted(unused_avatars)[0]
+        else:
+            # If all avatars have been used recently, return the least recently used
+            if selection_history:
+                used_avatars = [record["avatar"] for record in selection_history]
+                # Count usage frequency
+                avatar_counts = {}
+                for avatar in used_avatars:
+                    avatar_counts[avatar] = avatar_counts.get(avatar, 0) + 1
+                
+                # Return least used avatar
+                least_used = min(avatar_counts.items(), key=lambda x: (x[1], x[0]))
+                return least_used[0]
+            
+            # Final fallback - return Amelia as a neutral choice
+            return "Amelia"
 
 
 class WelcomeScreen:
@@ -667,14 +716,31 @@ class RecommendationDialog:
             ],
         }
 
-        # Merge with existing user profile for better recommendations
-        user_profile = get_user_profile_for_recommendation()
-        combined_preferences = {**user_profile, **dialog_preferences}
+        # Determine if user provided explicit preferences
+        has_explicit_preferences = bool(
+            dialog_preferences["gender"] or dialog_preferences["personality"]
+        )
 
-        # Update user profile with new preferences
-        user_prefs = get_user_preferences()
-        user_prefs.update_user_profile(dialog_preferences)
-        user_prefs.save_preferences()
+        if has_explicit_preferences:
+            # User provided explicit preferences - use them directly with minimal history influence
+            user_profile = get_user_profile_for_recommendation()
+            combined_preferences = {
+                "gender": dialog_preferences["gender"],
+                "personality": dialog_preferences["personality"],
+                "interaction_style": user_profile.get("interaction_style", "casual"),
+                "favorite_avatar": None,  # Don't use favorite when user has explicit preferences
+                "selection_history": user_profile.get("selection_history", [])
+            }
+        else:
+            # No explicit preferences - use existing user profile
+            user_profile = get_user_profile_for_recommendation()
+            combined_preferences = user_profile
+
+        # Update user profile with new preferences only if they provided some
+        if has_explicit_preferences:
+            user_prefs = get_user_preferences()
+            user_prefs.update_user_profile(dialog_preferences)
+            user_prefs.save_preferences()
 
         # Get recommendation
         recommended_avatar = self.recommender.recommend_avatar(combined_preferences)
