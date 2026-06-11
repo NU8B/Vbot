@@ -7,7 +7,15 @@ from huggingface_hub import login
 from pathlib import Path
 
 # Login to Hugging Face
-login("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")
+token_file = Path(__file__).resolve().parents[2] / "hf_token.txt"
+if token_file.exists():
+    login(token_file.read_text().strip())
+else:
+    token = os.environ.get("HF_TOKEN")
+    if token:
+        login(token)
+    else:
+        login()
 
 # Model setup
 model_size = "distil-large-v3"

@@ -101,3 +101,5 @@ Real-ESRGAN/
 cudnn/extracted_cudnn/cudnn-windows-x86_64-8.9.7.29_cuda12-archive/bin/cudnn_adv_infer64_8.dll
 cudnn/extracted_cudnn/cudnn-windows-x86_64-8.9.7.29_cuda12-archive/bin/cudnn_adv_train64_8.dll
 cudnn/..
+/.claude
+/hf_token.txt
