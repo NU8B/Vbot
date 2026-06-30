@@ -55,7 +55,12 @@ A VTuber chatbot application that combines AI conversation with animated charact
 
 ## Documentation
 
-For detailed instructions, see [manual.md](manual.md)
+For detailed instructions:
+
+- [USER_GUIDE.md](USER_GUIDE.md) - running the portable Windows executable
+- [BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md) - building and packaging the desktop release
+- [docs/desktop_release_cd.md](docs/desktop_release_cd.md) - Level 1 CD flow and release artifact policy
+- [docs/mlops_ci_cd_plan.md](docs/mlops_ci_cd_plan.md) - CI/CD, evaluation, and training roadmap
 
 ## Troubleshooting
 

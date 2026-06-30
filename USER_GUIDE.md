@@ -1,12 +1,13 @@
 # 🎯 Vbot - User Guide
 
-## Quick Start (Pre-built Executable)
+## Quick Start (Portable Windows Executable)
 
 ### Prerequisites
 - Windows 10/11 (64-bit)
 - NVIDIA GPU (GTX 1060 or better recommended)
 - 16GB RAM minimum
-- 10GB free disk space
+- 10-15GB free disk space
+- Internet connection on first run for local model downloads
 
 ---
 
@@ -20,10 +21,11 @@ or
 C:\Users\[YourName]\Desktop\Vbot\
 ```
 
-### 2. Install Docker Desktop (Optional - for LLM features)
+### 2. Install Docker Desktop (Required for Local LLM Chat)
 1. Download: https://www.docker.com/products/docker-desktop
 2. Install and restart computer
-3. Start Docker Desktop
+3. Enable the WSL 2 backend during setup
+4. Start Docker Desktop before launching Vbot
 
 ### 3. First Run
 ```
@@ -32,7 +34,7 @@ Double-click Vbot.exe
 
 **What happens:**
 1. System check runs automatically
-2. Downloads required models (first time only, ~4GB)
+2. Downloads required local models (first time only, several GB)
 3. Main window appears
 4. You're ready to chat!
 
@@ -66,7 +68,7 @@ Double-click Vbot.exe
 
 ### Model Settings
 - TTS Voice: Change text-to-speech voice
-- LLM Model: Select AI model (requires Docker)
+- LLM Model: Select AI model (requires Docker Desktop in the current release)
 
 ---
 
@@ -105,11 +107,11 @@ Double-click Vbot.exe
 
 ### Docker Warning
 
-This is **normal** if you don't have Docker installed.
+The current full local chat path uses Ollama through Docker Desktop.
 
 **Options:**
-- **Ignore it:** Vbot works fine without Docker (uses built-in models)
-- **Install Docker:** For advanced LLM features
+- **Install/start Docker:** Required for local LLM chat in this release
+- **Continue without Docker:** Non-LLM functionality may still be usable, but the main chatbot experience will be limited
 
 ---
 
@@ -170,16 +172,16 @@ C:\Users\[You]\Documents\Vbot\
 ## ❓ FAQ
 
 **Q: How much disk space does Vbot use?**
-A: ~3-4GB for application + 4GB for models = ~7-8GB total
+A: ~3-4GB for application + several GB for local models/cache. Keep 10-15GB free.
 
 **Q: Can I run Vbot without internet?**
-A: Yes! After first setup, everything runs locally.
+A: Yes after first setup for already-downloaded local models. First run needs internet.
 
 **Q: Do I need a powerful GPU?**
 A: Recommended but not required. Works on CPU (slower).
 
 **Q: Is my data sent anywhere?**
-A: No! Everything runs on your computer (except optional Ollama models).
+A: The default goal is local inference. Chat/voice data does not need a cloud LLM API in this release.
 
 **Q: Can I use different voices?**
 A: Yes! Select from character models in the app.
@@ -196,4 +198,4 @@ A: Yes! Select from character models in the app.
 ---
 
 **Version:** 1.0  
-**Last Updated:** 2025-10-10
+**Last Updated:** 2026-07-01

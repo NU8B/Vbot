@@ -15,8 +15,14 @@
 ────────────────────────────────────────────────────────────────
 conda activate vbot
 cd C:\Users\[YourUsername]\Desktop\Project\college-project\senior-project\Vbot
-Remove-Item -Recurse -Force .\dist
-python -m PyInstaller vbot.spec --clean --noconfirm
+.\build_with_logs.ps1 -Version "v0.1.0"
+
+Output:
+- dist\Vbot\Vbot.exe
+- release\artifacts\Vbot-v0.1.0-windows-portable.zip
+- release\artifacts\Vbot-v0.1.0-windows-portable.zip.sha256
+- release\artifacts\Vbot-v0.1.0-release-manifest.json
+- release\logs\build-v0.1.0-[timestamp].log
 
 
 ✅ TEST
@@ -52,10 +58,17 @@ Get-ChildItem .\dist\Vbot -Recurse | Measure-Object -Property Length -Sum
 ────────────────────────────────────────────────────────────────
 .\build_with_logs.ps1
 
+Options:
+.\build_with_logs.ps1 -SkipTests
+.\build_with_logs.ps1 -NoClean
+.\build_with_logs.ps1 -NoPackage
+.\build_with_logs.ps1 -Version "v0.1.0"
+
 
 ════════════════════════════════════════════════════════════════
 NOTES:
 - Build takes 5-10 minutes
 - Output: dist\Vbot\ (~3-4 GB)
-- Distribute entire Vbot\ folder
+- Distribution package: release\artifacts\*.zip
+- Docker Desktop + WSL 2 are required for the current local Ollama LLM chat path
 ════════════════════════════════════════════════════════════════
