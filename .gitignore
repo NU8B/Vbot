@@ -24,6 +24,7 @@ __pycache__/
 *.so
 .Python
 build/
+release/
 develop-eggs/
 dist/
 downloads/
