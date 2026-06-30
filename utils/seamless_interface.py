@@ -208,13 +208,20 @@ class SeamlessVbotInterface:
     def _show_loading_screen(self):
         """Show the loading screen"""
         self.current_screen = "loading"
+
+        preloader = getattr(self, "preloader", None)
+        if preloader is None:
+            self._show_loading_message("Loading...")
+            return
         
         # Clear container
         for widget in self.main_container.winfo_children():
             widget.destroy()
         
         # Create loading screen
-        self.loading_screen = LoadingScreen(self.main_container, self.preloader)
+        from utils.preloader import LoadingScreen
+
+        self.loading_screen = LoadingScreen(self.main_container, preloader)
         self.loading_screen.create_loading_ui()
     
     def _transition_to_welcome(self, preload_success: bool):
@@ -1086,12 +1093,7 @@ class SeamlessVbotInterface:
     
     def _retry_initialization(self):
         """Retry the initialization process"""
-        self._show_loading_screen()
-        threading.Thread(
-            target=self._preload_models_async,
-            daemon=True,
-            name="ModelPreloader"
-        ).start()
+        self._show_welcome_screen()
     
     def _darken_color(self, hex_color: str) -> str:
         """Darken a hex color by 20%"""
