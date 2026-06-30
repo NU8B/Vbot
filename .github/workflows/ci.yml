@@ -1,0 +1,89 @@
+# ============================================================
+# Vbot CI/CD Pipeline
+# ============================================================
+# Runs on every push and pull request to main.
+# Performs linting, code formatting checks, and unit tests.
+# These tests are designed to run WITHOUT GPU, Docker, or
+# heavy ML model downloads.
+# ============================================================
+
+name: Vbot CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vbot-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Python Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      # ----------------------------------------------------------
+      # 1. Checkout the repository
+      # ----------------------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # ----------------------------------------------------------
+      # 2. Set up Python 3.10 (matches Vbot's dev environment)
+      # ----------------------------------------------------------
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+
+      # ----------------------------------------------------------
+      # 3. Install lightweight CI dependencies only
+      #    (NOT the full requirements.txt — that needs CUDA/GPU)
+      # ----------------------------------------------------------
+      - name: Install CI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-ci.txt
+
+      # ----------------------------------------------------------
+      # 4. Lint with flake8
+      # ----------------------------------------------------------
+      - name: Lint syntax and undefined names
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics \
+            --exclude=StyleTTS2,tha4,asset/old,.git,.codex,.pytest_cache,__pycache__,build,dist,cache,colab
+
+      # ----------------------------------------------------------
+      # 5. Check code formatting with Black
+      # ----------------------------------------------------------
+      - name: Check formatting with Black
+        continue-on-error: true
+        run: |
+          black --check --diff --line-length 120 tests/ training/
+
+      # ----------------------------------------------------------
+      # 6. Check import sorting with isort
+      # ----------------------------------------------------------
+      - name: Check import sorting with isort
+        continue-on-error: true
+        run: |
+          isort --check-only --diff --profile black --line-length 120 tests/ training/
+
+      # ----------------------------------------------------------
+      # 7. Run unit tests with pytest
+      # ----------------------------------------------------------
+      - name: Run tests
+        run: |
+          pytest tests/ -q --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
