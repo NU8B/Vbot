@@ -83,7 +83,9 @@ Add a practical CI/CD foundation to Vbot without pretending that the desktop GUI
 | CD-3 | Upload release artifact/checksum | Done | Release workflow | Workflow uploads zip, `.sha256`, manifest, release notes, and build logs. Draft GitHub Release is optional. |
 | CD-4 | Document the prebuilt executable in the formal report | Todo | Docs | Add a packaged-product flow: unzip/install, prerequisites, first-run model download, offline/local behavior, limitations, and build verification. |
 | CD-5 | Decide installer vs portable zip | Done for Level 1 | Product/release | Level 1 ships a reproducible portable zip. True installer/code signing is a later product polish phase. |
-| CD-6 | Add true signed installer | Future | Product/release | Consider Inno Setup, NSIS, WiX, or MSIX after portable release is stable. |
+| CD-6 | Add launcher build mode | Done | Local Windows or self-hosted Windows | `vbot_launcher.spec` creates a real `Vbot.exe` launcher without freezing the whole ML runtime. |
+| CD-7 | Harden full frozen bundle | Todo | Local Windows or self-hosted Windows | `vbot.spec` is still available, but PyInstaller can stall while analyzing ML packages. Treat as experimental until fixed. |
+| CD-8 | Add true signed installer | Future | Product/release | Consider Inno Setup, NSIS, WiX, or MSIX after portable release is stable. |
 | CT-1 | Standardize TTS benchmark result schema | Todo | Local GPU or self-hosted GPU | Normalize human eval and objective metrics into a single JSON schema. |
 | CT-2 | Wire WandB into StyleTTS2 training | Todo | Training environment | Use existing `training/wandb_config.py` from `train_finetune*.py` or the Colab notebook. |
 | CT-3 | Add manual model-evaluation workflow | Todo | Self-hosted GPU | Run objective TTS metrics and upload JSON/summary artifacts. |
@@ -132,9 +134,9 @@ Status: Level 1 implemented.
 Tasks:
 
 - Use `.\build_with_logs.ps1 -Version "v0.1.0"` for local release builds.
-- Package Vbot as a portable zip containing `Vbot.exe`, `_internal/`, assets, README, prerequisites, release notes, and build log.
+- Package Vbot as a portable zip containing `Vbot.exe`, app payload/assets, README, prerequisites, release notes, and build log.
 - Use `.github/workflows/desktop-release.yml` for manual self-hosted Windows release builds.
-- Keep the workflow self-hosted because the real PyInstaller bundle needs a prepared Windows/CUDA/model environment.
+- Keep the workflow self-hosted because the app still needs a prepared Windows/Python/CUDA/model environment, and full bundle mode needs even more local setup.
 - Publish SHA256 checksum and JSON release manifest for every package.
 - Update the project report so it no longer only describes the developer/source install path.
 
@@ -178,6 +180,6 @@ The CI/CD upgrade is genuinely useful when:
 
 1. Every push/PR runs a green CI gate without requiring GPU, Docker Desktop, microphone access, Windows GUI libraries, or model downloads.
 2. The human TTS eval form has automated tests around result submission and aggregation.
-3. The Windows build path has one reproducible script and one manual workflow.
+3. The Windows build path has one reproducible launcher script path and one manual workflow.
 4. Heavy TTS/LLM/model evaluation runs are manual, artifact-producing, and do not block normal code review.
 5. Training metrics and model comparison results are stored in a consistent place and can be explained in an interview.

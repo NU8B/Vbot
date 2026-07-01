@@ -8,6 +8,7 @@
 - 16GB RAM minimum
 - 10-15GB free disk space
 - Internet connection on first run for local model downloads
+- Python/Conda 3.10 environment with Vbot dependencies installed
 
 ---
 
@@ -33,10 +34,13 @@ Double-click Vbot.exe
 ```
 
 **What happens:**
-1. System check runs automatically
-2. Downloads required local models (first time only, several GB)
-3. Main window appears
-4. You're ready to chat!
+1. The launcher finds your Python/Conda runtime
+2. The launcher starts the packaged Vbot app
+3. Downloads required local models if needed (first time only, several GB)
+4. Main window appears
+5. You're ready to chat!
+
+If the launcher cannot find the right Python environment, set `VBOT_PYTHON` to the full path of your environment's `python.exe`.
 
 ---
 
@@ -144,9 +148,8 @@ The current full local chat path uses Ollama through Docker Desktop.
 ```
 Vbot\
 ├── Vbot.exe              ← Main application
-├── _internal\            ← Dependencies (don't touch!)
-├── asset\                ← Models and resources
-└── cache\                ← Temporary files
+└── _internal\
+    └── app\              ← Packaged Vbot source, models, and resources
 ```
 
 ### User Data

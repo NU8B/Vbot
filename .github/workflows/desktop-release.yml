@@ -12,6 +12,14 @@ on:
         required: false
         default: false
         type: boolean
+      build_mode:
+        description: "Launcher is the Level 1 default. Full attempts to freeze the ML runtime."
+        required: false
+        default: "Launcher"
+        type: choice
+        options:
+          - "Launcher"
+          - "Full"
       create_github_release:
         description: "Create a draft GitHub Release with the packaged artifact."
         required: false
@@ -40,6 +48,7 @@ jobs:
         env:
           VBOT_RELEASE_VERSION: ${{ inputs.version }}
           VBOT_SKIP_TESTS: ${{ inputs.skip_tests }}
+          VBOT_BUILD_MODE: ${{ inputs.build_mode }}
           GITHUB_RUN_NUMBER_VALUE: ${{ github.run_number }}
         run: |
           $version = $env:VBOT_RELEASE_VERSION
@@ -47,7 +56,12 @@ jobs:
             $version = "dev-$env:GITHUB_RUN_NUMBER_VALUE"
           }
 
-          $buildArgs = @("-Version", $version)
+          $buildMode = $env:VBOT_BUILD_MODE
+          if ([string]::IsNullOrWhiteSpace($buildMode)) {
+            $buildMode = "Launcher"
+          }
+
+          $buildArgs = @("-Version", $version, "-BuildMode", $buildMode)
           if ($env:VBOT_SKIP_TESTS -eq "true") {
             $buildArgs += "-SkipTests"
           }

@@ -2,6 +2,8 @@
 param(
     [string]$Python = "python",
     [string]$Version = "",
+    [ValidateSet("Launcher", "Full")]
+    [string]$BuildMode = "Launcher",
     [switch]$NoClean,
     [switch]$SkipTests,
     [switch]$NoPackage
@@ -16,6 +18,7 @@ if (-not (Test-Path -LiteralPath $scriptPath)) {
     -ProjectRoot $PSScriptRoot `
     -Python $Python `
     -Version $Version `
+    -BuildMode $BuildMode `
     -NoClean:$NoClean `
     -SkipTests:$SkipTests `
     -NoPackage:$NoPackage

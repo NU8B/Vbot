@@ -5,6 +5,8 @@ param(
     [string]$Version = "",
     [string]$BuildLogPath = "",
     [string]$OutputDir = "",
+    [ValidateSet("Launcher", "Full")]
+    [string]$BuildMode = "Launcher",
     [switch]$KeepStaging
 )
 
@@ -118,6 +120,7 @@ $releaseNotesPath = Join-Path $stagingRoot "RELEASE_NOTES.md"
 # Vbot $Version
 
 Package type: Windows portable zip
+Build mode: $BuildMode
 Built at (UTC): $builtAt
 Git commit: $commit
 Git branch: $branch
@@ -126,15 +129,24 @@ Git branch: $branch
 
 This release keeps the AI stack local-first. It does not switch to a cloud LLM API.
 
-- StyleTTS2 voice synthesis runs locally.
-- THA4 avatar rendering runs locally.
-- Emotion classification runs locally.
+- StyleTTS2 voice synthesis runs locally in the configured Python environment.
+- THA4 avatar rendering runs locally in the configured Python environment.
+- Emotion classification runs locally in the configured Python environment.
 - Ollama LLM chat currently requires Docker Desktop and WSL 2.
 - First run may download local model assets.
 
+## Level 1 launcher note
+
+Launcher mode creates a real `Vbot.exe`, but it does not freeze the entire ML
+runtime into the executable. It packages the app payload and starts Vbot through
+a local Python/Conda environment that has `requirements.txt` installed. Set
+`VBOT_PYTHON` to the desired `python.exe` if the launcher cannot find it.
+
 ## Known limitations
 
-- The package is large because it bundles ML, GUI, avatar, and audio dependencies.
+- Launcher mode still requires the user to install Python/Conda dependencies.
+- Full mode is experimental and may take a long time because it freezes ML, GUI,
+  avatar, and audio dependencies.
 - The executable is not code-signed yet, so Windows SmartScreen may warn users.
 - This is a portable package, not a polished consumer installer.
 "@ | Set-Content -LiteralPath $releaseNotesPath -Encoding UTF8
@@ -185,8 +197,10 @@ $manifest = [ordered]@{
     artifact_size_bytes = $artifactSize
     dist_size_bytes = $distSize
     exe_sha256 = $exeHash.Hash
+    build_mode = $BuildMode
     runtime_requirements = @(
         "Windows 10/11 64-bit",
+        "Python or Conda 3.10 environment with requirements.txt installed for Launcher mode",
         "NVIDIA GPU and current NVIDIA driver recommended",
         "Docker Desktop with WSL 2 required for current local Ollama LLM chat",
         "Internet connection required on first run for local model downloads"

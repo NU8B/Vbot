@@ -3,6 +3,8 @@ param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
     [string]$Python = "python",
     [string]$Version = "",
+    [ValidateSet("Launcher", "Full")]
+    [string]$BuildMode = "Launcher",
     [switch]$NoClean,
     [switch]$SkipTests,
     [switch]$NoPackage
@@ -65,8 +67,11 @@ function Get-GitValue {
 }
 
 $script:ProjectRootFull = Get-FullPath $ProjectRoot
-if (-not (Test-Path -LiteralPath (Join-Path $script:ProjectRootFull "vbot.spec"))) {
-    throw "Project root does not contain vbot.spec: $script:ProjectRootFull"
+
+$specName = if ($BuildMode -eq "Full") { "vbot.spec" } else { "vbot_launcher.spec" }
+$specPath = Join-Path $script:ProjectRootFull $specName
+if (-not (Test-Path -LiteralPath $specPath)) {
+    throw "Project root does not contain ${specName}: $script:ProjectRootFull"
 }
 
 Set-Location -LiteralPath $script:ProjectRootFull
@@ -96,6 +101,7 @@ try {
     Write-Host "Vbot desktop release build"
     Write-Host "Project root: $script:ProjectRootFull"
     Write-Host "Version: $Version"
+    Write-Host "Build mode: $BuildMode"
     Write-Host "Build started: $((Get-Date).ToString('o'))"
 
     Invoke-Checked "Python version" { & $Python --version }
@@ -104,7 +110,11 @@ try {
     Write-Host ""
     Write-Host "== Environment summary =="
     & $Python -c "import sys; print('Python executable:', sys.executable)"
-    & $Python -c "import torch; print('Torch:', torch.__version__); print('CUDA available:', torch.cuda.is_available())"
+    if ($BuildMode -eq "Full") {
+        & $Python -c "import torch; print('Torch:', torch.__version__); print('CUDA available:', torch.cuda.is_available())"
+    } else {
+        Write-Host "Launcher mode does not import the ML runtime during packaging."
+    }
 
     if (-not $SkipTests) {
         if (Test-Path -LiteralPath (Join-Path $script:ProjectRootFull "tests")) {
@@ -123,11 +133,11 @@ try {
         Write-Host "Skipping clean because -NoClean was provided."
     }
 
-    Invoke-Checked "PyInstaller build" {
+    Invoke-Checked "PyInstaller build ($specName)" {
         if ($NoClean) {
-            & $Python -m PyInstaller vbot.spec --noconfirm
+            & $Python -m PyInstaller $specName --noconfirm
         } else {
-            & $Python -m PyInstaller vbot.spec --clean --noconfirm
+            & $Python -m PyInstaller $specName --clean --noconfirm
         }
     }
 
@@ -148,7 +158,7 @@ try {
         if (-not (Test-Path -LiteralPath $packageScript)) {
             throw "Packaging script not found: $packageScript"
         }
-        & $packageScript -ProjectRoot $script:ProjectRootFull -Version $Version -DistDir $distDir -BuildLogPath $logPath
+        & $packageScript -ProjectRoot $script:ProjectRootFull -Version $Version -DistDir $distDir -BuildLogPath $logPath -BuildMode $BuildMode
         if ($LASTEXITCODE -ne 0) {
             throw "Packaging failed with exit code $LASTEXITCODE"
         }

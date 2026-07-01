@@ -68,11 +68,11 @@ CUDA Available: True
 
 This will:
 - Run the fast test suite unless `-SkipTests` is provided
-- Build the executable
+- Build the Level 1 launcher executable
 - Save the full build log under `release/logs/`
 - Package a portable release zip under `release/artifacts/`
 - Write a SHA256 checksum and release manifest
-- Take ~5-10 minutes
+- Avoid freezing the full ML runtime into the exe by default
 
 Useful options:
 ```powershell
@@ -87,6 +87,9 @@ Useful options:
 
 # Set release version in artifact names
 .\build_with_logs.ps1 -Version "v0.1.0"
+
+# Experimental full PyInstaller bundle
+.\build_with_logs.ps1 -BuildMode Full -Version "v0.1.0-full"
 ```
 
 ### Option B: Direct Build
@@ -95,7 +98,10 @@ Useful options:
 Remove-Item -Recurse -Force .\dist -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force .\build -ErrorAction SilentlyContinue
 
-# Build
+# Build Level 1 launcher
+python -m PyInstaller vbot_launcher.spec --clean --noconfirm
+
+# Experimental full bundle
 python -m PyInstaller vbot.spec --clean --noconfirm
 ```
 
@@ -114,9 +120,9 @@ cd dist\Vbot
 ```
 
 ### Expected Behavior:
-1. Launcher appears with system check
-2. All checks pass (or warnings shown)
-3. Main GUI window opens
+1. Launcher prints the app payload and Python runtime it found
+2. Launcher starts `VbotSeamless.py` through the configured Python environment
+3. Main GUI window opens if Docker/model/audio prerequisites are ready
 4. Avatar loads successfully
 
 ---
@@ -207,17 +213,17 @@ After successful build:
 Vbot/
 ├── dist/
 │   └── Vbot/                    ← Distributable folder
-│       ├── Vbot.exe             ← Main executable (55-60 MB)
-│       ├── _internal/           ← Dependencies (~2-3 GB)
-│       │   ├── torch/
-│       │   ├── StyleTTS2/
-│       │   ├── tha4/
-│       │   └── [Python libs]
-│       ├── asset/               ← Models
-│       └── cache/               ← Empty cache dir
+│       ├── Vbot.exe             ← Level 1 launcher executable
+│       └── _internal/
+│           └── app/             ← Packaged Vbot source/assets
+│               ├── VbotSeamless.py
+│               ├── utils/
+│               ├── StyleTTS2/
+│               ├── tha4/
+│               └── asset/
 ```
 
-**Total Size:** ~3-4 GB
+Launcher mode is smaller than the old full-freeze target because it does not bundle torch/CUDA/transformers into the executable. The target machine still needs the Python/Conda environment described in `PREREQUISITES.md`.
 
 ---
 
@@ -250,10 +256,11 @@ release/
 
 ### User Installation:
 1. Extract `Vbot-Distribution.zip`
-2. Install Docker Desktop with WSL 2 for local LLM chat
-3. Install NVIDIA drivers
-4. Run `Vbot.exe`
-5. First launch downloads Ollama models (~4GB)
+2. Install Python/Conda 3.10 and dependencies from `requirements.txt`
+3. Install Docker Desktop with WSL 2 for local LLM chat
+4. Install NVIDIA drivers
+5. Run `Vbot.exe`
+6. First launch downloads Ollama models (~4GB)
 
 ---
 
@@ -338,6 +345,9 @@ python -m PyInstaller vbot.spec --clean --noconfirm
 
 # Full release build and package
 .\build_with_logs.ps1 -Version "v0.1.0"
+
+# Experimental full freeze
+.\build_with_logs.ps1 -BuildMode Full -Version "v0.1.0-full"
 
 # Test
 cd dist\Vbot && .\Vbot.exe
