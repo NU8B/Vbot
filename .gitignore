@@ -57,6 +57,10 @@ venv/
 .DS_Store
 Thumbs.db 
 
+# Microsoft Office temporary lock files
+~$*.docx
+docs/*.docx
+
 
 
 # Add these lines to your .gitignore
