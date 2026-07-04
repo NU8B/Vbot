@@ -68,7 +68,7 @@ CUDA Available: True
 
 This will:
 - Run the fast test suite unless `-SkipTests` is provided
-- Build the Level 1 launcher executable
+- Build the desktop package launcher executable
 - Save the full build log under `release/logs/`
 - Package a portable release zip under `release/artifacts/`
 - Write a SHA256 checksum and release manifest
@@ -98,7 +98,7 @@ Useful options:
 Remove-Item -Recurse -Force .\dist -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force .\build -ErrorAction SilentlyContinue
 
-# Build Level 1 launcher
+# Build desktop package launcher
 python -m PyInstaller vbot_launcher.spec --clean --noconfirm
 
 # Experimental full bundle
@@ -213,7 +213,7 @@ After successful build:
 Vbot/
 ├── dist/
 │   └── Vbot/                    ← Distributable folder
-│       ├── Vbot.exe             ← Level 1 launcher executable
+│       ├── Vbot.exe             ← Desktop package launcher executable
 │       └── _internal/
 │           └── app/             ← Packaged Vbot source/assets
 │               ├── VbotSeamless.py
@@ -229,7 +229,7 @@ Launcher mode is smaller than the old full-freeze target because it does not bun
 
 ## 🚚 Distribution
 
-The Level 1 CD target is a portable zip, not a polished signed installer.
+The desktop package target is a portable zip, not a polished signed installer.
 
 ### What to Share:
 ```

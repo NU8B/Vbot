@@ -135,7 +135,7 @@ This release keeps the AI stack local-first. It does not switch to a cloud LLM A
 - Ollama LLM chat currently requires Docker Desktop and WSL 2.
 - First run may download local model assets.
 
-## Level 1 launcher note
+## Desktop package launcher note
 
 Launcher mode creates a real `Vbot.exe`, but it does not freeze the entire ML
 runtime into the executable. It packages the app payload and starts Vbot through

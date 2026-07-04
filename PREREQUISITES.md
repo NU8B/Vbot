@@ -53,7 +53,7 @@ $env:VBOT_PYTHON = "C:\Users\YourName\miniconda3\envs\vbot\python.exe"
 
 ## Known Limitations
 
-- The Level 1 launcher package does not bundle the full Python ML runtime.
+- The desktop package launcher does not bundle the full Python ML runtime.
 - A future full bundle or installer can reduce manual setup, but it needs more PyInstaller hardening.
 - The executable is not code-signed yet, so Windows SmartScreen may show a warning.
 - This is a portable zip release, not a polished consumer installer.

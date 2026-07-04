@@ -1,10 +1,10 @@
-# Vbot Level 1 Desktop CD
+# Vbot Desktop Package
 
 Last reviewed: 2026-07-01
 
 ## Purpose
 
-Level 1 CD turns Vbot into a reproducible Windows desktop release artifact while keeping the AI stack local-first. This is not the future web app architecture and it does not replace local LLM work with API calls.
+The desktop package turns Vbot into a reproducible Windows release artifact while keeping the AI stack local-first. This is not the future web app architecture and it does not replace local LLM work with API calls.
 
 The release target is:
 
@@ -27,9 +27,9 @@ Vbot is a multimodal local AI desktop app:
 
 Docker Desktop is required for the current local Ollama LLM chat path. It is not a cloud API dependency; it is local infrastructure used to keep the Ollama runtime isolated and reproducible on Windows.
 
-The Level 1 executable is a launcher build. It packages the app source/assets and starts Vbot through a prepared local Python/Conda 3.10 environment. This is less frictionless than a fully frozen commercial installer, but it avoids the current PyInstaller full-freeze failure mode where torch/transformers/CUDA analysis can stall for a long time.
+The desktop package executable is a launcher build. It packages the app source/assets and starts Vbot through a prepared local Python/Conda 3.10 environment. This is less frictionless than a fully frozen commercial installer, but it avoids the current PyInstaller full-freeze failure mode where torch/transformers/CUDA analysis can stall for a long time.
 
-## Level 1 CD Flow
+## Desktop Package Flow
 
 ```text
 developer pushes code
@@ -52,7 +52,7 @@ release artifacts: zip, sha256, manifest, notes, build log
 
 ## Build Modes
 
-`Launcher` is the Level 1 default:
+`Launcher` is the default desktop package mode:
 
 - builds quickly
 - produces a real `Vbot.exe`
@@ -134,7 +134,7 @@ Self-hosted runner prerequisites:
 
 ## End-User Install Story
 
-For Level 1, the user experience is:
+For the desktop package, the user experience is:
 
 1. Download `Vbot-[version]-windows-portable.zip`.
 2. Extract it.
@@ -158,7 +158,7 @@ A true installer can come later with Inno Setup, NSIS, WiX, or MSIX. For now, it
 
 The portable zip is simpler, easier to debug, and better for early portfolio iteration.
 
-## Level 1 Done Criteria
+## Desktop Package Done Criteria
 
 - CI passes before release.
 - `.\build_with_logs.ps1 -Version "..."` creates `dist/Vbot/Vbot.exe`.

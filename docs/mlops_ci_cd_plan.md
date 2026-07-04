@@ -82,7 +82,7 @@ Add a practical CI/CD foundation to Vbot without pretending that the desktop GUI
 | CD-2 | Add manual release-build workflow | Done | Self-hosted Windows recommended | `.github/workflows/desktop-release.yml` builds the portable zip on `[self-hosted, Windows, X64]`. |
 | CD-3 | Upload release artifact/checksum | Done | Release workflow | Workflow uploads zip, `.sha256`, manifest, release notes, and build logs. Draft GitHub Release is optional. |
 | CD-4 | Document the prebuilt executable in the formal report | Todo | Docs | Add a packaged-product flow: unzip/install, prerequisites, first-run model download, offline/local behavior, limitations, and build verification. |
-| CD-5 | Decide installer vs portable zip | Done for Level 1 | Product/release | Level 1 ships a reproducible portable zip. True installer/code signing is a later product polish phase. |
+| CD-5 | Decide installer vs portable zip | Done for desktop package | Product/release | The desktop package ships a reproducible portable zip. True installer/code signing is a later product polish phase. |
 | CD-6 | Add launcher build mode | Done | Local Windows or self-hosted Windows | `vbot_launcher.spec` creates a real `Vbot.exe` launcher without freezing the whole ML runtime. |
 | CD-7 | Harden full frozen bundle | Todo | Local Windows or self-hosted Windows | `vbot.spec` is still available, but PyInstaller can stall while analyzing ML packages. Treat as experimental until fixed. |
 | CD-8 | Add true signed installer | Future | Product/release | Consider Inno Setup, NSIS, WiX, or MSIX after portable release is stable. |
@@ -129,7 +129,7 @@ Tasks:
 
 ### Phase 3 - CD for Desktop Builds
 
-Status: Level 1 implemented.
+Status: Desktop package implemented.
 
 Tasks:
 

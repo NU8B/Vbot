@@ -1,4 +1,4 @@
-"""Lightweight Windows launcher for the Level 1 Vbot desktop package.
+"""Lightweight Windows launcher for the Vbot desktop package.
 
 This executable intentionally does not import torch, transformers, wx, audio
 drivers, or the avatar stack. It validates the packaged payload and then
@@ -171,7 +171,7 @@ def run(argv: Optional[Sequence[str]] = None) -> int:
     smoke = SMOKE_FLAG in args
     args = [arg for arg in args if arg != SMOKE_FLAG]
 
-    print("Vbot Level 1 Launcher")
+    print("Vbot Desktop Package Launcher")
     print(f"Launcher directory: {bundle_dir()}")
 
     try:

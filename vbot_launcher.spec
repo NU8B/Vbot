@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for the Level 1 Vbot launcher package.
+"""PyInstaller spec for the Vbot desktop package launcher.
 
 The full ML freeze is kept in vbot.spec. This launcher spec builds quickly and
 packages the app payload without asking PyInstaller to analyze torch,
