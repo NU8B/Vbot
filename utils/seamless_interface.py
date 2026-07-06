@@ -26,7 +26,7 @@ sys.path.append(project_root)
 # from utils.preloader import ModelPreloader, LoadingScreen  # REMOVED - No more preloading
 from utils.welcome_screen import AvatarRecommender, RecommendationDialog
 from utils.user_preferences import get_user_preferences, record_avatar_selection
-from utils.performance_boost import performance_monitor
+from utils.performance_boost import memory_manager, performance_monitor
 
 
 class SeamlessVbotInterface:
@@ -940,14 +940,16 @@ class SeamlessVbotInterface:
         old_avatar = self.selected_avatar
         self.selected_avatar = new_model
         print(f"🔄 Avatar switch: {old_avatar} → {new_model}")
-        
+        memory_manager.log_memory(f"switch {old_avatar}->{new_model} start")
+
         # Check if we already have this model loaded
         if hasattr(self, 'model_data') and new_model in self.model_data:
             print(f"✅ Using cached model data for {new_model}")
             new_model_data = self.model_data[new_model]
-            
+
             # IMMEDIATE: Switch Ollama handler right away for cached models
             self._apply_model_switch(new_model_data, new_model)
+            memory_manager.log_memory(f"switch {old_avatar}->{new_model} done (cached)")
             return
         else:
             print(f"🚀 Loading {new_model} model on-demand for switching...")
@@ -983,9 +985,10 @@ class SeamlessVbotInterface:
             except Exception as e:
                 print(f"❌ Error loading {new_model}: {e}")
                 return
-        
+
         # Apply the model switch
         self._apply_model_switch(new_model_data, new_model)
+        memory_manager.log_memory(f"switch {old_avatar}->{new_model} done (on-demand load)")
     
     def _apply_model_switch(self, new_model_data, new_model):
         """Apply the actual model switch with new data"""

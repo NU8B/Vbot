@@ -8,6 +8,7 @@ import gc
 import torch
 import threading
 import time
+from contextlib import contextmanager
 from typing import Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, Future
 from pathlib import Path
@@ -85,6 +86,49 @@ class MemoryManager:
                 / 1024**3,  # GB
             }
         return info
+
+    @staticmethod
+    def log_memory(label):
+        """Print a compact one-line memory snapshot for runtime diagnostics.
+
+        Used around character switching and startup phases so memory
+        behavior shows up in the console logs users already read.
+        """
+        info = MemoryManager.get_memory_info()
+        gpu = info.get("gpu_memory")
+        if gpu:
+            peak = torch.cuda.max_memory_allocated() / 1024**3
+            print(
+                f"🧠 [{label}] RAM {info['system_ram']:.0f}% | "
+                f"CUDA {gpu['allocated']:.2f}GB alloc, {gpu['cached']:.2f}GB "
+                f"reserved, {peak:.2f}GB peak"
+            )
+        else:
+            print(f"🧠 [{label}] RAM {info['system_ram']:.0f}% | CUDA n/a")
+        return info
+
+
+@contextmanager
+def track_cuda_peak(label):
+    """Measure the CUDA footprint of a component load.
+
+    Reports retained allocation (still held after loading) and transient
+    peak (high-water mark during loading). Only meaningful around
+    sequential loads — parallel loaders would attribute each other's
+    allocations. No-op without CUDA.
+    """
+    if not torch.cuda.is_available():
+        yield
+        return
+
+    torch.cuda.synchronize()
+    torch.cuda.reset_peak_memory_stats()
+    before = torch.cuda.memory_allocated()
+    yield
+    torch.cuda.synchronize()
+    retained = (torch.cuda.memory_allocated() - before) / 1024**3
+    peak = torch.cuda.max_memory_allocated() / 1024**3
+    print(f"🧠 [{label}] CUDA load cost: +{retained:.2f}GB retained, {peak:.2f}GB peak during load")
 
 
 class LazyLoader:
