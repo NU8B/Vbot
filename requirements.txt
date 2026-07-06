@@ -1,6 +1,7 @@
 # developed on python=3.10
 # IMPORTANT: Install PyTorch separately with this command:
-# pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+# pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128
+# (cu128 build required for RTX 50-series/Blackwell GPUs; also supports 20/30/40-series)
 # 
 # Other installation notes:
 # espeak = https://www.youtube.com/watch?v=BBlivx6o0WM (in case of error)
@@ -25,9 +26,9 @@ matplotlib==3.10.0
 pyyaml>=6.0 
 
 # AI/ML Dependencies
-# torch==2.5.1  # Install via command above instead
-# torchaudio==2.5.1  # Install via command above instead
-# torchvision==0.20.1  # Install via command above instead
+# torch==2.7.1  # Install via command above instead
+# torchaudio==2.7.1  # Install via command above instead
+# torchvision==0.22.1  # Install via command above instead
 accelerate==1.1.1
 bitsandbytes==0.44.1
 transformers==4.46.3

@@ -53,7 +53,7 @@ python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA Av
 
 Expected output:
 ```
-PyTorch: 2.5.1+cu121
+PyTorch: 2.7.1+cu128
 CUDA Available: True
 ```
 
@@ -373,4 +373,4 @@ If you encounter issues not covered here:
 **Last Updated:** 2025-10-10  
 **Build System:** PyInstaller 6.16.0  
 **Python Version:** 3.10.18  
-**PyTorch Version:** 2.5.1+cu121
+**PyTorch Version:** 2.7.1+cu128
