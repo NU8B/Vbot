@@ -81,20 +81,13 @@ class TestDesktopSourceContracts:
         assert _module_defines(("utils", "ollama_utils.py"), "OllamaHandler", ast.ClassDef)
 
     def test_ollama_prompts_include_core_characters(self):
-        tree = _parse_project_file("utils", "ollama_utils.py")
-        model_prompts = None
-        for node in tree.body:
-            if isinstance(node, ast.Assign):
-                for target in node.targets:
-                    if isinstance(target, ast.Name) and target.id == "MODEL_PROMPTS":
-                        model_prompts = ast.literal_eval(node.value)
-                        break
-            if model_prompts is not None:
-                break
+        # Prompts moved to the versioned registry (stdlib-only, safe to
+        # import in CI); ollama_utils re-imports MODEL_PROMPTS from there,
+        # which tests/test_prompt_contract.py verifies at source level.
+        from utils.character_prompts import MODEL_PROMPTS
 
         expected_characters = {"Amelia", "Eveland", "Gura", "Shiori", "Wilson"}
-        assert model_prompts is not None
-        assert set(model_prompts.keys()) == expected_characters
+        assert set(MODEL_PROMPTS.keys()) == expected_characters
 
 
 # ============================================================

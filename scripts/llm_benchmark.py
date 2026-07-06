@@ -3,7 +3,10 @@ Runtime-compatible LLM benchmark for Vbot characters.
 
 Benchmarks the SAME language stack the app ships: the Dockerized Ollama
 runtime (model alias `stheno`) driven by the production character prompts
-from utils/ollama_utils.py. This replaces the archived HF-loading benchmark
+from the versioned registry in utils/character_prompts.py — the prompt
+versions in play are stamped into every artifact and MLflow run, so scores
+are only compared within a prompt version. This replaces the archived
+HF-loading benchmark
 (asset/old/benchmark/benchmark_LLM.py), which duplicated the 8B model
 outside Docker and only scored a hard-coded Amelia profile.
 
@@ -33,7 +36,6 @@ with prompt, response, character, timestamp, and metric breakdown.
 """
 
 import argparse
-import ast
 import json
 import os
 import re
@@ -46,6 +48,7 @@ import requests
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
+from utils.character_prompts import MODEL_PROMPTS, prompt_versions
 from utils.response_filter import filter_action_text
 
 SCHEMA_VERSION = 1
@@ -83,36 +86,81 @@ PROMPT_BATTERY = [
 CHARACTER_PROFILES = {
     "Amelia": {
         "persona_keywords": [
-            "detective", "time", "travel", "watson", "case", "mystery",
-            "investigate", "clue", "evidence", "pocket watch", "timeline",
+            "detective",
+            "time",
+            "travel",
+            "watson",
+            "case",
+            "mystery",
+            "investigate",
+            "clue",
+            "evidence",
+            "pocket watch",
+            "timeline",
         ],
         "topic_keywords": ["mystery", "case", "game", "gaming", "time travel", "adventure"],
     },
     "Eveland": {
         "persona_keywords": [
-            "novel", "book", "write", "writing", "story", "stories",
-            "author", "ink", "chapter", "sweden", "swedish", "read",
+            "novel",
+            "book",
+            "write",
+            "writing",
+            "story",
+            "stories",
+            "author",
+            "ink",
+            "chapter",
+            "sweden",
+            "swedish",
+            "read",
         ],
         "topic_keywords": ["book", "story", "horror", "romance", "writing", "novel"],
     },
     "Gura": {
         "persona_keywords": [
-            "shark", "ocean", "sea", "water", "swim", "apex", "predator",
-            "fish", "atlantis", "chomp", "fin",
+            "shark",
+            "ocean",
+            "sea",
+            "water",
+            "swim",
+            "apex",
+            "predator",
+            "fish",
+            "atlantis",
+            "chomp",
+            "fin",
         ],
         "topic_keywords": ["ocean", "sing", "singing", "rhythm", "game", "shark"],
     },
     "Shiori": {
         "persona_keywords": [
-            "archive", "story", "stories", "book", "knowledge", "tale",
-            "secret", "lore", "page", "mysterious", "novella",
+            "archive",
+            "story",
+            "stories",
+            "book",
+            "knowledge",
+            "tale",
+            "secret",
+            "lore",
+            "page",
+            "mysterious",
+            "novella",
         ],
         "topic_keywords": ["story", "book", "knowledge", "mystery", "archive", "tale"],
     },
     "Wilson": {
         "persona_keywords": [
-            "help", "support", "here for you", "listen", "care", "guide",
-            "steady", "trust", "together", "reliable",
+            "help",
+            "support",
+            "here for you",
+            "listen",
+            "care",
+            "guide",
+            "steady",
+            "trust",
+            "together",
+            "reliable",
         ],
         "topic_keywords": ["help", "support", "advice", "listen", "care"],
     },
@@ -133,28 +181,13 @@ BREAK_PATTERNS = [
     )
 ]
 
-EMOJI_PATTERN = re.compile(
-    "["
-    "\U0001f300-\U0001faff"
-    "\U00002600-\U000027bf"
-    "\U0001f1e6-\U0001f1ff"
-    "\U0000fe0f"
-    "]"
-)
+EMOJI_PATTERN = re.compile("[" "\U0001f300-\U0001faff" "\U00002600-\U000027bf" "\U0001f1e6-\U0001f1ff" "\U0000fe0f" "]")
 
 
 def load_model_prompts():
-    """Read MODEL_PROMPTS from utils/ollama_utils.py without importing the
-    desktop stack (same AST pattern as the CI tests)."""
-    path = os.path.join(PROJECT_ROOT, "utils", "ollama_utils.py")
-    with open(path, "r", encoding="utf-8") as file:
-        tree = ast.parse(file.read())
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "MODEL_PROMPTS":
-                    return ast.literal_eval(node.value)
-    raise RuntimeError("MODEL_PROMPTS not found in utils/ollama_utils.py")
+    """Production prompts from the versioned registry (stdlib-only import;
+    kept as a function because scripts/persona_judge.py imports it)."""
+    return dict(MODEL_PROMPTS)
 
 
 def score_response(text, profile):
@@ -261,8 +294,7 @@ def benchmark_character(host, character, system_prompt, battery):
         reply = call_character(host, system_prompt, prompt["text"])
         metrics = score_response(reply["text"], profile)
         print(
-            f"{reply['latency_s']:.1f}s, {metrics['word_count']}w,"
-            f" {'safe' if metrics['tts_safe'] else 'VIOLATION'}"
+            f"{reply['latency_s']:.1f}s, {metrics['word_count']}w," f" {'safe' if metrics['tts_safe'] else 'VIOLATION'}"
         )
         results.append(
             {
@@ -288,6 +320,7 @@ def build_artifact(host, characters):
         "ollama_host": host,
         "model": RUNTIME_MODEL,
         "num_predict": NUM_PREDICT,
+        "prompt_versions": prompt_versions(),
         "battery": PROMPT_BATTERY,
         "characters": characters,
     }
@@ -318,9 +351,7 @@ def main(argv=None):
     character_reports = {}
     for character in args.characters:
         print(f"\nBenchmarking {character} ({len(PROMPT_BATTERY)} prompts)...")
-        character_reports[character] = benchmark_character(
-            args.host, character, prompts[character], PROMPT_BATTERY
-        )
+        character_reports[character] = benchmark_character(args.host, character, prompts[character], PROMPT_BATTERY)
 
     artifact = build_artifact(args.host, character_reports)
 
@@ -352,12 +383,23 @@ def main(argv=None):
     log_eval_run(
         experiment="llm-benchmark",
         run_name=f"{RUNTIME_MODEL}_{stamp}",
-        params={"model": RUNTIME_MODEL, "num_predict": NUM_PREDICT, "battery": len(PROMPT_BATTERY)},
+        params={
+            "model": RUNTIME_MODEL,
+            "num_predict": NUM_PREDICT,
+            "battery": len(PROMPT_BATTERY),
+            **{f"prompt_version_{name}": version for name, version in prompt_versions().items()},
+        },
         metrics={
             f"{character}.{key}": report["aggregate"][key]
             for character, report in character_reports.items()
-            for key in ("tts_safety_rate", "brevity_rate", "persona_adherence_rate",
-                        "character_break_rate", "avg_latency_s", "avg_tokens_per_s")
+            for key in (
+                "tts_safety_rate",
+                "brevity_rate",
+                "persona_adherence_rate",
+                "character_break_rate",
+                "avg_latency_s",
+                "avg_tokens_per_s",
+            )
         },
         artifact=out_path,
     )

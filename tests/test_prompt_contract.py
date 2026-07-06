@@ -1,16 +1,17 @@
 """
 Prompt-contract tests for TTS-safe character prompts.
 =====================================================
-Every character prompt in MODEL_PROMPTS feeds a speech pipeline, not a text
-chat. These tests enforce the contract each prompt must carry so that LLM
-output stays speakable: no emojis, no parentheses, no action text, no
-asterisks, concise first-person replies.
+Every character prompt feeds a speech pipeline, not a text chat. These
+tests enforce the contract each prompt must carry so that LLM output stays
+speakable (no emojis, no parentheses, no action text, no asterisks,
+concise first-person replies), plus the registry contract: every prompt is
+versioned so edits get the same regression treatment as model swaps.
 
-MODEL_PROMPTS is read via AST (not imported) so CI never loads the desktop
-LLM/TTS stack. This mirrors the pattern in tests/test_imports.py.
+Prompts come from utils/character_prompts.py — stdlib-only, so CI imports
+it directly; no AST parsing needed since the registry replaced the literal
+in utils/ollama_utils.py.
 """
 
-import ast
 import os
 import re
 import sys
@@ -19,6 +20,8 @@ import pytest
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
+
+from utils.character_prompts import MODEL_PROMPTS, PROMPT_REGISTRY, prompt_versions
 
 EXPECTED_CHARACTERS = {"Amelia", "Eveland", "Gura", "Shiori", "Wilson"}
 
@@ -46,20 +49,27 @@ EMOJI_PATTERN = re.compile(
 )
 
 
-def _load_model_prompts():
-    path = os.path.join(PROJECT_ROOT, "utils", "ollama_utils.py")
-    with open(path, "r", encoding="utf-8") as file:
-        tree = ast.parse(file.read())
+class TestPromptRegistry:
+    """Registry metadata contract: versioned, dated, annotated entries."""
 
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "MODEL_PROMPTS":
-                    return ast.literal_eval(node.value)
-    raise AssertionError("MODEL_PROMPTS not found in utils/ollama_utils.py")
+    @pytest.mark.parametrize("character", sorted(EXPECTED_CHARACTERS))
+    def test_entry_metadata(self, character):
+        entry = PROMPT_REGISTRY[character]
+        assert isinstance(entry["version"], int) and entry["version"] >= 1
+        assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", entry["updated"]), "updated must be an ISO date"
+        assert entry["note"].strip(), "every version needs a note saying what changed"
 
+    def test_model_prompts_derived_from_registry(self):
+        assert MODEL_PROMPTS == {name: entry["prompt"] for name, entry in PROMPT_REGISTRY.items()}
+        assert prompt_versions() == {name: entry["version"] for name, entry in PROMPT_REGISTRY.items()}
 
-MODEL_PROMPTS = _load_model_prompts()
+    def test_runtime_imports_the_registry(self):
+        """ollama_utils must consume the registry, not fork its own copy."""
+        path = os.path.join(PROJECT_ROOT, "utils", "ollama_utils.py")
+        with open(path, "r", encoding="utf-8") as file:
+            source = file.read()
+        assert "from utils.character_prompts import MODEL_PROMPTS" in source
+        assert "MODEL_PROMPTS = {" not in source, "prompt literal must not reappear in ollama_utils"
 
 
 class TestPromptRoster:

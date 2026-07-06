@@ -115,12 +115,8 @@ def aggregate_judgments(judgments):
 
     aggregate = {"judged": len(scored), "unparsable": len(judgments) - len(scored)}
     for dimension in DIMENSIONS:
-        aggregate[f"avg_{dimension}"] = sum(
-            j["scores"][dimension] for j in scored
-        ) / len(scored)
-    aggregate["kayfabe_break_rate"] = sum(
-        1 for j in scored if j["scores"]["kayfabe"] <= 2
-    ) / len(scored)
+        aggregate[f"avg_{dimension}"] = sum(j["scores"][dimension] for j in scored) / len(scored)
+    aggregate["kayfabe_break_rate"] = sum(1 for j in scored if j["scores"]["kayfabe"] <= 2) / len(scored)
     return aggregate
 
 
@@ -147,9 +143,7 @@ def judge_artifact(artifact, host, judge_model, prompts):
         system_prompt = prompts[character]
         judgments = []
         for result in report["results"]:
-            prompt = build_judge_prompt(
-                system_prompt, result["user_prompt"], result["response"]
-            )
+            prompt = build_judge_prompt(system_prompt, result["user_prompt"], result["response"])
             start = time.time()
             reply = call_judge(host, judge_model, prompt)
             scores = parse_judge_reply(reply)
@@ -166,8 +160,7 @@ def judge_artifact(artifact, host, judge_model, prompts):
                 }
             )
             status = (
-                f"pv={scores['persona_voice']} en={scores['engagement']} "
-                f"kf={scores['kayfabe']}"
+                f"pv={scores['persona_voice']} en={scores['engagement']} " f"kf={scores['kayfabe']}"
                 if scores
                 else "UNPARSABLE"
             )
@@ -180,9 +173,7 @@ def judge_artifact(artifact, host, judge_model, prompts):
 
 
 def find_latest_artifact():
-    candidates = sorted(
-        glob.glob(os.path.join(DEFAULT_OUTPUT_DIR, "llm_benchmark_*.json"))
-    )
+    candidates = sorted(glob.glob(os.path.join(DEFAULT_OUTPUT_DIR, "llm_benchmark_*.json")))
     # Skip already-judged outputs of this script.
     candidates = [c for c in candidates if "judged" not in os.path.basename(c)]
     return candidates[-1] if candidates else None
@@ -190,9 +181,7 @@ def find_latest_artifact():
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Judge persona fidelity of a benchmark artifact")
-    parser.add_argument(
-        "artifact", nargs="?", help="llm_benchmark artifact JSON (default: newest)"
-    )
+    parser.add_argument("artifact", nargs="?", help="llm_benchmark artifact JSON (default: newest)")
     parser.add_argument("--judge-model", default=DEFAULT_JUDGE_MODEL)
     parser.add_argument("--host", default=OLLAMA_HOST)
     args = parser.parse_args(argv)
@@ -217,13 +206,14 @@ def main(argv=None):
         "judge_prompt_version": JUDGE_PROMPT_VERSION,
         "source_artifact": os.path.basename(artifact_path),
         "generator_model": artifact["model"],
+        # Prompt versions the benchmark ran against (absent in artifacts
+        # produced before the registry existed).
+        "prompt_versions": artifact.get("prompt_versions"),
         "characters": characters,
     }
 
     stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    out_path = os.path.join(
-        os.path.dirname(artifact_path), f"persona_judged_{stamp}.json"
-    )
+    out_path = os.path.join(os.path.dirname(artifact_path), f"persona_judged_{stamp}.json")
     with open(out_path, "w", encoding="utf-8") as file:
         json.dump(judged, file, indent=2, ensure_ascii=False)
 
@@ -252,6 +242,7 @@ def main(argv=None):
             "judge_prompt_version": JUDGE_PROMPT_VERSION,
             "generator_model": artifact["model"],
             "source_artifact": os.path.basename(artifact_path),
+            **{f"prompt_version_{name}": version for name, version in (artifact.get("prompt_versions") or {}).items()},
         },
         metrics={
             f"{character}.{key}": report["aggregate"][key]
