@@ -142,8 +142,10 @@ hiddenimports = [
     'gc',
 ]
 
-# Collect all submodules for critical packages
-for package in ['transformers', 'torch', 'torchaudio', 'unittest']:
+# Collecting every torch/torchaudio/transformers submodule is extremely slow and can
+# hang PyInstaller's isolated analysis for release builds. Rely on PyInstaller's
+# package hooks plus the explicit hidden imports above for those ML packages.
+for package in ['unittest']:
     try:
         hiddenimports += collect_submodules(package)
     except Exception:

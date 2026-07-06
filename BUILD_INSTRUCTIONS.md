@@ -53,7 +53,7 @@ python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA Av
 
 Expected output:
 ```
-PyTorch: 2.5.1+cu121
+PyTorch: 2.7.1+cu128
 CUDA Available: True
 ```
 
@@ -67,10 +67,30 @@ CUDA Available: True
 ```
 
 This will:
-- Build the executable
-- Save full build log to `build_log_[timestamp].txt`
-- Show summary of warnings/errors
-- Take ~5-10 minutes
+- Run the fast test suite unless `-SkipTests` is provided
+- Build the desktop package launcher executable
+- Save the full build log under `release/logs/`
+- Package a portable release zip under `release/artifacts/`
+- Write a SHA256 checksum and release manifest
+- Avoid freezing the full ML runtime into the exe by default
+
+Useful options:
+```powershell
+# Build without running tests
+.\build_with_logs.ps1 -SkipTests
+
+# Fast rebuild without cleaning previous PyInstaller state
+.\build_with_logs.ps1 -NoClean
+
+# Build only, do not create release zip
+.\build_with_logs.ps1 -NoPackage
+
+# Set release version in artifact names
+.\build_with_logs.ps1 -Version "v0.1.0"
+
+# Advanced full PyInstaller bundle
+.\build_with_logs.ps1 -BuildMode Full -Version "v0.1.0-full"
+```
 
 ### Option B: Direct Build
 ```powershell
@@ -78,7 +98,10 @@ This will:
 Remove-Item -Recurse -Force .\dist -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force .\build -ErrorAction SilentlyContinue
 
-# Build
+# Build desktop package launcher
+python -m PyInstaller vbot_launcher.spec --clean --noconfirm
+
+# Advanced full bundle
 python -m PyInstaller vbot.spec --clean --noconfirm
 ```
 
@@ -97,9 +120,9 @@ cd dist\Vbot
 ```
 
 ### Expected Behavior:
-1. Launcher appears with system check
-2. All checks pass (or warnings shown)
-3. Main GUI window opens
+1. Launcher prints the app payload and Python runtime it found
+2. Launcher starts `VbotSeamless.py` through the configured Python environment
+3. Main GUI window opens if Docker/model/audio prerequisites are ready
 4. Avatar loads successfully
 
 ---
@@ -153,7 +176,7 @@ If missing, reinstall CUDA Toolkit 12.1 from NVIDIA website.
 # Then restart Vbot.exe
 ```
 
-This is a **warning only** - Vbot will work without Docker (no LLM features).
+Docker Desktop is required for the current local Ollama LLM chat path. Some non-LLM functionality may still open without Docker, but the main chatbot experience expects Docker to be running.
 
 ---
 
@@ -190,21 +213,23 @@ After successful build:
 Vbot/
 ├── dist/
 │   └── Vbot/                    ← Distributable folder
-│       ├── Vbot.exe             ← Main executable (55-60 MB)
-│       ├── _internal/           ← Dependencies (~2-3 GB)
-│       │   ├── torch/
-│       │   ├── StyleTTS2/
-│       │   ├── tha4/
-│       │   └── [Python libs]
-│       ├── asset/               ← Models
-│       └── cache/               ← Empty cache dir
+│       ├── Vbot.exe             ← Desktop package launcher executable
+│       └── _internal/
+│           └── app/             ← Packaged Vbot source/assets
+│               ├── VbotSeamless.py
+│               ├── utils/
+│               ├── StyleTTS2/
+│               ├── tha4/
+│               └── asset/
 ```
 
-**Total Size:** ~3-4 GB
+Launcher mode is smaller than the old full-freeze target because it does not bundle torch/CUDA/transformers into the executable. The target machine still needs the Python/Conda environment described in `PREREQUISITES.md`.
 
 ---
 
 ## 🚚 Distribution
+
+The desktop package target is a portable zip, not a polished signed installer.
 
 ### What to Share:
 ```
@@ -213,15 +238,29 @@ Vbot-Distribution.zip containing:
 │   ├── Vbot.exe
 │   └── _internal/
 ├── README.md                    ← User instructions
-└── PREREQUISITES.md             ← System requirements
+├── PREREQUISITES.md             ← System requirements
+├── RELEASE_NOTES.md             ← Release metadata
+└── build.log                    ← Build log, when packaged by script
+```
+
+The build script creates:
+```
+release/
+├── artifacts/
+│   ├── Vbot-[version]-windows-portable.zip
+│   ├── Vbot-[version]-windows-portable.zip.sha256
+│   └── Vbot-[version]-release-manifest.json
+└── logs/
+    └── build-[version]-[timestamp].log
 ```
 
 ### User Installation:
 1. Extract `Vbot-Distribution.zip`
-2. Install Docker Desktop (optional, for LLM)
-3. Install NVIDIA drivers
-4. Run `Vbot.exe`
-5. First launch downloads Ollama models (~4GB)
+2. Install Python/Conda 3.10 and dependencies from `requirements.txt`
+3. Install Docker Desktop with WSL 2 for local LLM chat
+4. Install NVIDIA drivers
+5. Run `Vbot.exe`
+6. First launch downloads Ollama models (~4GB)
 
 ---
 
@@ -240,6 +279,24 @@ cd dist\Vbot
 ```
 
 **Note:** Only use this for testing. Always do full clean build for distribution!
+
+---
+
+## Manual GitHub Release Workflow
+
+The repo includes a manual workflow:
+
+```
+.github/workflows/desktop-release.yml
+```
+
+It is configured for a self-hosted Windows runner:
+
+```
+[self-hosted, Windows, X64]
+```
+
+Use this after the local build is stable. The runner must already have the Vbot Python/CUDA/build environment prepared. The workflow uploads the portable zip, checksum, manifest, release notes, and build log as workflow artifacts. It can optionally create a draft GitHub Release.
 
 ---
 
@@ -286,6 +343,12 @@ conda activate vbot
 Remove-Item -Recurse -Force .\dist, .\build -ErrorAction SilentlyContinue
 python -m PyInstaller vbot.spec --clean --noconfirm
 
+# Full release build and package
+.\build_with_logs.ps1 -Version "v0.1.0"
+
+# Advanced full freeze
+.\build_with_logs.ps1 -BuildMode Full -Version "v0.1.0-full"
+
 # Test
 cd dist\Vbot && .\Vbot.exe
 
@@ -310,4 +373,4 @@ If you encounter issues not covered here:
 **Last Updated:** 2025-10-10  
 **Build System:** PyInstaller 6.16.0  
 **Python Version:** 3.10.18  
-**PyTorch Version:** 2.5.1+cu121
+**PyTorch Version:** 2.7.1+cu128

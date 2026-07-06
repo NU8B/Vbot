@@ -1,0 +1,125 @@
+name: Vbot Desktop Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, for example v0.1.0. Leave blank for dev run number."
+        required: false
+        type: string
+      skip_tests:
+        description: "Skip fast tests before the PyInstaller build."
+        required: false
+        default: false
+        type: boolean
+      build_mode:
+        description: "Launcher is the Level 1 default. Full attempts to freeze the ML runtime."
+        required: false
+        default: "Launcher"
+        type: choice
+        options:
+          - "Launcher"
+          - "Full"
+      create_github_release:
+        description: "Create a draft GitHub Release with the packaged artifact."
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vbot-desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-windows-portable:
+    name: Build Windows Portable Release
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Build and package Vbot
+        shell: pwsh
+        env:
+          VBOT_RELEASE_VERSION: ${{ inputs.version }}
+          VBOT_SKIP_TESTS: ${{ inputs.skip_tests }}
+          VBOT_BUILD_MODE: ${{ inputs.build_mode }}
+          GITHUB_RUN_NUMBER_VALUE: ${{ github.run_number }}
+        run: |
+          $version = $env:VBOT_RELEASE_VERSION
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            $version = "dev-$env:GITHUB_RUN_NUMBER_VALUE"
+          }
+
+          $buildMode = $env:VBOT_BUILD_MODE
+          if ([string]::IsNullOrWhiteSpace($buildMode)) {
+            $buildMode = "Launcher"
+          }
+
+          $buildArgs = @("-Version", $version, "-BuildMode", $buildMode)
+          if ($env:VBOT_SKIP_TESTS -eq "true") {
+            $buildArgs += "-SkipTests"
+          }
+
+          .\build_with_logs.ps1 @buildArgs
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: vbot-windows-portable-release
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            release/artifacts/*.zip
+            release/artifacts/*.sha256
+            release/artifacts/*.json
+            release/artifacts/*.md
+            release/logs/*.log
+
+      - name: Create draft GitHub Release
+        if: ${{ inputs.create_github_release }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VBOT_RELEASE_VERSION: ${{ inputs.version }}
+          GITHUB_RUN_NUMBER_VALUE: ${{ github.run_number }}
+        run: |
+          $version = $env:VBOT_RELEASE_VERSION
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            $version = "dev-$env:GITHUB_RUN_NUMBER_VALUE"
+          }
+
+          $tag = "vbot-$version"
+          $zip = Get-ChildItem -LiteralPath "release/artifacts" -Filter "*-windows-portable.zip" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if (-not $zip) {
+            throw "No portable zip artifact found."
+          }
+
+          $artifactFiles = @(
+            $zip.FullName,
+            "$($zip.FullName).sha256"
+          )
+
+          $manifest = Get-ChildItem -LiteralPath "release/artifacts" -Filter "*-release-manifest.json" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if ($manifest) {
+            $artifactFiles += $manifest.FullName
+          }
+
+          $notes = Get-ChildItem -LiteralPath "release/artifacts" -Filter "*-release-notes.md" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+          if ($notes) {
+            gh release create $tag @artifactFiles --draft --title "Vbot $version" --notes-file $notes.FullName
+          } else {
+            gh release create $tag @artifactFiles --draft --title "Vbot $version" --notes "Windows portable Vbot release."
+          }

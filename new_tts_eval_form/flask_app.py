@@ -5,23 +5,30 @@ import random
 from datetime import datetime
 from pathlib import Path
 
+from eval_schema import (
+    ALL_MODELS,
+    EMOTIONS,
+    NEW_MODELS,
+    OLD_MODELS,
+    stamp_submission,
+    validate_submission,
+)
+
 app = Flask(__name__)
 
-# Configuration - use absolute paths
+# Configuration - use absolute paths. The results file can be overridden
+# (e.g. by tests) through VBOT_EVAL_RESULTS_FILE.
 APP_DIR = Path(__file__).parent
-RESULTS_DIR = APP_DIR / "results"
-RESULTS_FILE = RESULTS_DIR / "evaluation_results.json"
+_results_override = os.getenv("VBOT_EVAL_RESULTS_FILE")
+if _results_override:
+    RESULTS_FILE = Path(_results_override)
+    RESULTS_DIR = RESULTS_FILE.parent
+else:
+    RESULTS_DIR = APP_DIR / "results"
+    RESULTS_FILE = RESULTS_DIR / "evaluation_results.json"
 
 # Ensure results directory exists
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-
-# Model configurations
-OLD_MODELS = ["Amelia", "Eveland"]
-NEW_MODELS = ["Gura", "Amelia_new"]
-ALL_MODELS = OLD_MODELS + NEW_MODELS
-
-# Emotion configurations
-EMOTIONS = ["joy", "sadness", "anger", "surprise", "neutral"]
 
 
 def get_audio_files():
@@ -94,11 +101,15 @@ def index():
 @app.route("/submit", methods=["POST"])
 def submit():
     """Handle form submission"""
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
-    # Add timestamp and remote IP
-    data["timestamp"] = datetime.now().isoformat()
-    data["remote_ip"] = request.remote_addr
+    # Reject anything that does not match the canonical artifact schema
+    errors = validate_submission(data)
+    if errors:
+        return jsonify({"status": "error", "errors": errors}), 400
+
+    # Add schema version, timestamp, and remote IP
+    stamp_submission(data, datetime.now().isoformat(), request.remote_addr)
 
     # Load existing results
     results = load_results()

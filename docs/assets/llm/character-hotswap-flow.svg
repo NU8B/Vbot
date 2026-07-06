@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Vbot character hotswap flow</title>
+  <desc id="desc">Flow diagram showing how Vbot switches characters while reusing the shared Ollama runtime and per-character cached state.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+    <style>
+      .bg { fill: #0b1120; }
+      .panel { fill: #111827; stroke: #334155; stroke-width: 1.5; rx: 16; }
+      .node { fill: #172033; stroke: #64748b; stroke-width: 1.2; rx: 12; }
+      .decision { fill: #1f2937; stroke: #fbbf24; stroke-width: 1.4; }
+      .cache { fill: #11261f; stroke: #34d399; stroke-width: 1.4; rx: 12; }
+      .shared { fill: #251a35; stroke: #c084fc; stroke-width: 1.4; rx: 12; }
+      .text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #e5e7eb; font-size: 18px; font-weight: 600; }
+      .small { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #cbd5e1; font-size: 14px; }
+      .tiny { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #94a3b8; font-size: 12px; }
+      .label { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #bae6fd; font-size: 13px; font-weight: 600; }
+      .line { fill: none; stroke: #7dd3fc; stroke-width: 2.2; marker-end: url(#arrow); }
+      .soft { fill: none; stroke: #64748b; stroke-width: 1.6; stroke-dasharray: 6 6; }
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="620"/>
+  <text class="text" x="48" y="52">Character Hotswap Flow</text>
+  <text class="small" x="48" y="78">Character identity changes at the handler/cache layer while the Dockerized Ollama backend stays shared.</text>
+
+  <rect class="panel" x="36" y="112" width="1128" height="440"/>
+  <rect class="node" x="72" y="180" width="170" height="82"/>
+  <text class="text" x="98" y="213">User selects</text>
+  <text class="text" x="108" y="238">character</text>
+
+  <rect class="node" x="288" y="180" width="190" height="82"/>
+  <text class="text" x="318" y="213">Seamless</text>
+  <text class="text" x="318" y="238">switch request</text>
+
+  <polygon class="decision" points="590,164 710,221 590,278 470,221"/>
+  <text class="text" x="535" y="216">Cached</text>
+  <text class="text" x="548" y="241">data?</text>
+
+  <rect class="cache" x="790" y="132" width="250" height="88"/>
+  <text class="text" x="826" y="166">Reuse cached stack</text>
+  <text class="small" x="822" y="192">TTS, avatar, handler state</text>
+
+  <rect class="node" x="790" y="288" width="250" height="110"/>
+  <text class="text" x="832" y="322">Initialize stack</text>
+  <text class="small" x="824" y="350">fresh StyleTTS2 instance</text>
+  <text class="small" x="824" y="372">reference style cache</text>
+
+  <rect class="cache" x="790" y="430" width="250" height="74"/>
+  <text class="text" x="826" y="462">Save to model_data</text>
+  <text class="small" x="834" y="486">per-character cache</text>
+
+  <rect class="node" x="410" y="396" width="210" height="88"/>
+  <text class="text" x="442" y="430">Apply switch</text>
+  <text class="small" x="440" y="456">attach TTS, avatar, UI</text>
+
+  <rect class="shared" x="106" y="362" width="210" height="104"/>
+  <text class="text" x="140" y="396">Shared Ollama</text>
+  <text class="small" x="142" y="422">Docker container</text>
+  <text class="small" x="142" y="444">model alias: stheno</text>
+
+  <line class="line" x1="242" y1="221" x2="288" y2="221"/>
+  <line class="line" x1="478" y1="221" x2="470" y2="221"/>
+  <path class="line" d="M 710 221 C 740 221 744 176 790 176"/>
+  <text class="label" x="724" y="190">yes</text>
+  <path class="line" d="M 590 278 C 594 328 700 343 790 343"/>
+  <text class="label" x="638" y="332">no</text>
+  <line class="line" x1="915" y1="398" x2="915" y2="430"/>
+  <path class="line" d="M 790 467 C 700 467 684 440 620 440"/>
+  <path class="line" d="M 790 176 C 690 176 686 440 620 440"/>
+  <path class="soft" d="M 211 362 C 260 320 308 286 365 262"/>
+  <text class="tiny" x="132" y="492">The LLM process is not duplicated per character.</text>
+  <path class="line" d="M 410 440 C 356 440 340 420 316 414"/>
+</svg>

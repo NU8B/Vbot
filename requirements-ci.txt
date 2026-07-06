@@ -1,0 +1,36 @@
+# Lightweight CI dependencies.
+# Keep this file CPU-only and small enough for GitHub-hosted runners.
+# The full desktop/GPU environment stays in requirements.txt.
+
+--index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://pypi.org/simple
+
+# Testing, linting, and formatting
+pytest>=8.0,<9
+flask>=3.0,<4
+flake8>=7.0,<8
+black>=24.0,<26
+isort>=5.13,<6
+
+# Import-time dependencies for lightweight pipeline tests
+torch>=2.3,<3
+torchaudio>=2.3,<3
+numpy>=1.24,<3
+scipy>=1.10,<2
+librosa>=0.10,<0.12
+soundfile>=0.12,<1
+transformers>=4.40,<5
+huggingface-hub>=0.20,<1
+pyyaml>=6.0,<7
+requests>=2.28,<3
+docker>=7.0,<8
+psutil>=5.9,<8
+phonemizer>=3.3,<4
+pydub>=0.25,<1
+pesq>=0.0.4,<1
+pystoi>=0.4,<1
+pysrt>=1.1,<2
+tqdm>=4.60,<5
+munch>=4.0,<5
+einops>=0.6,<1
+nltk>=3.8,<4

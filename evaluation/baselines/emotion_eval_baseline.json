@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "kind": "emotion_eval",
+  "timestamp": "2026-07-06T03:39:57.761531",
+  "model": "SamLowe/roberta-base-go_emotions",
+  "runtime_threshold": 0.15,
+  "datasets": {
+    "goemotions_test_slice": {
+      "dataset_path": "evaluation\\emotion\\goemotions_test_slice.json",
+      "items": 741,
+      "runtime_threshold_report": {
+        "threshold": 0.15,
+        "total": 741,
+        "accuracy": 0.6450742240215924,
+        "macro_f1": 0.6401189800203905,
+        "neutral_prediction_rate": 0.358974358974359,
+        "per_bucket": {
+          "angry": {
+            "precision": 0.6610169491525424,
+            "recall": 0.52,
+            "f1": 0.582089552238806,
+            "support": 150
+          },
+          "happy": {
+            "precision": 0.7062146892655368,
+            "recall": 0.8333333333333334,
+            "f1": 0.764525993883792,
+            "support": 150
+          },
+          "neutral": {
+            "precision": 0.45112781954887216,
+            "recall": 0.8,
+            "f1": 0.5769230769230769,
+            "support": 150
+          },
+          "sad": {
+            "precision": 0.8455284552845529,
+            "recall": 0.6933333333333334,
+            "f1": 0.7619047619047619,
+            "support": 150
+          },
+          "surprised": {
+            "precision": 0.8947368421052632,
+            "recall": 0.3617021276595745,
+            "f1": 0.5151515151515151,
+            "support": 141
+          }
+        },
+        "confusion": {
+          "angry": {
+            "angry": 78,
+            "happy": 9,
+            "neutral": 52,
+            "sad": 9,
+            "surprised": 2
+          },
+          "happy": {
+            "angry": 4,
+            "happy": 125,
+            "neutral": 18,
+            "sad": 2,
+            "surprised": 1
+          },
+          "neutral": {
+            "angry": 13,
+            "happy": 13,
+            "neutral": 120,
+            "sad": 2,
+            "surprised": 2
+          },
+          "sad": {
+            "angry": 10,
+            "happy": 6,
+            "neutral": 29,
+            "sad": 104,
+            "surprised": 1
+          },
+          "surprised": {
+            "angry": 13,
+            "happy": 24,
+            "neutral": 47,
+            "sad": 6,
+            "surprised": 51
+          }
+        }
+      },
+      "threshold_sweep": {
+        "rows": [
+          {
+            "threshold": 0.0,
+            "accuracy": 0.6437246963562753,
+            "macro_f1": 0.6389669854299834,
+            "neutral_prediction_rate": 0.3576248313090418
+          },
+          {
+            "threshold": 0.05,
+            "accuracy": 0.6437246963562753,
+            "macro_f1": 0.6389669854299834,
+            "neutral_prediction_rate": 0.3576248313090418
+          },
+          {
+            "threshold": 0.1,
+            "accuracy": 0.6437246963562753,
+            "macro_f1": 0.6389669854299834,
+            "neutral_prediction_rate": 0.3576248313090418
+          },
+          {
+            "threshold": 0.15,
+            "accuracy": 0.6450742240215924,
+            "macro_f1": 0.6401189800203905,
+            "neutral_prediction_rate": 0.358974358974359
+          },
+          {
+            "threshold": 0.2,
+            "accuracy": 0.6450742240215924,
+            "macro_f1": 0.6403113126569158,
+            "neutral_prediction_rate": 0.3603238866396761
+          },
+          {
+            "threshold": 0.25,
+            "accuracy": 0.6437246963562753,
+            "macro_f1": 0.6400544200679739,
+            "neutral_prediction_rate": 0.3657219973009447
+          },
+          {
+            "threshold": 0.3,
+            "accuracy": 0.6410256410256411,
+            "macro_f1": 0.6372632488240831,
+            "neutral_prediction_rate": 0.3724696356275304
+          },
+          {
+            "threshold": 0.35,
+            "accuracy": 0.631578947368421,
+            "macro_f1": 0.6297789958121625,
+            "neutral_prediction_rate": 0.3967611336032389
+          },
+          {
+            "threshold": 0.4,
+            "accuracy": 0.6099865047233468,
+            "macro_f1": 0.6097828047043293,
+            "neutral_prediction_rate": 0.42780026990553305
+          },
+          {
+            "threshold": 0.45,
+            "accuracy": 0.5937921727395412,
+            "macro_f1": 0.5967977033803396,
+            "neutral_prediction_rate": 0.4574898785425101
+          },
+          {
+            "threshold": 0.5,
+            "accuracy": 0.5802968960863698,
+            "macro_f1": 0.5842703192388674,
+            "neutral_prediction_rate": 0.49527665317139
+          },
+          {
+            "threshold": 0.55,
+            "accuracy": 0.5600539811066126,
+            "macro_f1": 0.5673718176306862,
+            "neutral_prediction_rate": 0.543859649122807
+          },
+          {
+            "threshold": 0.6,
+            "accuracy": 0.5317139001349528,
+            "macro_f1": 0.5361475813078911,
+            "neutral_prediction_rate": 0.5843454790823212
+          },
+          {
+            "threshold": 0.65,
+            "accuracy": 0.5060728744939271,
+            "macro_f1": 0.5087266585366816,
+            "neutral_prediction_rate": 0.6410256410256411
+          },
+          {
+            "threshold": 0.7,
+            "accuracy": 0.46288798920377866,
+            "macro_f1": 0.4610428416335578,
+            "neutral_prediction_rate": 0.6977058029689609
+          },
+          {
+            "threshold": 0.75,
+            "accuracy": 0.43049932523616735,
+            "macro_f1": 0.41615328553523856,
+            "neutral_prediction_rate": 0.7422402159244265
+          },
+          {
+            "threshold": 0.8,
+            "accuracy": 0.3913630229419703,
+            "macro_f1": 0.36350176195112904,
+            "neutral_prediction_rate": 0.7894736842105263
+          },
+          {
+            "threshold": 0.85,
+            "accuracy": 0.3468286099865047,
+            "macro_f1": 0.29595355548843927,
+            "neutral_prediction_rate": 0.8461538461538461
+          },
+          {
+            "threshold": 0.9,
+            "accuracy": 0.28475033738191635,
+            "macro_f1": 0.19515253195243948,
+            "neutral_prediction_rate": 0.9149797570850202
+          }
+        ],
+        "recommended_threshold": 0.2
+      }
+    },
+    "vtuber_domain_slice": {
+      "dataset_path": "evaluation\\emotion\\vtuber_domain_slice.json",
+      "items": 80,
+      "runtime_threshold_report": {
+        "threshold": 0.15,
+        "total": 80,
+        "accuracy": 0.775,
+        "macro_f1": 0.7869417428038117,
+        "neutral_prediction_rate": 0.4,
+        "per_bucket": {
+          "angry": {
+            "precision": 0.9,
+            "recall": 0.5625,
+            "f1": 0.6923076923076923,
+            "support": 16
+          },
+          "happy": {
+            "precision": 1.0,
+            "recall": 0.875,
+            "f1": 0.9333333333333333,
+            "support": 16
+          },
+          "neutral": {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666,
+            "support": 16
+          },
+          "sad": {
+            "precision": 0.9230769230769231,
+            "recall": 0.75,
+            "f1": 0.8275862068965517,
+            "support": 16
+          },
+          "surprised": {
+            "precision": 1.0,
+            "recall": 0.6875,
+            "f1": 0.8148148148148148,
+            "support": 16
+          }
+        },
+        "confusion": {
+          "angry": {
+            "angry": 9,
+            "happy": 0,
+            "neutral": 6,
+            "sad": 1,
+            "surprised": 0
+          },
+          "happy": {
+            "angry": 0,
+            "happy": 14,
+            "neutral": 2,
+            "sad": 0,
+            "surprised": 0
+          },
+          "neutral": {
+            "angry": 0,
+            "happy": 0,
+            "neutral": 16,
+            "sad": 0,
+            "surprised": 0
+          },
+          "sad": {
+            "angry": 0,
+            "happy": 0,
+            "neutral": 4,
+            "sad": 12,
+            "surprised": 0
+          },
+          "surprised": {
+            "angry": 1,
+            "happy": 0,
+            "neutral": 4,
+            "sad": 0,
+            "surprised": 11
+          }
+        }
+      },
+      "threshold_sweep": {
+        "rows": [
+          {
+            "threshold": 0.0,
+            "accuracy": 0.775,
+            "macro_f1": 0.7869417428038117,
+            "neutral_prediction_rate": 0.4
+          },
+          {
+            "threshold": 0.05,
+            "accuracy": 0.775,
+            "macro_f1": 0.7869417428038117,
+            "neutral_prediction_rate": 0.4
+          },
+          {
+            "threshold": 0.1,
+            "accuracy": 0.775,
+            "macro_f1": 0.7869417428038117,
+            "neutral_prediction_rate": 0.4
+          },
+          {
+            "threshold": 0.15,
+            "accuracy": 0.775,
+            "macro_f1": 0.7869417428038117,
+            "neutral_prediction_rate": 0.4
+          },
+          {
+            "threshold": 0.2,
+            "accuracy": 0.7625,
+            "macro_f1": 0.7758462701319845,
+            "neutral_prediction_rate": 0.4125
+          },
+          {
+            "threshold": 0.25,
+            "accuracy": 0.7625,
+            "macro_f1": 0.7758462701319845,
+            "neutral_prediction_rate": 0.4125
+          },
+          {
+            "threshold": 0.3,
+            "accuracy": 0.75,
+            "macro_f1": 0.7627724867724867,
+            "neutral_prediction_rate": 0.425
+          },
+          {
+            "threshold": 0.35,
+            "accuracy": 0.75,
+            "macro_f1": 0.7627724867724867,
+            "neutral_prediction_rate": 0.425
+          },
+          {
+            "threshold": 0.4,
+            "accuracy": 0.7125,
+            "macro_f1": 0.7300593638030202,
+            "neutral_prediction_rate": 0.4625
+          },
+          {
+            "threshold": 0.45,
+            "accuracy": 0.6875,
+            "macro_f1": 0.7044887960060373,
+            "neutral_prediction_rate": 0.4875
+          },
+          {
+            "threshold": 0.5,
+            "accuracy": 0.6625,
+            "macro_f1": 0.6774203541504101,
+            "neutral_prediction_rate": 0.5125
+          },
+          {
+            "threshold": 0.55,
+            "accuracy": 0.625,
+            "macro_f1": 0.6388916075872597,
+            "neutral_prediction_rate": 0.55
+          },
+          {
+            "threshold": 0.6,
+            "accuracy": 0.5625,
+            "macro_f1": 0.5800972360972361,
+            "neutral_prediction_rate": 0.625
+          },
+          {
+            "threshold": 0.65,
+            "accuracy": 0.55,
+            "macro_f1": 0.5679832605205739,
+            "neutral_prediction_rate": 0.6375
+          },
+          {
+            "threshold": 0.7,
+            "accuracy": 0.5125,
+            "macro_f1": 0.5285962732919255,
+            "neutral_prediction_rate": 0.675
+          },
+          {
+            "threshold": 0.75,
+            "accuracy": 0.5125,
+            "macro_f1": 0.5285962732919255,
+            "neutral_prediction_rate": 0.675
+          },
+          {
+            "threshold": 0.8,
+            "accuracy": 0.4375,
+            "macro_f1": 0.43613275613275615,
+            "neutral_prediction_rate": 0.7625
+          },
+          {
+            "threshold": 0.85,
+            "accuracy": 0.3375,
+            "macro_f1": 0.28372055458338946,
+            "neutral_prediction_rate": 0.8625
+          },
+          {
+            "threshold": 0.9,
+            "accuracy": 0.275,
+            "macro_f1": 0.1802020202020202,
+            "neutral_prediction_rate": 0.925
+          }
+        ],
+        "recommended_threshold": 0.0
+      }
+    }
+  }
+}

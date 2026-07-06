@@ -14,6 +14,7 @@ from .performance_boost import (
     startup_optimizer,
     model_cache,
     performance_monitor,
+    track_cuda_peak,
     LazyLoader,
     MemoryManager,
 )
@@ -227,6 +228,7 @@ class InitializationHandler:
     def initialize_all(self):
         """Initialize all components with optimized startup sequence"""
         performance_monitor.start_timer("total_initialization")
+        memory_manager.log_memory(f"startup {self.model_name}: begin")
 
         # Create cache directory (handles PyInstaller)
         cache_path = Path(get_base_path()) / "cache"
@@ -249,8 +251,11 @@ class InitializationHandler:
 
         # ALWAYS create a fresh TTS model for each character - NO SHARING
         print(f"🔄 Creating FRESH TTS model for {self.model_name} (NO CACHING)")
-        self.tts_model = self._initialize_tts()  # Always call directly
+        # TTS loads sequentially here, so its CUDA cost can be attributed.
+        with track_cuda_peak(f"tts_model {self.model_name}"):
+            self.tts_model = self._initialize_tts()  # Always call directly
         critical_time = performance_monitor.end_timer("critical_components")
+        memory_manager.log_memory(f"startup {self.model_name}: critical components ready")
 
         # Set group1_time for compatibility with old reporting
         self.group1_time = critical_time
@@ -298,6 +303,7 @@ class InitializationHandler:
         # Audio processor and Ollama can load in background
         performance_monitor.end_timer("total_initialization")
         performance_monitor.print_metrics()
+        memory_manager.log_memory(f"startup {self.model_name}: initialization complete")
 
         return self._get_initialization_results()
 

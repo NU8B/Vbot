@@ -226,7 +226,9 @@ class AnimatedCharacter:
                 print(f"Error: Model file not found at {self.model_path.absolute()}")
                 return
 
-            self.character_model = CharacterModel.load(self.model_path)
+            # str() keeps CharacterModel.load compatible with omegaconf
+            # versions that cannot read pathlib.Path objects (e.g. 1.4.x).
+            self.character_model = CharacterModel.load(str(self.model_path))
             print("Character model loaded")
 
             # Cache the character image in memory

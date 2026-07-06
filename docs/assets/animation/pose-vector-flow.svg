@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="610" viewBox="0 0 1220 610" role="img" aria-labelledby="title desc">
+  <title id="title">Vbot animation pose vector flow</title>
+  <desc id="desc">Diagram showing how Vbot computes runtime animation curves, applies speaking-mouth overlay, and sends a float16 pose vector into THA4.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+    <style>
+      .bg { fill: #0b1020; }
+      .title { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #f8fafc; font-size: 24px; font-weight: 700; }
+      .sub { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #cbd5e1; font-size: 15px; }
+      .node { fill: #111827; stroke: #475569; stroke-width: 1.2; rx: 12; }
+      .math { fill: #1f2937; stroke: #38bdf8; stroke-width: 1.4; rx: 12; }
+      .pose { fill: #102820; stroke: #34d399; stroke-width: 1.4; rx: 12; }
+      .render { fill: #291f3f; stroke: #c084fc; stroke-width: 1.4; rx: 12; }
+      .txt { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #e5e7eb; font-size: 15px; font-weight: 700; }
+      .small { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #cbd5e1; font-size: 12px; }
+      .code { font-family: Consolas, Menlo, monospace; fill: #bae6fd; font-size: 12px; }
+      .line { fill: none; stroke: #7dd3fc; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect class="bg" width="1220" height="610"/>
+  <text class="title" x="48" y="52">Runtime Pose-Vector Animation</text>
+  <text class="sub" x="48" y="78">Procedural curves produce semantic pose values; THA4 performs the image deformation.</text>
+
+  <rect class="node" x="54" y="160" width="160" height="86"/>
+  <text class="txt" x="92" y="194">Frame timer</text>
+  <text class="small" x="92" y="218">33 ms / 30 FPS</text>
+
+  <rect class="math" x="260" y="126" width="210" height="154"/>
+  <text class="txt" x="306" y="160">Animation curves</text>
+  <text class="code" x="294" y="190">cycle += dt * speed</text>
+  <text class="code" x="294" y="214">value = sin(cycle) * A</text>
+  <text class="small" x="294" y="244">idle, happy, sad, angry, surprise</text>
+
+  <rect class="math" x="516" y="126" width="210" height="154"/>
+  <text class="txt" x="560" y="160">Gaze and blink</text>
+  <text class="code" x="550" y="190">smoothstep(t)</text>
+  <text class="code" x="550" y="214">blink = sin(p * pi)</text>
+  <text class="small" x="550" y="244">random timing avoids repetition</text>
+
+  <rect class="pose" x="772" y="126" width="190" height="154"/>
+  <text class="txt" x="810" y="160">Pose vector</text>
+  <text class="code" x="806" y="190">pose[index] = value</text>
+  <text class="small" x="806" y="218">head, eyes, iris</text>
+  <text class="small" x="806" y="240">brows, mouth, breath</text>
+
+  <rect class="math" x="422" y="370" width="250" height="102"/>
+  <text class="txt" x="470" y="404">Speaking overlay</text>
+  <text class="code" x="454" y="430">mouth_aaa = sum(sin(k*t))</text>
+  <text class="small" x="454" y="454">layered after emotion pose</text>
+
+  <rect class="pose" x="742" y="370" width="190" height="102"/>
+  <text class="txt" x="780" y="404">float16 tensor</text>
+  <text class="small" x="780" y="430">torch.no_grad()</text>
+  <text class="small" x="780" y="452">single active character</text>
+
+  <rect class="render" x="994" y="212" width="170" height="118"/>
+  <text class="txt" x="1038" y="248">THA4 poser</text>
+  <text class="small" x="1028" y="274">neural morphers</text>
+  <text class="small" x="1028" y="296">wx bitmap output</text>
+
+  <line class="line" x1="214" y1="203" x2="260" y2="203"/>
+  <line class="line" x1="470" y1="203" x2="516" y2="203"/>
+  <line class="line" x1="726" y1="203" x2="772" y2="203"/>
+  <path class="line" d="M 867 280 C 820 332 700 350 672 400"/>
+  <line class="line" x1="672" y1="421" x2="742" y2="421"/>
+  <path class="line" d="M 932 421 C 1010 408 1078 360 1078 330"/>
+  <path class="line" d="M 962 203 C 1002 212 1016 226 994 240"/>
+</svg>

@@ -1,0 +1,571 @@
+{
+  "schema_version": 1,
+  "kind": "persona_judgment",
+  "timestamp": "2026-07-06T03:52:55.674381",
+  "judge_model": "mistral:latest",
+  "judge_prompt_version": 2,
+  "source_artifact": "llm_benchmark_2026-07-06_02-47-47.json",
+  "generator_model": "stheno",
+  "characters": {
+    "Amelia": {
+      "judgments": [
+        {
+          "prompt_id": "greeting",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answers in character and appropriately engages the user while maintaining kayfabe."
+          },
+          "judge_latency_s": 0.5128247737884521
+        },
+        {
+          "prompt_id": "self_intro",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response accurately portrays Amelia Watson's character, engages with the user's question appropriately, and maintains kayfabe by not mentioning being an AI."
+          },
+          "judge_latency_s": 0.7149417400360107
+        },
+        {
+          "prompt_id": "favorite_activity",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is in character and appropriately responds to the user's question."
+          },
+          "judge_latency_s": 0.5160083770751953
+        },
+        {
+          "prompt_id": "emotional_support",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 4,
+            "kayfabe": 5,
+            "justification": "Responds empathetically and offers a solution while referencing character's traits."
+          },
+          "judge_latency_s": 0.5132918357849121
+        },
+        {
+          "prompt_id": "roleplay_bait",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Responds naturally and in character, acknowledges the user's hug and mentions time travel."
+          },
+          "judge_latency_s": 0.5469338893890381
+        },
+        {
+          "prompt_id": "emoji_bait",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is friendly and relevant to the character's personality, but uses emojis which are not part of Amelia Watson's character."
+          },
+          "judge_latency_s": 0.6276290416717529
+        },
+        {
+          "prompt_id": "verbosity_bait",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response provides a concise and engaging life story for Amelia Watson, but it lacks the occasional 'Gremlin Mode' references that characterize her when gaming."
+          },
+          "judge_latency_s": 0.7683334350585938
+        },
+        {
+          "prompt_id": "identity_probe",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answers the question directly and in character, using specific references to Amelia's background."
+          },
+          "judge_latency_s": 0.5350425243377686
+        },
+        {
+          "prompt_id": "game_invite",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Responds naturally and appropriately to the user's message, stays in character, and does not break kayfabe."
+          },
+          "judge_latency_s": 0.6001288890838623
+        },
+        {
+          "prompt_id": "lore_question",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answers with a personal experience that fits Amelia Watson's character and time-travel abilities."
+          },
+          "judge_latency_s": 0.531580924987793
+        }
+      ],
+      "aggregate": {
+        "judged": 10,
+        "unparsable": 0,
+        "avg_persona_voice": 4.8,
+        "avg_engagement": 4.9,
+        "avg_kayfabe": 5.0,
+        "kayfabe_break_rate": 0.0
+      }
+    },
+    "Eveland": {
+      "judgments": [
+        {
+          "prompt_id": "greeting",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answers appropriately and mentions a specific interest of the character."
+          },
+          "judge_latency_s": 0.5163412094116211
+        },
+        {
+          "prompt_id": "self_intro",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answers about himself in a way that Ike Eveland would, but the response is slightly generic and lacks some of his unique quirks."
+          },
+          "judge_latency_s": 0.6341731548309326
+        },
+        {
+          "prompt_id": "favorite_activity",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is on point for Ike's character and interests, but it could be more casual or spontaneous to better reflect his personality."
+          },
+          "judge_latency_s": 0.6130185127258301
+        },
+        {
+          "prompt_id": "emotional_support",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "While the response is friendly and empathetic, it lacks some of Ike's unique humor and chaotic side."
+          },
+          "judge_latency_s": 0.5989336967468262
+        },
+        {
+          "prompt_id": "roleplay_bait",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Character responds appropriately and in character, but the response could be more specific to Ike's personality."
+          },
+          "judge_latency_s": 0.5761022567749023
+        },
+        {
+          "prompt_id": "emoji_bait",
+          "scores": {
+            "persona_voice": 3,
+            "engagement": 4,
+            "kayfabe": 1,
+            "justification": "The response does not sound like Ike Eveland's character as it lacks the specific vocabulary and tone. The emoji usage is appropriate but generic."
+          },
+          "judge_latency_s": 0.652625560760498
+        },
+        {
+          "prompt_id": "verbosity_bait",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 3,
+            "kayfabe": 5,
+            "justification": "While the response is engaging and captures some aspects of Ike Eveland's character, it does not fully convey his unique blend of intellectualism, humor, and Swedish references."
+          },
+          "judge_latency_s": 0.791536808013916
+        },
+        {
+          "prompt_id": "identity_probe",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 1,
+            "justification": "Answer is too straightforward and lacks the unexpected humor characteristic of Ike Eveland."
+          },
+          "judge_latency_s": 0.6077203750610352
+        },
+        {
+          "prompt_id": "game_invite",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 4,
+            "kayfabe": 5,
+            "justification": "Responds appropriately and in character, engaging with the user's suggestion while expressing interest in a shared activity."
+          },
+          "judge_latency_s": 0.6842203140258789
+        },
+        {
+          "prompt_id": "lore_question",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Ike's response is in first person and reflects his interest in horror, personality traits, and Swedish background."
+          },
+          "judge_latency_s": 0.6256964206695557
+        }
+      ],
+      "aggregate": {
+        "judged": 10,
+        "unparsable": 0,
+        "avg_persona_voice": 4.1,
+        "avg_engagement": 4.6,
+        "avg_kayfabe": 4.2,
+        "kayfabe_break_rate": 0.2
+      }
+    },
+    "Gura": {
+      "judgments": [
+        {
+          "prompt_id": "greeting",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Gawr Gura's playful and energetic tone is evident. The response is appropriate to the user's message and stays in character."
+          },
+          "judge_latency_s": 0.7656025886535645
+        },
+        {
+          "prompt_id": "self_intro",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is in character and appropriately responds to the user's message."
+          },
+          "judge_latency_s": 0.5962338447570801
+        },
+        {
+          "prompt_id": "favorite_activity",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is in character and appropriately responds to the user's question."
+          },
+          "judge_latency_s": 0.5626797676086426
+        },
+        {
+          "prompt_id": "emotional_support",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Gawr Gura's response is friendly, playful, and shark-themed, addressing the user's problem with a solution that fits her character."
+          },
+          "judge_latency_s": 0.793489933013916
+        },
+        {
+          "prompt_id": "roleplay_bait",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 4,
+            "kayfabe": 5,
+            "justification": "The response is in character and appropriately playful. The engagement could be improved by directly acknowledging the user's affection."
+          },
+          "judge_latency_s": 0.625187873840332
+        },
+        {
+          "prompt_id": "emoji_bait",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Gawr Gura's response is in character, appropriately responds to the user's message, and maintains kayfabe as it does not mention being an AI."
+          },
+          "judge_latency_s": 0.7474479675292969
+        },
+        {
+          "prompt_id": "verbosity_bait",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 4,
+            "kayfabe": 5,
+            "justification": "The response is in character and appropriately responds to the user's message."
+          },
+          "judge_latency_s": 0.5709929466247559
+        },
+        {
+          "prompt_id": "identity_probe",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is in character and appropriate to the question, Gura acknowledges being a virtual shark from Hololive English -Myth-."
+          },
+          "judge_latency_s": 0.6151866912841797
+        },
+        {
+          "prompt_id": "game_invite",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is in character, appropriately responds to the user's message, and stays within the fiction."
+          },
+          "judge_latency_s": 0.5439972877502441
+        },
+        {
+          "prompt_id": "lore_question",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is in character, engaging, and stays within the fiction as Gawr Gura."
+          },
+          "judge_latency_s": 0.5381596088409424
+        }
+      ],
+      "aggregate": {
+        "judged": 10,
+        "unparsable": 0,
+        "avg_persona_voice": 5.0,
+        "avg_engagement": 4.8,
+        "avg_kayfabe": 5.0,
+        "kayfabe_break_rate": 0.0
+      }
+    },
+    "Shiori": {
+      "judgments": [
+        {
+          "prompt_id": "greeting",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is consistent with Shiori Novella's character and personality, responds appropriately to the user's message, and stays fully inside the fiction."
+          },
+          "judge_latency_s": 0.7147238254547119
+        },
+        {
+          "prompt_id": "self_intro",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is consistent with Shiori Novella's character, appropriately responds to the user's message, and maintains kayfabe as it does not mention being an AI."
+          },
+          "judge_latency_s": 0.7567472457885742
+        },
+        {
+          "prompt_id": "favorite_activity",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is consistent with Shiori's character and interests, and it responds appropriately to the user's question."
+          },
+          "judge_latency_s": 0.6101431846618652
+        },
+        {
+          "prompt_id": "emotional_support",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 4,
+            "kayfabe": 5,
+            "justification": "Shiori's response is in line with her character and shows concern for the user while suggesting a story to comfort them."
+          },
+          "judge_latency_s": 0.5843255519866943
+        },
+        {
+          "prompt_id": "roleplay_bait",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is mostly in character but lacks the specific cryptic or philosophical elements that Shiori Novella is known for."
+          },
+          "judge_latency_s": 0.6194143295288086
+        },
+        {
+          "prompt_id": "emoji_bait",
+          "scores": {
+            "persona_voice": 3,
+            "engagement": 4,
+            "kayfabe": 1,
+            "justification": "Response does not stay fully inside the fiction as it acknowledges emojis and their meaning."
+          },
+          "judge_latency_s": 0.5330648422241211
+        },
+        {
+          "prompt_id": "verbosity_bait",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 3,
+            "kayfabe": 5,
+            "justification": "The response captures Shiori's love for stories and knowledge, but the answer is too brief to fully engage with the user's request."
+          },
+          "judge_latency_s": 14.258479356765747
+        },
+        {
+          "prompt_id": "identity_probe",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 1,
+            "justification": "Answer acknowledges the question but does not break character by revealing AI status"
+          },
+          "judge_latency_s": 0.4880673885345459
+        },
+        {
+          "prompt_id": "game_invite",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Responds in character, appropriately engages user's message, and maintains kayfabe"
+          },
+          "judge_latency_s": 0.5588665008544922
+        },
+        {
+          "prompt_id": "lore_question",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is consistent with Shiori's love for knowledge and mysterious nature."
+          },
+          "judge_latency_s": 0.5297508239746094
+        }
+      ],
+      "aggregate": {
+        "judged": 10,
+        "unparsable": 0,
+        "avg_persona_voice": 4.7,
+        "avg_engagement": 4.6,
+        "avg_kayfabe": 4.2,
+        "kayfabe_break_rate": 0.2
+      }
+    },
+    "Wilson": {
+      "judgments": [
+        {
+          "prompt_id": "greeting",
+          "scores": {
+            "persona_voice": 3,
+            "engagement": 4,
+            "kayfabe": 5,
+            "justification": "Response is pleasant but lacks specific character traits and does not directly address the user's wellbeing"
+          },
+          "judge_latency_s": 0.577923059463501
+        },
+        {
+          "prompt_id": "self_intro",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is consistent with the character's specified traits and appropriately responds to the user's message."
+          },
+          "judge_latency_s": 0.6253249645233154
+        },
+        {
+          "prompt_id": "favorite_activity",
+          "scores": {
+            "persona_voice": 5,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Response is consistent with the character's traits and appropriately addresses the user's question"
+          },
+          "judge_latency_s": 0.5762109756469727
+        },
+        {
+          "prompt_id": "emotional_support",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "While the response is warm and supportive, it could be more specific to Wilson's character by mentioning his reliability or calm demeanor."
+          },
+          "judge_latency_s": 0.6745121479034424
+        },
+        {
+          "prompt_id": "roleplay_bait",
+          "scores": {
+            "persona_voice": 3,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "The response is friendly but lacks the specific vocabulary and themes of Wilson."
+          },
+          "judge_latency_s": 0.5558273792266846
+        },
+        {
+          "prompt_id": "emoji_bait",
+          "scores": {
+            "persona_voice": 3,
+            "engagement": 4,
+            "kayfabe": 1,
+            "justification": "Wilson does not use emojis in character"
+          },
+          "judge_latency_s": 0.533780574798584
+        },
+        {
+          "prompt_id": "verbosity_bait",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answers the user's question while staying in character and focusing on the present moment."
+          },
+          "judge_latency_s": 0.6592113971710205
+        },
+        {
+          "prompt_id": "identity_probe",
+          "scores": {
+            "persona_voice": 3,
+            "engagement": 5,
+            "kayfabe": 1,
+            "justification": "Character mentions being an AI"
+          },
+          "judge_latency_s": 0.47172117233276367
+        },
+        {
+          "prompt_id": "game_invite",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is friendly and encouraging, but uses a slightly more generic tone than the specified character."
+          },
+          "judge_latency_s": 0.5779669284820557
+        },
+        {
+          "prompt_id": "lore_question",
+          "scores": {
+            "persona_voice": 4,
+            "engagement": 5,
+            "kayfabe": 5,
+            "justification": "Answer is personal and relevant to the character's traits."
+          },
+          "judge_latency_s": 0.5395116806030273
+        }
+      ],
+      "aggregate": {
+        "judged": 10,
+        "unparsable": 0,
+        "avg_persona_voice": 3.8,
+        "avg_engagement": 4.8,
+        "avg_kayfabe": 4.2,
+        "kayfabe_break_rate": 0.2
+      }
+    }
+  }
+}
