@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Vbot runtime cache boundary</title>
+  <desc id="desc">Diagram showing shared runtime state, per-character cache state, lazy components, and cleanup boundaries.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#93c5fd"/>
+    </marker>
+    <style>
+      .bg { fill: #0a0f1f; }
+      .title { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #f8fafc; font-size: 24px; font-weight: 700; }
+      .sub { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #cbd5e1; font-size: 15px; }
+      .band { fill: #111827; stroke: #334155; stroke-width: 1.2; rx: 14; }
+      .shared { fill: #241b34; stroke: #c084fc; stroke-width: 1.4; rx: 12; }
+      .per { fill: #10251f; stroke: #34d399; stroke-width: 1.4; rx: 12; }
+      .lazy { fill: #2b2114; stroke: #fbbf24; stroke-width: 1.4; rx: 12; }
+      .cleanup { fill: #301c23; stroke: #fb7185; stroke-width: 1.4; rx: 12; }
+      .head { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #e5e7eb; font-size: 18px; font-weight: 700; }
+      .txt { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #d1d5db; font-size: 14px; }
+      .line { fill: none; stroke: #93c5fd; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="650"/>
+  <text class="title" x="50" y="54">Runtime Memory and Cache Boundaries</text>
+  <text class="sub" x="50" y="80">The active character gets rich cached state; heavyweight shared services are reused or lazy-loaded.</text>
+
+  <rect class="band" x="40" y="116" width="1120" height="468"/>
+
+  <rect class="shared" x="82" y="160" width="240" height="310"/>
+  <text class="head" x="116" y="198">Shared Runtime</text>
+  <text class="txt" x="112" y="232">Dockerized Ollama</text>
+  <text class="txt" x="112" y="258">model alias: stheno</text>
+  <text class="txt" x="112" y="284">global PyTorch tuning</text>
+  <text class="txt" x="112" y="310">allocator config</text>
+  <text class="txt" x="112" y="336">one app process</text>
+  <text class="txt" x="112" y="388">Not duplicated for</text>
+  <text class="txt" x="112" y="414">each character.</text>
+
+  <rect class="per" x="382" y="160" width="260" height="310"/>
+  <text class="head" x="420" y="198">Per-Character Cache</text>
+  <text class="txt" x="420" y="232">StyleTTS2 instance</text>
+  <text class="txt" x="420" y="258">reference style tensors</text>
+  <text class="txt" x="420" y="284">avatar/poser state</text>
+  <text class="txt" x="420" y="310">chat handler wiring</text>
+  <text class="txt" x="420" y="336">cached in model_data</text>
+  <text class="txt" x="420" y="388">Fast path after the</text>
+  <text class="txt" x="420" y="414">first character load.</text>
+
+  <rect class="lazy" x="704" y="160" width="210" height="310"/>
+  <text class="head" x="750" y="198">Lazy/Optional</text>
+  <text class="txt" x="742" y="232">Faster-Whisper</text>
+  <text class="txt" x="742" y="258">audio processor</text>
+  <text class="txt" x="742" y="284">emotion classifier</text>
+  <text class="txt" x="742" y="310">Ollama warmup</text>
+  <text class="txt" x="742" y="388">Attached when the</text>
+  <text class="txt" x="742" y="414">runtime needs them.</text>
+
+  <rect class="cleanup" x="962" y="160" width="150" height="310"/>
+  <text class="head" x="990" y="198">Cleanup</text>
+  <text class="txt" x="990" y="232">GC</text>
+  <text class="txt" x="990" y="258">empty_cache</text>
+  <text class="txt" x="990" y="284">CUDA sync</text>
+  <text class="txt" x="990" y="310">CPU fallback</text>
+  <text class="txt" x="990" y="388">Reduces allocator</text>
+  <text class="txt" x="990" y="414">pressure.</text>
+
+  <line class="line" x1="322" y1="315" x2="382" y2="315"/>
+  <line class="line" x1="642" y1="315" x2="704" y2="315"/>
+  <line class="line" x1="914" y1="315" x2="962" y2="315"/>
+  <text class="sub" x="84" y="536">Rule of thumb: keep the selected character responsive, avoid duplicating LLM state, and release unused CUDA allocator pressure around switches.</text>
+</svg>
