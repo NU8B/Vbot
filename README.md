@@ -255,7 +255,7 @@ The automated gate is followed by a Flask human review tool. Reviewers can appro
 
 ## Evaluation and MLOps Tooling
 
-Deep dive: [EVALUATION.md](EVALUATION.md)
+Deep dive: [EVALUATION.md](EVALUATION.md) and [docs/MLOPS.md](docs/MLOPS.md)
 
 Vbot now has an evaluation layer for the parts of the system that can regress when models, prompts, or voice checkpoints change.
 
@@ -383,6 +383,7 @@ At a high level, the desktop runtime expects:
 - [LLM.md](LLM.md) - LLM runtime, prompts, hotswap state, and response cleanup
 - [EVALUATION.md](EVALUATION.md) - data quality gates, TTS evaluation, benchmarks, and CI eval scope
 - [MEMORY_MANAGEMENT.md](MEMORY_MANAGEMENT.md) - runtime VRAM strategy, cache boundaries, lazy loading, and instrumentation
+- [docs/MLOPS.md](docs/MLOPS.md) - closed-loop MLOps/LLMOps lifecycle, runtime monitoring, and promotion architecture
 - [docs/MODEL_CARDS.md](docs/MODEL_CARDS.md) - shipped model summary with current eval numbers
 - [evaluation/baselines/README.md](evaluation/baselines/README.md) - baseline registry and promotion procedure
 - [docs/assets/README.md](docs/assets/README.md) - documentation asset map and screenshot/GIF slots
