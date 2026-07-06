@@ -749,7 +749,7 @@ class OllamaHandler:
         return user_emotion if user_priority <= ai_priority else ai_emotion
 
     def _streaming_tts_playback(self, text):
-        """Sentence-streaming TTS playback (opt-in via VBOT_STREAMING_TTS=1).
+        """Sentence-streaming TTS playback (default; VBOT_STREAMING_TTS=0 opts out).
 
         Splits the response into 1-2 sentence chunks and plays the first one
         while later ones are still synthesizing, cutting time-to-first-sound
@@ -1373,13 +1373,14 @@ class OllamaHandler:
                     {"role": "assistant", "content": filtered_response}
                 )
 
-                # Play the response using simple TTS (use filtered text!)
-                # VBOT_STREAMING_TTS=1 opts into chunked sentence streaming
-                # (lower time-to-first-sound); default stays the stable path.
-                if os.getenv("VBOT_STREAMING_TTS") == "1":
-                    success = self._streaming_tts_playback(filtered_response)
-                else:
+                # Sentence-streaming playback is the default (validated
+                # live 2026-07-06: first audio 1.28-1.44s vs ~2.5-3s serial,
+                # zero chunk errors). Set VBOT_STREAMING_TTS=0 to fall back
+                # to the full-response path.
+                if os.getenv("VBOT_STREAMING_TTS", "1") == "0":
                     success = self._simple_tts_playback(filtered_response)
+                else:
+                    success = self._streaming_tts_playback(filtered_response)
                 if not success:
                     print("[ERROR] Simple TTS playback failed")
                     # If TTS failed, reset state immediately
