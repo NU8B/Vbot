@@ -109,64 +109,11 @@ def get_model_params(model_name="Amelia"):
     return MODEL_PARAMS[model_name]
 
 
-# Centralized emotion definitions with audio file mappings.
-# Format: emotion_name: (audio_type, alpha_param, beta_param, embedding_param)
-# Module-level so evaluation tooling and tests can treat this as the single
-# source of truth for the 28 GoEmotions labels -> 5 voice-style buckets.
-EMOTION_DEFINITIONS = {
-        # Neutral emotions - use neutral audio and default parameters
-        "neutral": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
-        "confusion": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
-        "caring": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
-        "curiosity": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
-        "desire": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
-        "relief": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
-        # Happy emotions - use happy audio and happy parameters
-        "admiration": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "amusement": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "approval": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "excitement": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "gratitude": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "joy": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "love": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "optimism": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        "pride": ("happy", "HAPPY_ALPHA", "HAPPY_BETA", "HAPPY_EMBEDDING_SCALE"),
-        # Sad emotions - use sad audio and sad parameters
-        "disappointment": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        "embarrassment": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        "fear": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        "grief": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        "nervousness": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        "remorse": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        "sadness": ("sad", "SAD_ALPHA", "SAD_BETA", "SAD_EMBEDDING_SCALE"),
-        # Angry emotions - use angry audio and angry parameters
-        "disapproval": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
-        "disgust": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
-        "anger": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
-        "annoyance": ("angry", "ANGRY_ALPHA", "ANGRY_BETA", "ANGRY_EMBEDDING_SCALE"),
-        # Surprised emotions - use surprised audio and surprise parameters
-        "realization": (
-            "surprised",
-            "SURPRISE_ALPHA",
-            "SURPRISE_BETA",
-            "SURPRISE_EMBEDDING_SCALE",
-        ),
-        "surprise": (
-            "surprised",
-            "SURPRISE_ALPHA",
-            "SURPRISE_BETA",
-            "SURPRISE_EMBEDDING_SCALE",
-        ),
-    }
-
-
-def get_emotion_bucket(label):
-    """Map a classifier label to its runtime voice-style bucket.
-
-    Unknown labels fall back to neutral, matching the runtime's defensive
-    behavior elsewhere in the pipeline.
-    """
-    return EMOTION_DEFINITIONS.get(label, ("neutral",))[0]
+# Label -> voice-style bucket mapping lives in utils/emotion_buckets.py
+# (stdlib-only) so monitoring/eval tooling can import it without
+# transformers/torch. Re-exported here so runtime code and the eval
+# scripts keep their existing import paths.
+from utils.emotion_buckets import EMOTION_DEFINITIONS, get_emotion_bucket  # noqa: E402,F401
 
 
 # Emotion to voice style mapping with inference parameters
