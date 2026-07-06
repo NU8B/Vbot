@@ -180,7 +180,7 @@ Prompt change procedure:
 1. Edit the prompt and bump the affected character version.
 2. Run `scripts/llm_benchmark.py`.
 3. Run `scripts/persona_judge.py` against the benchmark artifact.
-4. Compare against the prior version's artifacts.
+4. Compare against the prior version's artifacts with `scripts/compare_llm_artifacts.py`.
 5. Land the prompt change and eval evidence together.
 
 ## CI Boundaries
@@ -241,4 +241,7 @@ python scripts/monitoring_report.py --json monitoring_report.json
 # LLM prompt benchmark and judge
 python scripts/llm_benchmark.py
 python scripts/persona_judge.py
+
+# Prompt experiment comparison
+python scripts/compare_llm_artifacts.py old_benchmark.json new_benchmark.json --old-judge old_judge.json --new-judge new_judge.json
 ```

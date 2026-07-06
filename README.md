@@ -267,7 +267,7 @@ Supported evaluation paths:
 | Human TTS evaluation | [new_tts_eval_form](new_tts_eval_form), [new_tts_eval_form/promotion_gate.py](new_tts_eval_form/promotion_gate.py) | emotion recognizability, optional naturalness, candidate-vs-baseline promotion |
 | Objective TTS evaluation | [scripts/tts_objective_eval.py](scripts/tts_objective_eval.py) | speaker similarity against reference audio and WER against a frozen sentence battery |
 | Emotion routing | [scripts/emotion_eval.py](scripts/emotion_eval.py) | GoEmotions-to-runtime-bucket accuracy, macro-F1, threshold calibration, regression gates |
-| LLM behavior | [scripts/llm_benchmark.py](scripts/llm_benchmark.py), [scripts/persona_judge.py](scripts/persona_judge.py) | TTS-safe output, brevity, persona adherence, kayfabe behavior, judge-scored character fidelity |
+| LLM behavior | [scripts/llm_benchmark.py](scripts/llm_benchmark.py), [scripts/persona_judge.py](scripts/persona_judge.py), [scripts/compare_llm_artifacts.py](scripts/compare_llm_artifacts.py) | TTS-safe output, brevity, persona adherence, kayfabe behavior, judge-scored character fidelity, prompt-experiment deltas |
 | Runtime observability | [utils/runtime_metrics.py](utils/runtime_metrics.py), [scripts/metrics_report.py](scripts/metrics_report.py) | per-turn LLM latency, TTS latency, audio duration, streaming chunks, time to first audio |
 | Eval tracking | [scripts/eval_tracking.py](scripts/eval_tracking.py) | optional MLflow experiment logging without making CI depend on MLflow |
 
