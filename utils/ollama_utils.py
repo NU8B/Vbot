@@ -10,8 +10,11 @@ from queue import Queue
 import re
 import tkinter as tk
 from pathlib import Path
-from utils.emotion_utils import EmotionHandler, create_emotion_config
-from utils.TTS_utils import InferenceHandler
+from utils.emotion_utils import DIFFUSION_STEPS, EmotionHandler, create_emotion_config
+from utils.response_filter import filter_action_text
+from utils.runtime_metrics import log_interaction
+from utils.streaming_pipeline import StreamingTTSPipeline, chunk_sentences
+from utils.TTS_utils import InferenceHandler, get_base_path
 import numpy as np
 import soundfile as sf
 import torch
@@ -745,6 +748,119 @@ class OllamaHandler:
 
         return user_emotion if user_priority <= ai_priority else ai_emotion
 
+    def _streaming_tts_playback(self, text):
+        """Sentence-streaming TTS playback (opt-in via VBOT_STREAMING_TTS=1).
+
+        Splits the response into 1-2 sentence chunks and plays the first one
+        while later ones are still synthesizing, cutting time-to-first-sound
+        for multi-sentence responses. Emotion/style is classified once on the
+        full response so the voice stays consistent across chunks. Returns
+        None like _simple_tts_playback so the caller's state handling is
+        identical for both paths.
+        """
+        try:
+            chunks = chunk_sentences(text)
+            if len(chunks) <= 1:
+                # No overlap to win; the stable path is simpler.
+                return self._simple_tts_playback(text)
+
+            emotion_handler = self.inference_handler.emotion_handler
+            detected_emotion = emotion_handler.classify_emotion(text)
+            emotion_params = self.inference_handler.emotion_config[detected_emotion]
+            style_path = os.path.join(
+                get_base_path(),
+                f"asset/ref_sound/{emotion_params['file'][self.model_name]}",
+            )
+            try:
+                ref_style = self.tts_model.get_cached_style(style_path)
+            except ValueError:
+                ref_style = self.tts_model.compute_style(style_path)
+
+            print(
+                f"[DEBUG] Streaming TTS: {len(chunks)} chunks, "
+                f"emotion={detected_emotion}"
+            )
+
+            def synthesize(chunk):
+                speech = self.tts_model.inference(
+                    text=chunk,
+                    ref_s=ref_style,
+                    alpha=emotion_params["alpha"],
+                    beta=emotion_params["beta"],
+                    diffusion_steps=DIFFUSION_STEPS,
+                    embedding_scale=emotion_params["embedding_scale"],
+                )
+                if speech is None or len(speech) == 0:
+                    return None
+                return speech, len(speech) / 24000
+
+            def play(chunk, speech, duration, index, total):
+                # Subtitle updates must run on the Tk main thread.
+                if self.gui:
+                    self.gui.root.after(
+                        0,
+                        lambda c=chunk, d=duration: self._show_complete_subtitle(c, d),
+                    )
+                self.audio_processor.play_audio(speech, duration=duration)
+                # play_audio returns immediately; block until the chunk is
+                # done plus a short natural pause between chunks.
+                time.sleep(duration + 0.15)
+
+            def run_pipeline():
+                # Mirror _play_audio_in_thread's lazy audio processor fetch.
+                if self.audio_processor is None and hasattr(self, "_init_handler"):
+                    self.audio_processor = (
+                        self._init_handler.get_audio_processor_when_ready()
+                    )
+                if self.audio_processor is None:
+                    print("[ERROR] Streaming TTS: no audio processor available")
+                    self.is_processing = False
+                    return
+
+                avatar = self.gui.get_avatar() if self.gui else None
+                try:
+                    if avatar:
+                        avatar.start_speaking()
+                    report = StreamingTTSPipeline(synthesize, play).run(chunks)
+                    first_audio = report["time_to_first_audio"]
+                    first_audio_text = (
+                        f"{first_audio:.2f}s" if first_audio is not None else "never"
+                    )
+                    print(
+                        f"[DEBUG] Streaming TTS: played {report['played']}/"
+                        f"{report['chunks']} chunks, first audio in "
+                        f"{first_audio_text}, errors: {report['errors'] or 'none'}"
+                    )
+                    log_interaction(
+                        character=self.model_name,
+                        path="streaming",
+                        llm_latency_s=getattr(self, "_last_llm_latency", None),
+                        emotion=detected_emotion,
+                        chunks=report["chunks"],
+                        chunks_played=report["played"],
+                        time_to_first_audio_s=first_audio,
+                        tts_latency_s=sum(report["synth_times"]),
+                        pipeline_errors=len(report["errors"]),
+                        response_words=len(text.split()),
+                    )
+                except Exception as pipeline_error:
+                    print(f"[ERROR] Streaming TTS pipeline failed: {pipeline_error}")
+                finally:
+                    if avatar:
+                        avatar.stop_speaking()
+                        avatar.set_emotion("neutral")
+                    self.is_processing = False
+
+            threading.Thread(
+                target=run_pipeline, daemon=True, name="StreamingTTS"
+            ).start()
+
+        except Exception as e:
+            print(f"[ERROR] Streaming TTS playback failed: {e}")
+            import traceback
+
+            traceback.print_exc()
+
     def _simple_tts_playback(self, text):
         """Simplified TTS playback with subtitle support - OPTIMIZED VERSION"""
         try:
@@ -773,6 +889,16 @@ class OllamaHandler:
             duration = len(speech) / 24000  # 24kHz sample rate
             print(
                 f"[DEBUG] Simple TTS: Generated {duration:.2f}s of audio in {tts_time:.2f}s"
+            )
+
+            log_interaction(
+                character=self.model_name,
+                path="simple",
+                llm_latency_s=getattr(self, "_last_llm_latency", None),
+                emotion=detected_emotion,
+                tts_latency_s=tts_time,
+                audio_duration_s=duration,
+                response_words=len(text.split()),
             )
 
             # Show subtitle with the complete text (not sentence-by-sentence)
@@ -1202,109 +1328,9 @@ class OllamaHandler:
 
     def _filter_action_text(self, text):
         """Filter out action text (text wrapped in asterisks) and ensure natural sentence completion"""
-        import re
-
         print(f"[DEBUG] Filtering text: '{text}'")
-
-        # Remove text wrapped in asterisks (e.g., *whips out pocket watch*)
-        # This regex matches *text* and removes it
-        filtered_text = re.sub(r"\*[^*]*\*", "", text)
-
-        # Also remove any remaining asterisks that might be left
-        filtered_text = re.sub(r"\*+", "", filtered_text)
-
-        # Remove any text that looks like stage directions or actions
-        filtered_text = re.sub(
-            r"\([^)]*\)", "", filtered_text
-        )  # Remove text in parentheses
-        filtered_text = re.sub(
-            r"\[[^\]]*\]", "", filtered_text
-        )  # Remove text in brackets
-
-        # Additional patterns to catch more action text
-        filtered_text = re.sub(
-            r"\*[^*]*\s+[^*]*\*", "", filtered_text
-        )  # Multi-word actions
-        filtered_text = re.sub(
-            r"\*[^*]*\*[^*]*\*", "", filtered_text
-        )  # Multiple asterisk groups
-
-        # Clean up any extra whitespace that might be left
-        filtered_text = re.sub(r"\s+", " ", filtered_text).strip()
-
+        filtered_text = filter_action_text(text)
         print(f"[DEBUG] After filtering: '{filtered_text}'")
-
-        # If the filtered text is empty or just whitespace, return a default message
-        if not filtered_text or filtered_text.isspace():
-            print("[DEBUG] Filtered text is empty, returning default message")
-            return "Hello! How can I help you today?"
-
-        # Ensure the response ends naturally
-        # If the text ends with an incomplete sentence (no period, exclamation, or question mark),
-        # try to find a natural break point or add a period
-        if filtered_text and not filtered_text[-1] in ".!?":
-            # Look for the last complete sentence
-            sentences = re.split(r"[.!?]+", filtered_text)
-            if len(sentences) > 1:
-                # Keep only complete sentences
-                complete_sentences = sentences[
-                    :-1
-                ]  # Remove the incomplete last sentence
-                filtered_text = ". ".join(complete_sentences) + "."
-            else:
-                # If there's only one sentence and it's incomplete, add a period
-                filtered_text = filtered_text.rstrip() + "."
-
-        # Handle cases where the response might be cut off mid-word
-        # Look for the last complete word and trim if necessary
-        words = filtered_text.split()
-        if len(words) > 0:
-            last_word = words[-1]
-            # If the last word is very short (likely incomplete), remove it
-            if len(last_word) <= 2 and not last_word.lower() in [
-                "a",
-                "an",
-                "at",
-                "in",
-                "on",
-                "to",
-                "of",
-                "is",
-                "it",
-                "he",
-                "she",
-                "we",
-                "me",
-                "my",
-                "up",
-                "go",
-                "no",
-                "so",
-                "do",
-                "if",
-                "or",
-                "as",
-                "by",
-                "be",
-                "am",
-                "hi",
-                "oh",
-                "ah",
-                "ha",
-                "he",
-                "ho",
-                "la",
-                "ma",
-                "pa",
-                "ta",
-                "ya",
-            ]:
-                words = words[:-1]
-                filtered_text = " ".join(words)
-                # Add a period if it doesn't end with punctuation
-                if filtered_text and not filtered_text[-1] in ".!?":
-                    filtered_text = filtered_text.rstrip() + "."
-
         return filtered_text
 
     def handle_text_input_simple(self, text):
@@ -1326,10 +1352,12 @@ class OllamaHandler:
             response = ""
 
             # Get response from Ollama
+            llm_start = time.time()
             for response_chunk in self.call_ollama_stream(
                 text, self.message_history, MAX_HISTORY, system_prompt
             ):
                 response = response_chunk
+            self._last_llm_latency = time.time() - llm_start
 
             if response:
                 # Filter out action text (text wrapped in asterisks)
@@ -1346,7 +1374,12 @@ class OllamaHandler:
                 )
 
                 # Play the response using simple TTS (use filtered text!)
-                success = self._simple_tts_playback(filtered_response)
+                # VBOT_STREAMING_TTS=1 opts into chunked sentence streaming
+                # (lower time-to-first-sound); default stays the stable path.
+                if os.getenv("VBOT_STREAMING_TTS") == "1":
+                    success = self._streaming_tts_playback(filtered_response)
+                else:
+                    success = self._simple_tts_playback(filtered_response)
                 if not success:
                     print("[ERROR] Simple TTS playback failed")
                     # If TTS failed, reset state immediately
