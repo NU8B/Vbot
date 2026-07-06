@@ -75,6 +75,11 @@ __pycache__/
 # NLTK data directory
 nltk_data/
 /asset/outputs
+
+# MLflow local tracking store (JSON artifacts in evaluation/ are the source of truth)
+/mlruns
+/mlflow.db
+/mlartifacts
 /Data_prep/audio_preprocessor/temp
 /Data_prep/raw_data/full_audio
 /Data_prep/raw_data
@@ -108,3 +113,6 @@ cudnn/extracted_cudnn/cudnn-windows-x86_64-8.9.7.29_cuda12-archive/bin/cudnn_adv
 cudnn/..
 /.claude
 /hf_token.txt
+
+# Private local planning notes
+.private/
