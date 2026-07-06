@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "runtime_slos",
+  "updated": "2026-07-06",
+  "notes": "Budgets for scripts/monitoring_report.py. Anchored to live-validated measurements from 2026-07-06 (llm p95 1.45s, time-to-first-audio 1.28-1.44s, TTS RTF 0.18-0.23, zero pipeline errors) with roughly 2x headroom. Changing a budget is a reviewed, committed decision - never a CLI flag.",
+  "slos": {
+    "llm_latency_s_p95": {
+      "max": 3.0,
+      "min_samples": 5,
+      "description": "p95 LLM response latency across all interactions"
+    },
+    "time_to_first_audio_s_p95": {
+      "max": 2.5,
+      "min_samples": 5,
+      "description": "p95 time to first audible TTS chunk (streaming path); budget = the serial-path latency streaming exists to beat"
+    },
+    "tts_rtf_p95": {
+      "max": 0.5,
+      "min_samples": 5,
+      "description": "p95 TTS real-time factor, synth time / audio duration (simple path; streaming records have no total audio duration)"
+    },
+    "pipeline_error_rate": {
+      "max": 0.02,
+      "min_samples": 5,
+      "description": "failed chunks / total chunks across streaming interactions"
+    },
+    "chunk_completion_rate": {
+      "min": 0.95,
+      "min_samples": 5,
+      "description": "played chunks / total chunks across streaming interactions"
+    }
+  },
+  "drift": {
+    "emotion_bucket_tvd_max": 0.25,
+    "min_samples_per_window": 30,
+    "description": "Total variation distance between the emotion-bucket distribution of the current window and all older telemetry. Requires min_samples_per_window on both sides before a verdict is issued."
+  }
+}
