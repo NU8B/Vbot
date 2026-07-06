@@ -1,0 +1,3726 @@
+{
+  "schema_version": 1,
+  "kind": "emotion_eval_dataset",
+  "name": "goemotions_test_slice",
+  "source": "https://raw.githubusercontent.com/google-research/google-research/master/goemotions/data/test.tsv (GoEmotions, Apache-2.0)",
+  "created": "2026-07-06T03:35:23.247994",
+  "sampling": {
+    "seed": 7,
+    "per_bucket": 150,
+    "single_label_only": true,
+    "min_chars": 10,
+    "max_chars": 200,
+    "masked_rows_dropped": [
+      "[NAME]",
+      "[RELIGION]",
+      "[TRANSGENDER]"
+    ]
+  },
+  "items": [
+    {
+      "text": "\"What was the \"\"injustice?\"\" Nothing happened to him. Assuming his story was not hugely exaggerated to fit the victim card.\"",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "No. It’s slower and takes more calculation but it can be done. That’s why it should be practiced.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Somebody gettin fired",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Wow that's not how you resolve things. Escalation is the last option.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This is like the timeline from hell.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I didn’t understand because it’s not dark mode",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That's not a healthy way of thinking. Obviously that dude was troubled and, without proper help, he would have done these things regardless.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "People like you with premature ejaculation and poor hygiene should not write long posts. Am I doing it right?",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Crime in the park is the only kind of crime that matters for the sake of this discussion. Your generality does not apply here.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I provoked by breathing too hard. And yes, I hate that.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That shit sent me on a fucking journey to read.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Definitely the current worst, hence 20 actually buffs coming her way.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "She always looks sticky.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Loathing Big Pharma has nothing to do with being anti-vax.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "No that would be yet another mistake.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That's literally impossible.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "She can take her boring, drunk husband with her. He's not interesting at all.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I can see why you’ll never be in a leadership position.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That is even worse. No tax from them and we provide them with services.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Weird as I do know I've seen CoC waste/recycling services trucks picking up bins as early as 6:30AM.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "My poor space bar takes an awful bashing with all the pausing in a Squidge vid",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "they dont pay shit",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "IT'S NOT FUNNY HOLLY.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This is stupid",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Doesn't mean we can't improve on what we have",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yeah that was inexcusable",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I didn't say it was proof that anything was a scam with no future, perhaps you're projecting.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yea this past season her outfits were horrid",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Wait so I shouldn't try to sell my shavers by telling my customers that they aren't good enough and could do better? Damn.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "they will also hate the eagles for years to come because their fans were a bunch of meanies",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Damnit Morty! D'you see wha-rrrgh-t you've done!? We're fucked Morty, the squirrels - they're recruiting dolphins now Morty.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I'll look into it! I don't mind language but misogyny can be pretty intolerable",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This is one of the worst I've seen...",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "you dirty karma theft",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "... that's simply wrong.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "MeToo is about sharing personal stories of sexual assault. Reframing it as accusation based, and as furthering a kidnap, is fucking disgusting.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I disagree with many picks in this list",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I'm ugly and able to bump uglies with someone I can make laugh. Mission accomplished.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Nah man I prefer endless cause of the part where he goes WOMWOMWOMWOMWOMWOM WOOOOOO REEEEEEEEE like that's lyrical genius right there",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "You must be wrong, because this is the sub for intelligent people!!!",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It's the universe trying to kill us with radiation :D",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Good for you for shutting that door! You are not responsible for him. He’s a grown ass man who made his own mistakes.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "\"I've tried the \"\"peanut butter\"\"...I almost vomited. NASTY! It went straight to the trash.\"",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Nobody likes you nonhuman mimics and everyone knows what you are.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "They don’t like to be excluded from anything",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Ahhhhh you should start screaming and flailing. What a piss poor argument. Now I believe in invisible dragons.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Just saw your history. Makes complete sense now. Your a trumptroll. Bye.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It is. You generally need 5 down and 5 up to play reliably. Also wired.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "> It's not like Bonds use was worse or anything list would beg to differ.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I think it's normal. Don't analyse how you look like and worry about it btw, those idiots sure don't when they say their bullshit",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yeah that's what I just got. Fkin annoying.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "You should've smashed his head into it.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "My point was that it’s creepy. I never said it was illegal.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "He's always had the tools to do this, which is why he can be frustrating at times.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It depends on who you ask. i didnt downvote you, im answering now",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Men are the worst.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "WHERE IS THE JOKE",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Was already mad when it wasn’t center. Then when it got knock over, i was furious. Damn machine has no brains.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "So you then took that lie and began aggressively cheating on him? Your post history. Wow.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I know they are treated very well, but some of them do die.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This sounds an awful lot like khorne......",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "He's messing with my emotions and my fantasy hockey pool....",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Or just get the fuck out and never look back.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Fuuuuuck. That’s the worst I’ve seen.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yeah I know what you meant. Fuck the police, most of them are vile pieces of shit, they deserve every kick in the back they get.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yea, very rude. Avoid anything with a strong smell like fish and popcorn, curry is just as strong.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Nobody claims that 20th century socialism was a utopia. Please remember your own comment before replying.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Mostly because they're not completely stupid. They don't have the support in the senate to pull it off.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Tbh I think there are a lot of parts of chicago that are way shittier than memphis",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "They don’t. Conservatives want to characterize any scoopy news organization as unreliable because they can’t get ahead of them easily.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "holy shit that's bad, maybe the extremist right can't meme either?",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "How dare you, she's in your flair too!",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yeah I'm not arguing there isnt recreational potential though it can certainly mess you up. Doesn't help most products with dxm have other active ingredients.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "yea he had 6 assists which created 13 points, if he had 13 points and no assists people would be calling it a great game for him",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Talk about an oldddd school shit coin.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "You really don't comprehend anything my man, now do you? Goodness gracious the amount of stupidity.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Same...except that I'm not good looking :",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "my god quit getting blocked",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Those words you used. I don't want to believe that exists.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "They always blab about IQ and other garbage but they have the intelligence of a bag of hammers.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Hey! Your mom sucks.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "The self righteous feel no shame",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "If I ever see that in my area, that will be a bullet to the head. Fuck Reddit's rules.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Been saying horford has been overrated since he got that fat contract",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "She's been fired and shamed out of existence. Good riddance.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Hey mods... let's not allow articles pushing unsubstantiated rumour from poor sources",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "So you're male then. Ps ur wrong bud",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I have always found them grating",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Nuh uh. She didn't go to Gudger College.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Dad doesn't need to be there for 12 months. But way too step up!",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Those fingers disturb me the most",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I don't think playing with her hair would work. Thats just creepy.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Somehow I got banned for replying to a troll. The mods over there have itchy trigger fingers.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "And she has ignored every single one of them, as expected of course.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This made me spill my drink.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Exactly. We’re only here for the money, assholes.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Of course these are all conspiracy theory shitposts BUT just because he got squeezed out, doesn’t mean they want him playing for a rival team.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "His music is bad starting with that yeezus album",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This almost certainly should not have gone to OT. SEC refs are bad CBB refs are bad",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "i feel like slapping /s after everything sucks the fun out. it's not my fault people are autistic.... /s",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "You fool! Now look what you've unleashed!",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "No point in getting rid of Keemun for another Keemun.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Looks like you just finished eating a shit covered ass.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I believe it was clear I disagreed. And I don’t play wow.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I would play the fuck out of this game",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Maybe try living a little longer before you talk about things you don't know about, sweaty. NEXT!",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It's hard to have a nuanced opinion, innit? But I don't like everything he does. This is one if them.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "How dare you! Don’t you know seatbelts cause autism!",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "My ETL been trying to tell us every box should take us 30 seconds max, and everyone ive asked about that has laughed and called it bullshit",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That's not cute",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Why is it that EVERY SINGLE TIME ONE OF THESE HAPPENS I’m only like a day late",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I don't think this happened at all tbh",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Hello autism my old friend",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Oh I know. I was just pointing out that our current number one has consistency issues as well so we are used to it.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Southern Mexico tends to always get fucked in the ass as well",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Everyone in this video is annoying. This seems like a terrible place to go hang out.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Yeah, it's pretty funny how incapable most of them are of actual satire and subtlety.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Please dont put words into my mouth.I never said rape isnt a problem.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Well that's disgusting",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It's even worse when you get someone from NJ who has no clue how to drive in the city environment.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That’s the chelsea board will all know and hate.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Personal insults aren't allowed around here. 1 week ban for first offense.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Neither am I. I'm mocking her alongside you.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "-30°, then again I'm only 16. Been a while since these temps have come around so it's not pleasant.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Weird but effective",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Every time I get a staff kill, it feels like seeing a shooting star <3 Yeah, it definitely sucks.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "The third period is going to be uncomfortable and I preemptively hate it.",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Was not expecting that spongebob reference",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "No thanks probably stank af.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It's so weird having HGs up this early, but I love having something to watch before my 8am lecture starts.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "This is disgusting.... please make more.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "It's actually illegal to do this. Only allowed if absolutely unavoidable.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "You didn't watch it to the end.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "So. Fucking. Tone. Deaf.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "says you, too bad you're totally wrong.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "If there is no goal on this powerplay it will be difficult not to be hopeless",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Ignorance is unfortunately a part of mankind. We are still so Un-evolved",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Fuck a newspaper",
+      "gold_label": "anger",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "I’ve still not noticed the kid",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "i am a man and i disagree. i mean you logic is worse if you believe it.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Honestly, if you did not, then you were watching the video incorrectly.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "No, I have been avoiding doing anything until it's actually fixed because I don't want to give them any reason to drag their feet.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "\"Going for that most hated title with stupid posts from his \"\"fans \"\" \"",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Clearly not Cubs fans.",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "No! You can't have that one! That's a coconut cake!",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That's a really cheap cop-out for rather common criticism of those games.",
+      "gold_label": "annoyance",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "You also can’t prove it happened so logically this doesn’t exist and is a paradox that never happened therefore pi = 3.14159",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "She muctb not really be that into you",
+      "gold_label": "disapproval",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "That was what was most nauseating for me honestly. Not a single period used once.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Fcking disgusting.",
+      "gold_label": "disgust",
+      "gold_bucket": "angry"
+    },
+    {
+      "text": "Wow, that's crazy. Ever tried DMT?",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Dam boys, we announcing players back in training like new signings!",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Interesting, I did not know that. Thanks for the TIL! Could you recommend any resources that discuss this further?",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "\"\"\"By far one of the best\"\" Mmmm\"",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Went in to the comments to look for this. Thanks!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "i mean I love the smell of race fumes",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Life Hack Attack has become Attack Everyone's Life and Hack. I love it.",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thats great... Here same with me",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Honestly Texas deserves to win with they way they’re playing, they clearly came motivated and they’re outperforming UGA on both sides of the ball.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Oh well maybe your cousin gave his account info to someone lol.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Well don’t complain here about another media outlet lol",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "thank you!!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Good luck with writing in the future :D Everyone has to have their critics...right?",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Happy cake day!",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": ">Have a good time debating the people in your head, looks like you're having fun.",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "So he is half decent. Glad to see your finally making some sense.",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yes! Adoption is an amazing generous gift you can give to people that really want to be parents.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I can't wait to tell my daughter how she used to love me so much she even wanted to watch me poop.",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "You can always tell from the vote counts lol. They're way too blatant",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "This is just so sweet! That's all. :). So sweet.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thanks fam jam.",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "This made my rainy day",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Very legal and cool",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "So happy for you :)",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I love how many penguins stopped and waited for him 😍",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I sort of did lol. I think what I mean is that you cant look at it as an alternative to rdp",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Damn, ultimate efficiency.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yeah their passes are crazy.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "There is clearly something really goddamned wrong with the policy then.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Also pretty fantastic in Good Girls Revolt",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "You’re not a loser. You’re a whole and complete person unto yourself.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Hope so but deadshot was her man too bad they had to kill him smh",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Nice! I haven’t listened to them or Tool in so long. Will def be getting back into them now.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "What a beauty",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Wise choice. You had kebab.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Memes that were made 2 or more years ago don’t count. They were probably funny back then, just not now.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yeah, I wouldn't be too surprised by that either. I'm so excited to see or hear SOMETHING though.",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "If the fan doesn't work, then I'm fine with it.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "It will be carefully tailored to piss their parents off, which I will enjoy greatly :-)",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Interesting read, but horrible format on mobile.",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Much love half purple homie",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thank you :)",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Keep going! Every day you stick with it is another victory you can cherish!",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "They are both good in their own way. But the us is funnier lol",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "No, that looks h*ckin delicious",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I rarely like or comment on YouTube. But I make hella playlists so I guess I use it more as a tool than a community.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Lol for real tho. But hey, we’re a football, soccer, and tennis school now",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "SKAM was great. I literally binged all of S3 as soon as I got home last night.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Sending you some Ramona wine as thanks!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "thats some very advanced way of thinking - and I dont think I was able to do that when I was 18",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Sapa is pretty good, but Takashi is by far the best quality sushi in Salt Lake.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Good potatoes, good pasta.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Congrats!!! Happy for you.",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I love how you only see these types of comments on Japanese games, brings out the inner weep.",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "> a complete ham sandwich Love this. Using this.",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Those guys are TOUGH. glad to see Blackwater back in business to keep the peace over there",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I think bluey is quite possibly the greatest kids s how I've ever seen So quintessentially Aussie, nails family life, funny as hell. Love it",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Try really warm water instead. It's awesome.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Lmao, this guy is a tool.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thank god I'm not dating anymore. I wouldn't want to risk some girl I'm trying to bang seeing my reddit history.",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Same boat here, man.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Wow that's a really great explanation. Makes sense!",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I love this post. Are you with park services?",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Welcome to switzerland 😂 I see it everyday, when I'm on my way to work.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I think most people have listened to bohemian rhapsody at some point thank you very much",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "thank you SO SO much for your help <3",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "That’s impressive you can tell that from the back of his head",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Happy Together. It feels so natural.",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yeah, this just sounds like the usual Seattle understatement.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Had to sober up before I could figure out YouTube, but that was amazing.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I'm doing my best to apply that. Thank you for commenting",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Oh ok that makes sense then! Thanks for taking the time to explain. 😊",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "As a person that regularly down votes people that repost front age gifs, I will award you an upvote because this makes me laugh every time.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "POINTER!!!!!! YOU DA REAL ALL STAR!!!",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Great idea! Thanks :)",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I believe he means he was a very pretty child to become otherwise after puberty...",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I do have a drain beside the water heater, thanks I'll look into getting a drain pan.",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I now live in the Mediterranean, which is nice.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Happy cake day!",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Lmao. Fuck, you got me good.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Maybe you can't, but plenty of other people would be able to.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yeah lol, my bad.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "This would be very much appreciated.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "But you appear to think you have some amazing insights on how to handle a pwBPD. Have you considered the possibility that you don't?",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "While I agree with you for the most part, I also have cats and upholstered furniture.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Fight milk 🥛 lol",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Shame ,your quite cute",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Aw thanks!!!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I agree. There was just a big disconnect. They weren't talking specifically about masculinity but about certain situations that are toxic.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Live about 2 mins from there. Love the view of Waramaug from Tanner Hill.",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Well since they hate cops and love criminals... this fits for them",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "\"Lol I always go with public speaking (\"\"but I'm trying to be better at it!!\"\"). \"",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I fully agree. What works for one doesn't worth for another. Good luck.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "That’s great! I hope s/he gets better!",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thanks Harvard!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Love this guy, love this team",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Not my opinion either, but the soundtrack is easily one of the best parts of the game. It’s incredible.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "This is amazing!!",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "No he's right, and you're deflecting from his argument.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yea I would've lost it there",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Damn, still hoping...",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thank you. ❤️ I really appreciate your comment",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "My turn should arrive this year. At least this place will allow me to leave my last words.",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I hate it and I love it.",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I plan on being respectful lol. I hope he’s there.",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Probably vallied out man haha",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "what a beast",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Adoration is definitely something I could do more of. Thank you!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "i passed thanks everyone",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I like how everyone is being so mysterious about the proof that has convinced them",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Good idea, brought to the table by a questionable at best minister, likely for the purpose of shifting focus away from his failures.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "The Ethical code of conduct. However it's subjective in many instances. But its based on impairment",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I saw it when it was at the Mackintosh Church in Glasgow, it’s pretty impressive.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Please ask questions about moving to Denver in the Q&A sticky, thanks! Short answer: no",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Take a seat young ragewalker.",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I think this qualifies as r/prorevenge, honestly. Dude needs to face consequences more often, otherwise he will keep trampling over people’s boundaries.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Your username makes me think you would appreciate this joke of mine.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I’m a fan of them in the wild, weasels are interesting. Not as pets, nope.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Just rumors online, it most likely won't happen",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thanks for the kindness; it’s all good enough- I’m hoping to move out later this year",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thanks for adding the link. I'm not that reddit savvy",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "It's good worrying about things that can be helped. Lol",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I've been watching it recently and it is such an amazing show!",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Subway is the smartest option unless you have tones of stuffs to carry !",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "thanks. I will read these",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I wish that too.",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "One of my coworkers made the wait list. Great guy, but yeah, it is a rich getting richer situation.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "\"I love this; now when commies say they had the word \"\"libertarian\"\" first, we can say we had class analysis first!\"",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "PS. I love my aunt! She’s one of the reasons I went into “nursins.”",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "So... she just won the lottery!!",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "\"\"\"The first step, is to put on a set of vicious stilleto claws. This doesn't make things any easier, but it does build character\"\"\"",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I only eat cronuts cuz I'm sophisticated!",
+      "gold_label": "pride",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thanks for the clarification, appreciate that.",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Hunting would at least be more rewarding and fun. Every time I wanna meal prep in RDO I just horseback ride and lock-on to deer.",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "toxic players will sure show you the ways soon enough. Hope you got the game for free.",
+      "gold_label": "optimism",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I appreciate it my guy! I try my best to really do research behind my opinions so I appreciate the call out.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I am proud to be racist No one in real life will know this",
+      "gold_label": "pride",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "I just saw this on netflix..... Now I'm Watching it... Then you post this.... It's like we almost watched it together...",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Thanks for the reply! I’ll probably just smoke, as you said, once maybe twice a month. Thanks again!",
+      "gold_label": "gratitude",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "\"lol, as he goes down on you he suddenly screams into your vagina \"\"THE BEES THE BEES\"\".\"",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "You need to recheck your science. A simple Google search will yield research articles showing a biological and genetic basis for being LGBT. Happy reading!",
+      "gold_label": "joy",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Red, Green, Blue. It's like a Christmas tree Edit: lol",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "\"This whole episode is one of my favorites; it has this AND \"\"Requiem for a Tuesday\"\" AND \"\"the Low-Cal Calzone Zone\"\" \"",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "very pretty lady.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Lol found the neckbeard",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "He looks like a model tbh. Very good looking man.",
+      "gold_label": "admiration",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Ahh, so the exact same place he was last time. wonderful lol",
+      "gold_label": "amusement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Let's get things back on track! Happy new year!",
+      "gold_label": "excitement",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Everyone started making remakes. Here is my favorite Lineage, too want, but why? People who love this game will also play it",
+      "gold_label": "love",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yep, you can go around crashing into things and run people over and completely get away with it.",
+      "gold_label": "approval",
+      "gold_bucket": "happy"
+    },
+    {
+      "text": "Yet, the Blue Bell crowd still worships this half ass ice cream, full of artificial flavors and HFCS.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Mmmmm tasty 🅱️estrogens",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Bike snob here. $400 is hella cheap for any bike that gets raced.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "In other news; Water is still wet.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Sometimes those are the only options. Laughing makes other people feel better at least so that's what you gotta do.",
+      "gold_label": "caring",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Stay in bed and binge watch a new show, my suggestion Brooklyn 99",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "So you agree.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "A bash that doesn’t guaranty anything? Isn’t that a bad thing I mean it’s one of the complaints of heard about lawbringers shove",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Since you called me out for saying that I am defending the attacker, then just point out which sentence I wrote led you to that conclusion.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "KAMALA 2020!!!!!!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Adapt and overcome",
+      "gold_label": "caring",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"There are good reasons but you potatos just brush it all off with \"\"hurr life is bad cause bad things happen sometimes\"\"\"",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Call your attorney general. 615-741-3491",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "As a Jeep driver, I constantly have to remind other Jeep drivers that 4WD/AWD only makes a difference when driving. Everyone has 4-wheel stop.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Bzzzzt, try again",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I'll see if I can find it Found it!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Idk why you’re getting down voted I also pick it every time and almost always get it done on that initial skirmish",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Sooner or later you're both going to have to make some choices about your priorities.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Stay strong friend.",
+      "gold_label": "caring",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Debating whether this is a troll or gross overshare. Going to go with troll since you just also made a new account",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Why am I seeing this everywhere now? This wasn't in my vocabulary last week.",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "By not using Facebook as a barometer of success. Look at Facebook as a highlight reel and not what people are actually living,",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "some people just want attention..lol",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I got that reference",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "59 days until opening day!!!!!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Is anyone forced to work in prison?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Its onky been 6 years i think you read the second line",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "And then everyone clapped",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "He has 3 years as first team manager, he signed the contract in November, but it doesn't matter",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "What makes it ok as it is?",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "No, because asses that hot don't come in trenta",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "welcome to a whole new world, my friend",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "why are you a detective all of a sudden",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "How can we send money to you?",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "*looks at YouTube comments sections* Um. I'm not so sure.",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "The edit... what? Why is he playing on an account that was registered by someone else?",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"I think I translates more into \"\"Waiting to see what kind of Brexit turd-burger Westminster eventually vomits up\"\".\"",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "That means nothing beyond the fact that I couldn’t be asked arguing with you. It was a no contest essentially.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Is that bottom trey filled with beer? If so, how did he acquire them?",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Who cares? 2019 season hasn’t even started",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I want to see this a a movie!!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Idaho lot rather we stop with these amas.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "It is certainly interesting.....but is it anything?.....",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "LSD or the fungal kind? Out of curiosity",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Saying that combo with a straight face after the fucking mess that went into the last UFC event should be hard.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Are you talking about equalization payments? Because BC doesn't get equalization payments.",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I've probably put a couple hundred miles on my space saver tire. It's still on there right now.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Bet you $20 she had more in her than 0.05 hell, more than 0.08 hmm...",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Yes. We're finishing the script out now. Shooting starts in February.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "No I wish. They don't come to Texas very often.",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "You're easily as classist as her.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"*Not wearing makeup the next day* \"\"Are you okay? You look sick.\"\"\"",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "One more thing don't try to like eavesdrop or anything just kinda bring it up organically",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "You're in the wrong subs",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Team Hina FTW!!!!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Is it because of the accents you thought they were the same?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "If everybody put down their camera to help, what would you be doing right now?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "NJ has zero of their own picks from the 2010 draft still in the org",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Damn, I really been playing this series all my life...and I ain’t got any regrets.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Bit like Dundee United trying to not concede 5 against Ayr United.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "No doubt would start at wing. We need help there and it would help ease him in",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"Whatever conclusion they reach now or in the future, the only constant will be that \"\"nothing should be done to stop it.\"\"\"",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Don’t do a long distance thing, not worth it and a waste of time",
+      "gold_label": "caring",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Do you.....have a certificate showing you're not a donkey-brained man?",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"And those offences are not Criminal Code offences. Criminal Code offences require it be established \"\"beyond a reasonable doubt\"\" that an accused actually committed the offence.\"",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "r/forhonor leaking again?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Of course I remember a time when I didn't know what calories were. I was a child.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Big yikes. Biiiig yikes. I do feel your pain. I wish I could upvote you more than once.",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I too am a vaginal flap surrounded by useless flesh. Let us fly into the sunset and get raped.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "The entire culture of NE is win at all costs. Not sure where you live but if that kid shovels snow..tell mom to him bring home .",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "okay but where to find bara that isnt fetish/sex stuff and is more wholesome and romantic?",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "What's does the future hold for you two? You're not happy with him. You deserve better.",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"You know it doesn't use the word \"\"boycott\"\" at all, right?\"",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Explains why I couldn't connect to their forums.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "^ but she ain’t a traitor",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "What about fees? Much of the hit for a payday loan isn't interest, technically, it's fees.",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Nor are they common in the UK. Never seen one in the middle.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Eh, says who? Anyway, I like being by myself. I'm by myself right now.",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "But should I? And who would I report that too? since none of us 3 are in the same country",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "On PS4 it's very toxic. I would imagine it is the same over on Xbox One aswell",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I’ve woken up next to some shocking things but just imagine finding the top of a police car in your room.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Before things like that can happen we need to first atleast make it stable and usable for the people that actually do pay",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "So You're going to become India... Because immigrants... Dude... If you got nothing just say so.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "KUBIAK WHY HAVE YOU FORSAKEN US???",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I never understood the point of parole. Seems to me like an expensive way to increase recidivism.",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Whoever told you that is lying.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Man up and get yourself a date with a different woman.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Students: North and South Dakota have finally settled their differences and become one big D, for Dakota.”",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "YOU GOT FAT!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Ok, fair enough. From your original post, it wasn't really clear that you looked at sources other than YouTube.",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "most conservatives have been pissed at cities in Minnesota raising the age to buy tobacco, I guess i'm a little confused on what you are talking about.",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "That's interesting. Have you used it to register on many sites/services?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "> Iturriaga (Mexico) Oh yeah. that was a thing. How was we?",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "All I want for Christmas is a broken home",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Worst bit is that it keeps snowballing, and growing and suddenly it this mess you can't make sense out of or clear up",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Crippling? How so? It’s with Fox Sports right? I figured they probably had a good deal with them, but maybe not.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Open a ticket and wait. These next two weeks will be very telling. All we can do is wait.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "nothing special? I drop stuff like this mate",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Look like when i wake up in the same bed with my uncle",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Wish I was this happy",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Stick with us. If only for one more day. Then let’s try again tomorrow.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Not when you compare it to CW though.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Is this a mood?",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Vr chat is free and you can play it without vr",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "When they hire him",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "learn to say no more. After a few times you have something you like destroyed it gets easier.",
+      "gold_label": "caring",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "The Lidl ones definitely don't taste like Weetabix, if they are make by Weetabix then they must be using different stuff!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Hes looking for a handout of 3 free meals a day, education and skill training and a roof over his head. Jail, it works.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Change your mindset to not expect anything in return, if they do great if not...their loss",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Who wrote the IQ tests?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": ">Pri*toiletries*",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Does that person only eats rocks? Because if you put bacteria and human beings on an equal footing, everyone is a fucking cannibal.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Even if it was true, what would they actually gain from misrepresenting the data?",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Problem is fornite kids are playing fortnite.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Surely you meant isn't. XD",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "It really do be like that",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "You da real MVP",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Wich stinks for you",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I'd love to collab with some reddit folks on NFL Draft prospect scouting, rankings and mock drafts if anyone is interested.",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Can't wait to see her looks in S11!",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Didn't even take a sip of the wine, and he still got wasted.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "\"\"\"Don't eat pork! Not even with a fork!\"\"\"",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Actually the Bills’ current uniforms make them look like the 1980-1999 Giants",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "This happens to me a lot. I'll also sing the same phrase over and over.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "are you a genji main cause i feel the same way",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Okay but how about someone who doesn’t believe the Wifi signals are going to kill us?",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "And you got it, a federal tax cut. If you want to pay less taxes overall you need to stop electing democrats.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "It doesn't matter if they are crazy stacked. We definently shouldnt be last in the league.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "They got bored from haunting earth for thousands of years and ultimately moved on to the afterlife.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "You're naive if you think they won't balance it out somehow in the future.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "would love to see a win here",
+      "gold_label": "desire",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Oh hey I have those jeans",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "A friend of mine is like that, and they seemed quiet upset when someone form middle school said hello after they hadn't talked for 13 years.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "The DPRK is ethno fascism",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "My ex with BPD said this to me about her ex. They have been apart for nearly a year.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Generally you are still a “teacher” but I’m not sure 100%. I know my instructional coach role is still “teacher” contract/pay.",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Nasty, nasty, nasty... Really *can't* understand why she is a 300lb human. s/",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I'm struggling to find what you're referring to here, could you maybe add something that points to it?",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Big and smooth as a marble.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Plus you forgot the best part... I can hang my hands from an outer vest",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Tf is a smartpass+?",
+      "gold_label": "confusion",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I think ignoring intentions is ridiculous too, but I also think that only looking at intentions (and at face value) is a bit naive",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Its a half baked RP. If they wanted to kill each other they oculd have just started shooting.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "You really dont have a day off do you",
+      "gold_label": "curiosity",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "I tried to but i ended up booing the postman",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "i’n on a diet for my disease AND to lose weight therefore it cancels out boys, i’m scot free",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Tell her boyfriend and send him the screenshots of her saying she’s having affairs for proof. Then cut this toxic person out of your life!",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "AA is BS as a whole. Meritocracy or GTFO.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Papa Johns in my area basically gives away their pizza. I can smell the desperation in the store",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "Alright now you're intentionally misinterpreting what I say. Whatever.",
+      "gold_label": "neutral",
+      "gold_bucket": "neutral"
+    },
+    {
+      "text": "“Guys watch out, the scary looking kid is coming down the hall”",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Outrage over something that isnt even true. Thats sad man Edit: well the bandwaggoning part is true",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Really worried about NISA translating it, but at this point I don't care any more, as long as we get an english version of it.",
+      "gold_label": "nervousness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I've also heard that intriguing but also kinda scary",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Kids can't have fun anymore...:(",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "This.. im sorry but this is a dumb reply. Ofc it was fake kindness golly",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "At least he's finally done one thing right. Utter fucking disappointment at every level, by every metric.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "THIS MADE ME CRY",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "The only problem is that what you will never hear pf their relationship through sponsorships.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Sorry my teams gave you your only two losses this season ;)",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Ouch. Hurts because it's true.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "His army of Swedish blondes are going to be upset.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I don't know any but my own I'm afraid.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "No because to them this disabled boy is faceless. It’s easier to digest our hate and vitriol without thinking about it.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "\"Tranlated: Wooooo be afraid of the spooky \"\"shadowban\"\" so don't do the thing that gets your message to a wider audience. Smh\"",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "The only thing wrong with her is her face. Maybe she has a giving personality?",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "There are Cubs fans that died at 95 without ever having seen their favorite team win a title. At what point is the LOILTY worth it?",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Tl, dr - Take the abuse. Squirming only gets them off more.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I'm sorry you fell for the carnie, bro.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "It's like an Arts school but with dangerous, easily weaponizable spells being flung all over the place!",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Oh god, the one common denominator strikes again and is rubbing off on the other players. We're doomed, back to the drawing board in 2020",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I mean, it’s kind of her problem. She blithely makes so many mental errors.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Same here, after she initiated the divorce and acussed me of not doing anything to stop it.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I’m scared of shots, but I’m more scared of dying. What Anti-vaxxers are scared of is autism",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Don't you're making me paranoid man",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "want* a source on that, sorry.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "literally I feel like crying",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Can't relate because the sadness and loneliness is constant 😎",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "This is terrifying",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Not really cringe. Just sad.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I'm sorry, I can't hear your useless badgering over me drinking my 38' from a wine bottle and enjoying my extra $200.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "The questions are normal enough, but all at once and leading with them is a little weird.",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I mean, it certainly is weird but don't kinkshame",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Conservative is massively brigaded on an hourly basis. Unfortunately, it requires strict moderation or else it is unreadable.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I see notifications of people commenting the source but this sub must auto delete or something. Sorry, guys. I binged her and found me quick though.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "That number seems a bit low to me",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Hurr durr everyone needs to worry about other people’s problems",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "What a beautiful memory for you to have found. So sorry for your loss ❤️",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I've have a serious fear of getting winded, this video made my balls fall off",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Oh man that hurt to watch",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Unfortunately for you, no one of importance cares about your absurd views.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "That’s an insult!! To fecal matter.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "At home with a viral infection right now! Praying for death and to the god of paracetamol. Ugh.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Feeling insecure now",
+      "gold_label": "nervousness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "WHO WON THIS FIGHT My thoughts: neither side did a good job at explaining their positions and this entire interview was mostly useless",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "This is clearly the world's most dangerous gang",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "We finally lost a game while I was shuffling my tarot deck and now I can’t decide if I should try again or if the luck ran out",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Of course he will lie cheat and steal to make him self relevant to the public. Horrible person.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Crap. Absolutely missed that when typing my paragraph mountains. Fixed.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Please post any news you may find about her fate. This is so sad and so wrong. We need to know what happens to her.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "It is genuinely hard to imagine what the Magic basketball experience will be like when these two legends are no longer in their roles.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "These refs are remarkably terrible tonight. So are the sabres but wow some terrible calls.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Could be depression with psychotic features. Talk to your doctor asap!",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "What a horrible way to find out, though. My sympathies to the dead man.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "EDIT: wrong link sorry here’s the right one I hope",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Sorry to be the bearer of bad tidings.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Any one of us could be a journalist, and that level of journalism feeding the masses is mildly scary.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "This whole sub makes me sad.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I missed that part unfortunately",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "\"Aaaand I'm still here. I don't have a alt account but whoever you reported I\"\"m sure is alive and well. You're terrible.\"",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Been off since November 29th. I would rather be working and making money. Home gets boring",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Ik I’m crying rn",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Just got a bit worried because it's always showed up instantly for me before",
+      "gold_label": "nervousness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "You really shouldn’t just pat wolves you know...",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Sorry your right",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "In many states the law prosecutes the server just as harsh as the lawbreakers when it comes to alcohol. Dram shop law",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "And yet it looks like one thing you can't is read. Shame shame.",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "The loading screen has the circle at the bottom that just keeps spinning. I tried uninstalling the app and that didn't work either.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "You still didn’t answer the question. Sorry it’s bugging me :)",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "You just made my point, you obnoxious whining kid",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "No response after a week? That's something to worry about.",
+      "gold_label": "nervousness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Ouch. That hurt the ego. And that’s not easy to do.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Every time, lots of people overwhelm me. I have light sensitivity to florescents so that doesn't help.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I got bad news for ya'll. I picked Chargers, Colts, Saints, and Cowboys to win. So Eagles might be winning :/",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Omg, unbelievably scary. Insane",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Yah. I unfortunately was sitting and watching this documentary with my Mother. That was very awkward.",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Wow, you folks sure are salty about losing the midterms! Pathetic?",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Your TLDR sucks",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I do feel sorry for the squirrel, but I wouldn't say the dog is a jerk for acting on natural instinct.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Iirc she's alive but an alcoholic.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "feeling like im not normal and that im shameful and wrong and other people telling me those things are what have done this to me",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I really pity those unfree Cuban babies. It’s just sad.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "THIS IS TRAUMATISING",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I'm sorry that's what you read because it isn't what I said.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "it's hurting my heart :( why did you leave me",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Doubters. I'm still waiting on a status report of the 2 fluffers from a few weeks ago. WOOF!",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Rip the guy from psych",
+      "gold_label": "grief",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Just reading this makes me sick",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Because the hierarchy is afraid they’ll get burned.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Well two other close testers are really upset about rolling",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Because of this bad situation some people are afraid of becoming youtubers because of this",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Threatening to drive your sisters into the ocean is illegal. It's called making a terroristic threat or menacing and can cause her to lose access to your sisters",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I have an issue metabolizing medications fast. I'll wake up during surgeries so they give me a lot of drugs.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I don’t understand how her parents were able to take kid when she claims they are horrible alcoholics",
+      "gold_label": "nervousness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Help, I'm scared and want to go back.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "It was a painful cringe, too. Are we masochists?",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I see you utilized it. 3.5? Sad.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "trailer fabulous!!! i miss it",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "So. This is scary as fuck.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Wow that’s scary, she’s so young and healthy. I hate that.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "\"I feel sorry for people that think Reddit (or even some random sub-reddit) is \"\"an international stage\"\".\"",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I thought that type of camouflage failed horribly because the high contrast and defined shapes made the ships really stand out.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Oh, it's definitely working and that worries me a lot.",
+      "gold_label": "nervousness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Sorry for the bad analogy, yours is way better",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "No one ever laid on their death bed and said, “I regret not working even harder.”",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "That's a maryland fan comment. You should be ashamed of yourself.",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Meanwhile my sister won’t even hug my goodbye when I drop her off at school.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I was in awe the whole hour I spent in there.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "\"That's a lot of words to say \"\"I'm upset that women don't want to date me.\"\"\"",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "No, what’s sad is saying the same message like it’s news. He’s a copy paste machine. No original thought.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Read his post again. 'It's more fact based than Fox.' I'm sorry but you might have some extra chromosomes.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Just keep going and don't lose hope. Stuff like this can happen all the time to anybody. It's just bad luck",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Crap. I need more Excedrin. STAT.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I’m so sorry the internet has inconvenienced you",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "ok so that was fucking sick",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Me me big sad.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Sorry I dropped this /sノ( ゜-゜ノ)",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I’m going to die right now I’m so scared tears and snot everywhere",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Is this a real thing? I'm a terrible stoner.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Right like interacting with each other having a normal evening? Ugh they’re both so trashy I’m sorry.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "None, I know nobody or have anyone nearby who can help.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I mean yeah we were the best counter attacking team. That counter was so disappointing",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "One of my worst nightmares. Ugh.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "That was my mistake. It should only show your First Name and The 1st letter of my last name.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I heard the ostrich was sick.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Hip hop has fallen down so far music in general, since the 90's.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Yeah imagine if he had been as efficient as the beginning of the season. We would have at least 2 more.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Still is glitched to this day.... sad",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I'm sorry it happened like that for you. I really can't imagine.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I am trying they try to say I’m fake even though I’m trying it’s painful to talk to them sometimes",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Maybe so. Should I try to ask her about it? I'm worried that will only scare her more",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "You seem pretty upset about this. It's not an email it is a formal filing. It doesn't surprise me you don't understand that though.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Yikes that's cringe",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I didn’t know I’m sorry",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "His smile is so damn creepy",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "And then you're stuck on that medication for life, sounds like a scary trade-off.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "This is creepy.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "And that smilie she gave the fiancé when he sat down with the sandwich....I would be scared if I was him.",
+      "gold_label": "fear",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "My husband and I have been circling the drain for years. :(",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Oh god another injury",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I felt bad for laughing",
+      "gold_label": "embarrassment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Honestly his post was a little sad. The fact that it got upvotes makes me want to avoid this sub over the summer.",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I literally got the same bug",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "\"\"\"what you want\"\" is a populated, limited set, and thus discrete.\"",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "I’m sorry :(. Lol. For me, after the ending of 3, and Andromeda, I have zero interest in ME.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "It is. It’s so bad. Then I start blaming myself for liking them. It’s like I have no control over this.",
+      "gold_label": "disappointment",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": ">Sorry, but any city that had any kind of ~~epidemic in its~~ history will have bunches of dead people buried under it.",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "This hits hard, sadly both of my relationships have been toxic so I've decided not to start any new ones until I start going to uni",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Ugh I'm sorry man! Jerk off until your heart is content and don't apologize for it!",
+      "gold_label": "remorse",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Gonna be sad when Gameday is inside a gym for shooty hoops. I already miss CFB :(",
+      "gold_label": "sadness",
+      "gold_bucket": "sad"
+    },
+    {
+      "text": "Didn't realize I'm so famous!",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "The music caught me off guard",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I realised after I typed it, but I left it up. I feel sometimes in life, you just gotta take the L.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "A little too old to be skateboarding",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I've realized after more than 100 hours that you can dismount a horse without jumping off",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I thought this allegation was squashed when it came out. I was surprised to see it still making headlines. Poor guy.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Every other way sounds wrong. SPR for life.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Time flies when you're a semiprofessional quotemaker. I wonder what he's up to these days.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "What a game.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "This response is highly unexpected yet logical. I’m fixin to chew on it for a spell.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "OMG... Dad!",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Then I'll be accused of being a racist.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wife just had our baby, and this story freaked me out. I can't imagine going through something like that.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'm surprised that this is still happening despite the threats of an invasion of manbij.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Don’t I know it! I can’t believe this breading station thing is so enormous.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "My wife would say that all of the above and another dozen more are cheating...and she wonders why I’ve fucked other women...",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Watching now. Oh wow we both didn't realize how much we hated this guy. This is one of the most quotable episodes by far.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "\"It' kinda ironic that \"\"Winners\"\" are actually losers (they haven't realised that yet)\"",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "And I thought Honda Civics smell bad on the outside!",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "just realized the pic is unrelated kinda, whatever though. proud of me despite my anxiety about puttin myself or there",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Us girls are taught to always be polite. Screw that, safety is more important.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Or just spend ten seconds around some fire and realize that it's super hot.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Like I said previously I realise they weren't commonly called asylum seekers until recently. However that doesn't mean that previously they weren't asylum seekers",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Kinda reminds me of that pluto pic from nasa",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "This was not only true, but pleasing to watch.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I was there on the opposite side of the field. I did not believe he made that catch until we saw it later on tv. Unreal.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I never went back to the post to see if it was BOA, but I’m not surprised if it was. That was my first guess.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow! I’m barely 2 cities over and it isn’t even nearly that cold :o",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I had forgotten it was coming up until I saw this. That us my level of excitement and anticipation.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "looks unreal, like it's a toy or something.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I am shocked they don’t have a vanity plate that reads “Beer Cheez”",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow there a lot to choose from for 10 bucks or less too",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "The miracle was just that. Because we all know the Vikings would fail the next game.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I wouldn't say age would stop it just lessen the affect of it but probably start to notice it around mid to late 30's.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Huh... I'm left handed and have never realised I do this.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Surprised he's in. Imagined he was concussed. He was on another planet for a bit.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "woah this is a reversal of the norm you took a meme from instagram to reddit",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'm surprised he survived the primary.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I have crowns and I thought I needed a mouth guard but it seems like I don’t anymore.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Nobel prize, u/Otomyre, Nobel prize! I’ll see you in Sweden!",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oh, I realized that moments after rolling down my window, when his hand came through the space.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Pull your fucking pants up oh my god",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I’ve never heard of a vet adopting out pets before.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow, I remember having this kind of meal a lot as a kid.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "You completely missed the point of the meme...",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I don't think you can find a better support line in contenders than alarm and elk. absolutely insane and clutch it's unbelievable",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Reminds me of the podcast Welcome To Nightvale.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "FWIW this was also posted yesterday",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Yikes I cringed hard",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Lost finger how?",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I had no idea it would hit me as hard as it did. It really changed my view.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Damn, I didn't know that you used to mod there.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "When he puts it in too fast and you don't have time to let your walls expands, this is exactly how it feels...",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I know I am still going to frequent Argonaut and my other neighborhood family owned liquor store.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I can't imagine buds being very hard to find in Hawaii",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Honestly? I dont know. My parents told me that itd be seen as suspicious",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oh sorry my bad, didmt know",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow. This is messed up.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "It’s not about the money, it’s all about the love of the game.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oh hell no",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "This is amazing. WTF.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I THOUGHT I HAD MY WILL ALREADY COPIED AND FORGOT I HAD THIS IN MY CLIPBOARD",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "It's also complicated because a lot of videogame media outlets quote him",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Can't believe me and my family were gonna leave five minutes early to beat the traffic. Honestly the best game I've ever seen live",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Before he was riding a Bronco he was riding your mom.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wasn’t it 99% of the WORLD’S population? Like how in the fuck is that even possible...",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Holy shit that’s nothing",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Hey what a coincidence so is a human head!",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I just renewed my license today and they didn't check my proof of address, just looked at my us passport, license, and debit card",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "What a turnaround.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Intelligence is to know the difference between MB and Mbps. Wisdom is to not be a cunt about it.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "It’s shocking isn’t it? I paid less for a flight from London to Manchester than it would have cost for the train.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oh for sure. Sometimes I wonder if they are actually harming there cause with the over the top hypocrisy the newcomers seem to see it quite quickly.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oof the way he just tossed the cat aside oof",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "if only we could blast this type of stuff out there for everyone to hear, then we might just get get those neo libs to the realization.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "This man looks so much older without the cap",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I wondered where the quote about “supporting your azz” and was very pleased to finally find the train wreck that said it.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "shockingly close to reality.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Right. He didn't even say a word. I feel like I've seen this before tho.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Unless you're the type of person who rolls through relationships every 3-6 months like clockwork",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "To be fair how often has someone drafted in the top 5 not immediately joined the team.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "If you’re a solo player, then I understand...",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow, season 3 is actually out already. Need to check it out",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Yeah 150 is a little much. Reverting to 125 would be perfect",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Refreshmentos! What's that? It's new!",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wack. Oh heard some 17 year olds are doing it too.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "In the first combo if you just do the b+k instead of even bothering to kick it does 1 more damage Not much obviously but yeah just a thought",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'm shocked! Shocked! Well, not that shocked.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "That's a weird way of spelling Disenchanted",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "For I second I thought he was a sophomore learning to drive based on that figure, baby face from a distance and choice of clothing",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'll be surprised if *Monty Python's Life of Brian* wasn't one of those.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I mean...that’s quite obvious. I’m just left wondering what the other item is. 2/10",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Didn't know they were doing matches on smaller pitch in the combine to see how they do with less reaction time. Thought that was interesting.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "They are taking advantage of the fact that you found this thread and realized you have to do is one more day until you get it.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Better than mine.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'd like to add spontaneously experiencing unending self-loathing because you suddenly remembered that embarrassing thing you did 3 years ago.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "2nd one resounds with me so much, I rarely realize how little I trust other people to do any task lol",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "We really need to stick to having helpful titles or a quick tldr.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow, 5 downvotes in 3 minutes. Go you!",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "That's the laziest bro I've ever seen",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Well if we just started in the second quarter in both games...we would have come out ahead!",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "i got the auto reply a day ago",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I mean everyone already knows what u like so its gonna be weird",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Omg didn't even think of that! So clever! Yes!",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I saw that comment and wondered if someone was going to post it here. I almost feel bad. Maybe they’re lonely.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "As a Florida girl I have no clue how you all have not died. I could never live there.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "The more I look the worse it gets",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'm going Saints and Chiefs. Although I think the Chiefs-Pats game could go either way",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wondered 'why doesn't it seem like theyre making any progress' before I realized how short the loop was....",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Didn’t know he had his initials on his thigh pads too",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Hmm, I didn't notice that change ... will pay attention ..",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I've found that carrying 21 chromosome's is the sweet spot",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "You mean anti-intelligent",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "That's a surprise from this guy.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow, your ex partner sounds exactly like mine.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I mean, ya, but this has been his stance for as long as I have been a fan. It isn’t really new for him.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oh, grilled nuggets. Haven't really seen those at fast food places so I thought they were just the regular nuggets",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I had to write in the Swangas. Seems far better than the choices given.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I'm not saying to hate them, I'm wondering why this sub just started worshiping them.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Butter bronzer-physicians formula and I HATE the smell. I haven’t really played w it but wow, so scented.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "*Hey just noticed..* it's your **1st Cakeday** Spottedgriffin! ^(hug)",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Wow. Forget the separation, lawyer up and go straight to divorce.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Sounds weird but dont swallow",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "wow - resonates with me.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "\"\"\"I have been abusive.\"\" This was before I even realised his narcissistic characteristics. \"",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I thought V had great gameplay, but the big character switch that no one asked for really held it back.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "nah it takes it a lot more than one time, I reckon you'll be fine considering your aware of the risk",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I’m surprised by how quickly they were able to get a graphic for Kent.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Surprised to not see Three Arrows on the list when he went from no videos at all to over 100,000 subscribers just in the course of 2018.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I do not trust our defense at all. I do not believe you can increase the range of Andujar.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Someone made a similar joke and got 500 down votes.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "No because it's been a steady decline over 20 months.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "One post, 155 updogs. I've seen this raw power only once before.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I don’t cry, either. It’s weird. I think it’s a personality/mentality thing. Just depends on how your brain is wired I think",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Reminds me of the old lady in Police Academy 4 shooting the .44 magnum. Damn that was fun!",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Oh, what a tangled web we weave When first we practise to deceive!",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Unexpected Hail corporate.",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "Can't lose if you never stop appealing. Or at least that's what I'm told by your cohorts.",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": ">tfw she was explaining to him what a nuclear explosion would do",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "My mom sent it to me so I knew it was bad but I didn’t realise it was already here",
+      "gold_label": "realization",
+      "gold_bucket": "surprised"
+    },
+    {
+      "text": "I've always wondered how much of this stuff doesn't end up on the internet",
+      "gold_label": "surprise",
+      "gold_bucket": "surprised"
+    }
+  ]
+}

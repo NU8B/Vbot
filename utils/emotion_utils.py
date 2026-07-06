@@ -1,8 +1,16 @@
+import threading
+
 from transformers import pipeline
 import torch
 
 # Emotion model settings
 EMOTION_MODEL_NAME = "SamLowe/roberta-base-go_emotions"
+
+# Minimum classifier confidence before falling back to neutral delivery.
+# Calibrated 2026-07-06 via scripts/emotion_eval.py threshold sweep on the
+# frozen GoEmotions + domain slices (was a hand-picked 0.3; macro-F1 is flat
+# from 0.0-0.25 and degrades from 0.3 upward on both datasets).
+EMOTION_CONFIDENCE_THRESHOLD = 0.15
 
 DIFFUSION_STEPS = 10
 
@@ -101,16 +109,11 @@ def get_model_params(model_name="Amelia"):
     return MODEL_PARAMS[model_name]
 
 
-# Emotion to voice style mapping with inference parameters
-def create_emotion_config(model_name="Amelia"):
-    params = get_model_params(model_name)
-
-    # Define available character models and their fallbacks
-    AVAILABLE_CHARACTERS = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
-
-    # Centralized emotion definitions with audio file mappings
-    # Format: emotion_name: (audio_type, alpha_param, beta_param, embedding_param)
-    EMOTION_DEFINITIONS = {
+# Centralized emotion definitions with audio file mappings.
+# Format: emotion_name: (audio_type, alpha_param, beta_param, embedding_param)
+# Module-level so evaluation tooling and tests can treat this as the single
+# source of truth for the 28 GoEmotions labels -> 5 voice-style buckets.
+EMOTION_DEFINITIONS = {
         # Neutral emotions - use neutral audio and default parameters
         "neutral": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
         "confusion": ("neutral", "ALPHA", "BETA", "EMBEDDING_SCALE"),
@@ -155,6 +158,23 @@ def create_emotion_config(model_name="Amelia"):
             "SURPRISE_EMBEDDING_SCALE",
         ),
     }
+
+
+def get_emotion_bucket(label):
+    """Map a classifier label to its runtime voice-style bucket.
+
+    Unknown labels fall back to neutral, matching the runtime's defensive
+    behavior elsewhere in the pipeline.
+    """
+    return EMOTION_DEFINITIONS.get(label, ("neutral",))[0]
+
+
+# Emotion to voice style mapping with inference parameters
+def create_emotion_config(model_name="Amelia"):
+    params = get_model_params(model_name)
+
+    # Define available character models and their fallbacks
+    AVAILABLE_CHARACTERS = ["Amelia", "Eveland", "Gura", "Shiori", "Wilson"]
 
     # Character audio file mapping with fallbacks for missing characters
     CHARACTER_AUDIO_MAPPING = {
@@ -234,29 +254,52 @@ def get_emotion_file(emotion, model_name="Amelia"):
     return EMOTION_CONFIG[emotion]["file"][model_name]
 
 
+# One RoBERTa pipeline shared process-wide. Every EmotionHandler used to
+# build (and warm up) its own copy; with two handlers per OllamaHandler and
+# one per character init, startup carried ~10 identical classifiers
+# (~3.4 GB RAM, ~12s — measured 2026-07-06). Character-specific state lives
+# in EmotionHandler; the classifier itself is character-independent.
+# Runtime callers classify sequentially (single processing flag), matching
+# the previous per-instance usage pattern.
+_shared_classifier = None
+_shared_classifier_lock = threading.Lock()
+
+
+def get_shared_emotion_classifier():
+    """Return the process-wide emotion classification pipeline, creating
+    and warming it on first use."""
+    global _shared_classifier
+    if _shared_classifier is None:
+        with _shared_classifier_lock:
+            if _shared_classifier is None:
+                classifier = pipeline(
+                    "text-classification",
+                    model=EMOTION_MODEL_NAME,
+                    top_k=1,
+                    truncation=True,
+                    device=-1,
+                    framework="pt",  # Force PyTorch backend
+                    model_kwargs={
+                        "low_cpu_mem_usage": True,
+                        "torch_dtype": torch.float32,
+                    },
+                )
+                # Warm up once for everyone
+                classifier("Test message for warmup.")
+                _shared_classifier = classifier
+    return _shared_classifier
+
+
 # Update EmotionHandler to support multiple models
 class EmotionHandler:
     def __init__(self, model_name="Amelia"):
         self.model_name = model_name
-        # Initialize emotion classifier with RoBERTa
-        self.emotion_classifier = pipeline(
-            "text-classification",
-            model=EMOTION_MODEL_NAME,
-            top_k=1,
-            truncation=True,
-            device=-1,
-            framework="pt",  # Force PyTorch backend
-            model_kwargs={
-                "low_cpu_mem_usage": True,
-                "torch_dtype": torch.float32,
-            },
-        )
+        # Shared classifier: character identity affects config below, not
+        # the classification model itself.
+        self.emotion_classifier = get_shared_emotion_classifier()
 
         # Create model-specific emotion config
         self.emotion_config = create_emotion_config(model_name)
-
-        # Warm up classifier silently
-        self.classify_emotion("Test message for warmup.")
 
     def classify_emotion(self, text):
         """Classify the emotion of the given text using RoBERTa."""
@@ -268,7 +311,7 @@ class EmotionHandler:
         self._last_confidence = confidence
 
         # Use neutral for low confidence predictions
-        if confidence < 0.3:
+        if confidence < EMOTION_CONFIDENCE_THRESHOLD:
             emotion = "neutral"
 
         return emotion
