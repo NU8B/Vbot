@@ -16,7 +16,7 @@ This repository is best read as an implementation case study for optimizing a mu
 - VRAM and cache management across the whole runtime
 - model evaluation gates, runtime metrics, and release workflows
 
-![Vbot interface](asset/screenshots/interface.png)
+![Vbot character selection](asset/screenshots/character-selection.png)
 
 ## What This README Prioritizes
 
@@ -49,6 +49,10 @@ This README prioritizes implementation details over setup walkthroughs. Vbot is 
 10. Audio playback runs in a separate thread so the GUI does not freeze.
 11. Avatar speaking state starts when playback starts and stops after the audio duration.
 12. The avatar expression is updated from the detected emotion.
+
+The welcome flow also includes a preference-based avatar recommendation panel for first-time character selection.
+
+![Vbot avatar recommendation preview](asset/screenshots/recommendation-preview.png)
 
 ## Character Hotswap and Cache Design
 

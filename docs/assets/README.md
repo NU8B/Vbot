@@ -4,13 +4,21 @@ This folder is for README and documentation visuals only.
 
 Do not put runtime assets here. Character model files, backgrounds, reference audio, and generated samples should stay in their existing runtime folders under `asset/`.
 
-## Existing Screenshot
+## README Screenshots
 
-The main README preview currently uses:
+The main README currently uses:
+
+- `asset/screenshots/character-selection.png`
+- `asset/screenshots/recommendation-preview.png`
+
+The HTML sources used to render these README-safe previews are:
+
+- `readme/character-selection-preview.html`
+- `readme/recommendation-preview.html`
+
+The older app chat screenshot is still available at:
 
 - `asset/screenshots/interface.png`
-
-That file is already a clean app screenshot, so do not duplicate it into `docs/assets/readme/` unless replacing it with a newer polished screenshot.
 
 ## Generated Diagrams
 
