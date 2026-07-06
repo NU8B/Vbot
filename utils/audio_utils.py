@@ -67,17 +67,21 @@ class AudioProcessor:
             torch.cuda.empty_cache()
 
     def _select_whisper_device(self):
-        """Smart device selection for Whisper with cuDNN fallback"""
-        if not torch.cuda.is_available():
-            return "cpu"
+        """Device selection for Whisper STT.
 
-        try:
-            # Test CUDA availability more safely
-            test_tensor = torch.randn(1, 10).cuda()
-            _ = test_tensor.cpu()  # Simple operation to test CUDA
+        Defaults to CPU: ctranslate2's CUDA initialization crashes the
+        process (access violation in WhisperModel.__init__) when it races
+        torch's CUDA context during startup — observed 2026-07-06 with
+        ctranslate2 4.7.1 + torch 2.7.1+cu128 while StyleTTS2 loads
+        concurrently. The tiny int8 model transcribes faster than realtime
+        on CPU, and keeping STT off the GPU avoids contention with TTS
+        inference and avatar rendering. Set VBOT_WHISPER_DEVICE=cuda to
+        opt back in for experimentation.
+        """
+        requested = os.getenv("VBOT_WHISPER_DEVICE", "cpu").lower()
+        if requested == "cuda" and torch.cuda.is_available():
             return "cuda"
-        except Exception as e:
-            return "cpu"
+        return "cpu"
 
     def set_microphone(self, device_index, device_name):
         """Set the microphone to use for recording"""

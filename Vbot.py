@@ -979,18 +979,50 @@ class ModernChatGUI(ChatGUI):
         # Create popup menu
         menu = Menu(self.root, tearoff=0, bg="#2d2d44", fg="white", font=("Arial", 11))
 
-        # Get available microphones
+        # Get available microphones. Windows exposes every physical mic
+        # once per host API (MME, DirectSound, WASAPI, WDM-KS), so restrict
+        # to the default host API and dedupe by name to list each device once.
         p = pyaudio.PyAudio()
         available_mics = []
 
         try:
+            try:
+                default_host_api = p.get_default_host_api_info()["index"]
+            except Exception:
+                default_host_api = None
+
+            seen_names = set()
             for i in range(p.get_device_count()):
                 try:
                     device_info = p.get_device_info_by_index(i)
-                    if device_info["maxInputChannels"] > 0:
-                        available_mics.append((i, device_info["name"]))
+                    if device_info["maxInputChannels"] <= 0:
+                        continue
+                    if (
+                        default_host_api is not None
+                        and device_info["hostApi"] != default_host_api
+                    ):
+                        continue
+                    name = device_info["name"].strip()
+                    if name in seen_names:
+                        continue
+                    seen_names.add(name)
+                    available_mics.append((i, name))
                 except Exception:
                     continue
+
+            # Safety net: if filtering left nothing, fall back to all input
+            # devices deduped by name.
+            if not available_mics:
+                seen_names.clear()
+                for i in range(p.get_device_count()):
+                    try:
+                        device_info = p.get_device_info_by_index(i)
+                        name = device_info["name"].strip()
+                        if device_info["maxInputChannels"] > 0 and name not in seen_names:
+                            seen_names.add(name)
+                            available_mics.append((i, name))
+                    except Exception:
+                        continue
         finally:
             p.terminate()
 
