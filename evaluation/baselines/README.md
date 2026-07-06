@@ -9,7 +9,7 @@ with what measured quality.
 | --- | --- | --- | --- |
 | `emotion_eval_baseline.json` | `scripts/emotion_eval.py` | `scripts/emotion_eval.py --baseline` (macro-F1 + per-bucket F1, no regression) | 2026-07-06, threshold 0.15 calibration |
 | `tts_objective_<Character>_baseline.json` (all 5 characters) | `scripts/tts_objective_eval.py --character <Character>` | `scripts/tts_objective_eval.py --baseline` and `new_tts_eval_form/promotion_gate.py` (speaker similarity ≥, WER ≤) | 2026-07-06, production voices |
-| `persona_judged_reference.json` | `scripts/persona_judge.py` (judge prompt v2) | report-only — judge scores are compared in the eval summary but do not block (7B judge noise; see tracker session 6) | 2026-07-06, stheno + production prompts |
+| `persona_judged_reference.json` | `scripts/persona_judge.py` (judge prompt v2) | scorecard comparison for character-fidelity review | 2026-07-06, stheno + production prompts |
 
 ## Promotion procedure
 

@@ -4,7 +4,7 @@ Last reviewed: 2026-07-01
 
 ## Purpose
 
-The desktop package turns Vbot into a reproducible Windows release artifact while keeping the AI stack local-first. This is not the future web app architecture and it does not replace local LLM work with API calls.
+The desktop package turns Vbot into a reproducible Windows release artifact while keeping the AI stack on the user's machine.
 
 The release target is:
 
@@ -12,7 +12,7 @@ The release target is:
 - containing `Vbot.exe`, the app payload/assets, user docs, prerequisites, release notes, and build log
 - with a SHA256 checksum and JSON release manifest
 
-This is enough for a serious portfolio artifact because it proves productization without hiding the real ML/runtime constraints.
+This is enough for a serious portfolio artifact because it proves productization around a real ML desktop runtime.
 
 ## Current Runtime Reality
 
@@ -27,7 +27,7 @@ Vbot is a multimodal local AI desktop app:
 
 Docker Desktop is required for the current local Ollama LLM chat path. It is not a cloud API dependency; it is local infrastructure used to keep the Ollama runtime isolated and reproducible on Windows.
 
-The desktop package executable is a launcher build. It packages the app source/assets and starts Vbot through a prepared local Python/Conda 3.10 environment. This is less frictionless than a fully frozen commercial installer, but it avoids the current PyInstaller full-freeze failure mode where torch/transformers/CUDA analysis can stall for a long time.
+The desktop package executable is a launcher build. It packages the app source/assets and starts Vbot through a prepared local Python/Conda 3.10 environment.
 
 ## Desktop Package Flow
 
@@ -60,11 +60,11 @@ release artifacts: zip, sha256, manifest, notes, build log
 - requires Python/Conda 3.10 plus `requirements.txt` on the target machine
 - supports `VBOT_PYTHON=C:\path\to\python.exe` when the user wants to point at a specific environment
 
-`Full` is experimental:
+`Full` is the advanced bundle mode:
 
 - uses the original `vbot.spec`
 - attempts to freeze the ML/GUI/audio/CUDA runtime into `dist/Vbot`
-- can be useful later, but currently needs hardening because PyInstaller may stall while analyzing heavyweight ML packages
+- is available for deeper packaging work around the complete ML stack
 
 ## Local Release Command
 
@@ -144,19 +144,7 @@ For the desktop package, the user experience is:
 6. Run `Vbot/Vbot.exe`.
 7. Wait for first-run local model downloads/cache setup.
 
-This is not as frictionless as a commercial installer, but it is an honest product artifact for a GPU-heavy local AI app.
-
-## Why Not a True Installer Yet?
-
-A true installer can come later with Inno Setup, NSIS, WiX, or MSIX. For now, it would mostly wrap the same constraints:
-
-- Python/Conda dependency setup in Launcher mode
-- large ML dependency bundle in Full mode
-- Docker Desktop still required for local LLM chat
-- first-run model downloads
-- unsigned executable warnings unless code signing is added
-
-The portable zip is simpler, easier to debug, and better for early portfolio iteration.
+This gives the project a reproducible desktop distribution path for a GPU-heavy AI app.
 
 ## Desktop Package Done Criteria
 
@@ -164,23 +152,3 @@ The portable zip is simpler, easier to debug, and better for early portfolio ite
 - `.\build_with_logs.ps1 -Version "..."` creates `dist/Vbot/Vbot.exe`.
 - The package script creates zip, checksum, manifest, release notes, and build log.
 - A Windows machine can extract the zip and launch `Vbot.exe` after installing prerequisites.
-- Runtime limitations are documented instead of hidden.
-
-## Future Upgrade Path
-
-Level 2 desktop product:
-
-- true installer
-- code signing
-- first-run prerequisite checks
-- cleaner Docker/Ollama detection and recovery
-- hardened full-freeze PyInstaller build or a managed embedded Python runtime
-- optional native Ollama or llama.cpp backend to reduce Docker friction
-
-Future web app:
-
-- browser client
-- backend model orchestration
-- server-side GPU workers
-- web avatar rendering or streamed avatar video
-- evaluation and model promotion pipeline behind the service

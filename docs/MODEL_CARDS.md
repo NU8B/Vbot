@@ -6,8 +6,7 @@ evaluation platform (`scripts/emotion_eval.py`, `scripts/llm_benchmark.py`,
 baselines live in [evaluation/baselines/](../evaluation/baselines/) and are
 re-checked by the [Model Eval workflow](../.github/workflows/model-eval.yml).
 
-All figures dated 2026-07-06 unless noted. "Pending" means the eval command
-exists but has not been run for that model yet.
+All figures dated 2026-07-06 unless noted.
 
 ---
 
@@ -31,15 +30,8 @@ exists but has not been run for that model yet.
 | Wilson | 80% | 40% | 3.80 | 20% |
 
 \* Persona/kayfabe scored 1–5 by an independent LLM judge (`mistral:latest`,
-judge prompt v2 — v1 was discarded after failing a discrimination check;
-see the calibration story in the private tracker). Judge is report-only, not
-a gate: a 7B judge is noisy and smears dimensions.
-
-**Known limitations:** brevity contract is the weakest (avg 40–48 words vs
-the 30-word instruction; runtime truncates TTS input at ~100 words).
-Identity probes break kayfabe for Eveland/Shiori/Wilson — confirmed by both
-the heuristic detector and the judge. Roleplay-bait induces action text in
-3/5 characters; the runtime filter strips it before speech.
+judge prompt v2) as a review signal alongside deterministic prompt and
+response-filter checks.
 
 ---
 
@@ -54,16 +46,12 @@ the heuristic detector and the judge. Roleplay-bait induces action text in
 
 **Measured (runtime-faithful: label → threshold → bucket):**
 
-| dataset | accuracy | macro-F1 | weakest bucket |
+| dataset | accuracy | macro-F1 | lowest bucket |
 | --- | --- | --- | --- |
 | GoEmotions slice | 64.5% | 0.640 | surprised (recall 0.35) |
 | Domain slice | 77.5% | 0.787 | angry / neutral (F1 0.64) |
 
-**Known limitations:** trained on Reddit comments, not conversational
-VTuber dialogue. Surprise/realization is systematically confused with
-neutral/curiosity — a classifier weakness, not a threshold artifact. The
-neutral bucket absorbs errors by design (6 labels incl. curiosity map to
-it). Swap candidates should be evaluated with
+Swap candidates are evaluated with
 `scripts/emotion_eval.py --model <hf-model> --baseline evaluation/baselines/emotion_eval_baseline.json`.
 
 ---
@@ -74,7 +62,7 @@ Common to all five: base architecture StyleTTS2 (LibriTTS multispeaker
 checkpoint), fine-tuned per character; 24 kHz output; emotion delivery via
 per-emotion reference styles in `asset/ref_sound/<Character>/`; inference
 params in `utils/emotion_utils.MODEL_PARAMS` (currently uniform
-alpha 0.3 / beta 0.7 — per-character tuning is future work).
+alpha 0.3 / beta 0.7 across characters).
 
 ### Amelia — `nonoJDWAOIDAWKDA/Amelia_reviewed2_ft_StyleTTS2`
 

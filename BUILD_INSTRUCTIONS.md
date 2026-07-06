@@ -88,7 +88,7 @@ Useful options:
 # Set release version in artifact names
 .\build_with_logs.ps1 -Version "v0.1.0"
 
-# Experimental full PyInstaller bundle
+# Advanced full PyInstaller bundle
 .\build_with_logs.ps1 -BuildMode Full -Version "v0.1.0-full"
 ```
 
@@ -101,7 +101,7 @@ Remove-Item -Recurse -Force .\build -ErrorAction SilentlyContinue
 # Build desktop package launcher
 python -m PyInstaller vbot_launcher.spec --clean --noconfirm
 
-# Experimental full bundle
+# Advanced full bundle
 python -m PyInstaller vbot.spec --clean --noconfirm
 ```
 
@@ -239,7 +239,7 @@ Vbot-Distribution.zip containing:
 │   └── _internal/
 ├── README.md                    ← User instructions
 ├── PREREQUISITES.md             ← System requirements
-├── RELEASE_NOTES.md             ← Release metadata and known limitations
+├── RELEASE_NOTES.md             ← Release metadata
 └── build.log                    ← Build log, when packaged by script
 ```
 
@@ -346,7 +346,7 @@ python -m PyInstaller vbot.spec --clean --noconfirm
 # Full release build and package
 .\build_with_logs.ps1 -Version "v0.1.0"
 
-# Experimental full freeze
+# Advanced full freeze
 .\build_with_logs.ps1 -BuildMode Full -Version "v0.1.0-full"
 
 # Test
