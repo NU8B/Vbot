@@ -1,0 +1,135 @@
+# ============================================================
+# Vbot Model Evaluation (Model CI)
+# ============================================================
+# Continuous evaluation of the AI pipeline on the self-hosted
+# GPU runner: emotion classifier, LLM character contract +
+# persona fidelity (LLM-as-judge), and TTS objective metrics.
+# Regressions against the committed baselines in
+# evaluation/baselines/ fail the run.
+#
+# Manual dispatch only: the self-hosted runner is a workstation,
+# not an always-on box, so a cron schedule would just pile up
+# queued runs. Enable the schedule block below if the runner
+# ever becomes always-on.
+# ============================================================
+
+name: Vbot Model Eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_emotion_eval:
+        description: "Run emotion pipeline eval (gated vs baseline)"
+        default: true
+        type: boolean
+      run_llm_eval:
+        description: "Run LLM benchmark + persona judge (needs ollama)"
+        default: true
+        type: boolean
+      run_tts_eval:
+        description: "Run TTS objective metrics (gated vs baseline, needs GPU)"
+        default: true
+        type: boolean
+  # schedule:
+  #   - cron: "0 3 * * 1"  # weekly, only if the runner is always-on
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vbot-model-eval-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  evaluate-models:
+    name: Evaluate AI Pipeline
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 90
+
+    env:
+      # The self-hosted runner's project environment. Override by defining
+      # VBOT_PYTHON in the runner's machine environment.
+      VBOT_PYTHON: ${{ vars.VBOT_PYTHON || 'C:\Users\peepz\.conda\envs\vbot\python.exe' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Verify Python environment
+        shell: pwsh
+        run: |
+          & $env:VBOT_PYTHON --version
+          & $env:VBOT_PYTHON -c "import torch; print('torch', torch.__version__, '| cuda:', torch.cuda.is_available())"
+
+      - name: Start Ollama runtime
+        if: ${{ inputs.run_llm_eval }}
+        shell: pwsh
+        run: |
+          docker start ollama
+          $deadline = (Get-Date).AddSeconds(90)
+          do {
+            Start-Sleep -Seconds 3
+            try {
+              $tags = (Invoke-WebRequest -Uri "http://localhost:11500/api/tags" -TimeoutSec 5 -UseBasicParsing).Content
+              break
+            } catch { $tags = $null }
+          } while ((Get-Date) -lt $deadline)
+          if (-not $tags) { throw "Ollama API did not come up in 90s" }
+          Write-Host "Ollama ready: $tags"
+
+      - name: Emotion pipeline eval (gated)
+        if: ${{ inputs.run_emotion_eval }}
+        shell: pwsh
+        run: |
+          & $env:VBOT_PYTHON scripts/emotion_eval.py --baseline evaluation/baselines/emotion_eval_baseline.json
+          if ($LASTEXITCODE -ne 0) { throw "Emotion eval gate failed" }
+
+      - name: LLM character benchmark
+        if: ${{ inputs.run_llm_eval }}
+        shell: pwsh
+        run: |
+          & $env:VBOT_PYTHON scripts/llm_benchmark.py
+          if ($LASTEXITCODE -ne 0) { throw "LLM benchmark failed" }
+
+      - name: Persona fidelity judge (report-only)
+        if: ${{ inputs.run_llm_eval }}
+        shell: pwsh
+        run: |
+          & $env:VBOT_PYTHON scripts/persona_judge.py
+          if ($LASTEXITCODE -ne 0) { throw "Persona judge failed to run" }
+
+      - name: TTS objective metrics (gated, all characters)
+        if: ${{ inputs.run_tts_eval }}
+        shell: pwsh
+        run: |
+          $failed = @()
+          foreach ($character in @("Amelia", "Eveland", "Gura", "Shiori", "Wilson")) {
+            $baseline = "evaluation/baselines/tts_objective_${character}_baseline.json"
+            if (-not (Test-Path $baseline)) {
+              Write-Host "::warning::No baseline for $character, skipping gate"
+              continue
+            }
+            & $env:VBOT_PYTHON scripts/tts_objective_eval.py --character $character `
+              --label "ci_$character" --baseline $baseline
+            if ($LASTEXITCODE -ne 0) { $failed += $character }
+          }
+          if ($failed.Count -gt 0) { throw "TTS objective gate failed for: $($failed -join ', ')" }
+
+      - name: Publish scorecard to job summary
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          & $env:VBOT_PYTHON scripts/eval_summary.py --out $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload eval artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: model-eval-artifacts
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            asset/outputs/emotion_eval/*.json
+            asset/outputs/llm_benchmark/*.json
+            asset/outputs/tts_objective_eval/*.json
+            asset/outputs/tts_objective_eval/audio/**/*.wav

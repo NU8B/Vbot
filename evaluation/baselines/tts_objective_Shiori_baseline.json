@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "kind": "tts_objective_eval",
+  "timestamp": "2026-07-06T05:00:43.682895",
+  "character": "Shiori",
+  "repo_id": "nonoJDWAOIDAWKDA/Shiori_reviewed_ft_StyleTTS2",
+  "label": "shiori_production_baseline",
+  "battery_version": 1,
+  "whisper_model": "base",
+  "per_sentence": [
+    {
+      "index": 0,
+      "text": "The quick brown fox jumps over the lazy dog near the riverbank.",
+      "transcript": "The quick brown fox jumps over the lazy dog near the riverbank.",
+      "speaker_similarity": 0.8907546401023865,
+      "wer": 0.0,
+      "audio_seconds": 4.158333333333333,
+      "synth_seconds": 1.9134883880615234
+    },
+    {
+      "index": 1,
+      "text": "Yesterday I visited the museum and saw paintings from another century.",
+      "transcript": "Yesterday I visited the museum and saw paintings from another century.",
+      "speaker_similarity": 0.891085147857666,
+      "wer": 0.0,
+      "audio_seconds": 5.033333333333333,
+      "synth_seconds": 1.7122864723205566
+    },
+    {
+      "index": 2,
+      "text": "Please remember to water the plants before you leave this evening.",
+      "transcript": "Please remember to water the plants before you leave this evening.",
+      "speaker_similarity": 0.8865014314651489,
+      "wer": 0.0,
+      "audio_seconds": 4.283333333333333,
+      "synth_seconds": 1.7476537227630615
+    },
+    {
+      "index": 3,
+      "text": "Seven silver spoons sat shining on the small kitchen shelf.",
+      "transcript": "Seven silver spoons that, shining on the small kitchen shelf.",
+      "speaker_similarity": 0.8440887928009033,
+      "wer": 0.1,
+      "audio_seconds": 4.433333333333334,
+      "synth_seconds": 1.7077879905700684
+    },
+    {
+      "index": 4,
+      "text": "The weather forecast predicts light rain followed by clear skies.",
+      "transcript": "The weather forecast predicts light rain, followed by clear skies.",
+      "speaker_similarity": 0.8535299301147461,
+      "wer": 0.0,
+      "audio_seconds": 5.033333333333333,
+      "synth_seconds": 0.2991642951965332
+    },
+    {
+      "index": 5,
+      "text": "Everyone agreed the concert was the best performance of the year.",
+      "transcript": "Everyone agreed the concert was the best performance of the year.",
+      "speaker_similarity": 0.8544103503227234,
+      "wer": 0.0,
+      "audio_seconds": 4.508333333333334,
+      "synth_seconds": 1.6249487400054932
+    },
+    {
+      "index": 6,
+      "text": "Bring me the blue notebook that is lying on the wooden desk.",
+      "transcript": "Bring me to blue notebook that is lying on the wooden desk.",
+      "speaker_similarity": 0.8437124490737915,
+      "wer": 0.08333333333333333,
+      "audio_seconds": 3.658333333333333,
+      "synth_seconds": 1.601780652999878
+    },
+    {
+      "index": 7,
+      "text": "The train departs at nine fifteen from the central station platform.",
+      "transcript": "The train departs at 9.15 from the Central Station platform.",
+      "speaker_similarity": 0.8302869200706482,
+      "wer": 0.18181818181818182,
+      "audio_seconds": 4.608333333333333,
+      "synth_seconds": 1.749915361404419
+    },
+    {
+      "index": 8,
+      "text": "Curiosity often leads to the most unexpected and wonderful discoveries.",
+      "transcript": "Curiosity? Often leads to the most unexpected and wonderful discoveries.",
+      "speaker_similarity": 0.878273606300354,
+      "wer": 0.0,
+      "audio_seconds": 5.358333333333333,
+      "synth_seconds": 1.7944841384887695
+    },
+    {
+      "index": 9,
+      "text": "Thank you for listening so patiently to this entire announcement.",
+      "transcript": "Thank you for listening so patiently to this entire announcement.",
+      "speaker_similarity": 0.8571280241012573,
+      "wer": 0.0,
+      "audio_seconds": 3.9583333333333335,
+      "synth_seconds": 1.6482996940612793
+    }
+  ],
+  "gate_metrics": {
+    "speaker_similarity": 0.8629771292209625,
+    "wer": 0.036515151515151514
+  }
+}
