@@ -8,9 +8,13 @@
 # evaluation/baselines/ fail the run.
 #
 # Manual dispatch only: the self-hosted runner is a workstation,
-# not an always-on box, so a cron schedule would just pile up
-# queued runs. Enable the schedule block below if the runner
-# ever becomes always-on.
+# not an always-on box, and this run needs Docker + GPU for up
+# to 90 minutes — a cron schedule would just pile up queued
+# runs. The lightweight scheduled counterpart is
+# runtime-monitoring.yml (weekly SLO + drift gate, seconds).
+# Enable the schedule block below if the runner ever becomes
+# always-on. Gate failures open/update a labeled GitHub issue
+# so a bad run leaves a tracked record either way.
 # ============================================================
 
 name: Vbot Model Eval
@@ -35,6 +39,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: vbot-model-eval-${{ github.ref }}
@@ -133,3 +138,47 @@ jobs:
             asset/outputs/llm_benchmark/*.json
             asset/outputs/tts_objective_eval/*.json
             asset/outputs/tts_objective_eval/audio/**/*.wav
+
+      - name: Open or update gate-failure issue
+        if: ${{ failure() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'model-eval-failure';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `Model eval run failed on ${new Date().toISOString().slice(0, 10)}.`,
+              '',
+              `Run (logs + scorecard + artifacts): ${runUrl}`,
+              '',
+              'Baselines live in `evaluation/baselines/`; see its README for the promotion procedure.',
+            ].join('\n');
+
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: label });
+            } catch {
+              await github.rest.issues.createLabel({
+                ...context.repo,
+                name: label,
+                color: 'b60205',
+                description: 'Model CI evaluation gate failure',
+              });
+            }
+
+            const open = await github.rest.issues.listForRepo({
+              ...context.repo, state: 'open', labels: label, per_page: 1,
+            });
+            if (open.data.length > 0) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: open.data[0].number, body,
+              });
+              core.notice(`Commented on existing issue #${open.data[0].number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                ...context.repo,
+                title: 'Model eval gate failure',
+                labels: [label],
+                body,
+              });
+              core.notice(`Opened issue #${created.data.number}`);
+            }

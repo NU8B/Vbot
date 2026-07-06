@@ -1,0 +1,120 @@
+# ============================================================
+# Vbot Runtime Monitoring
+# ============================================================
+# Scheduled SLO + drift gate over production telemetry: runs
+# scripts/monitoring_report.py against the runtime metrics the
+# desktop app logs per interaction, compares them to the
+# committed budgets in evaluation/monitoring_slos.json, and
+# opens (or updates) a GitHub issue when a budget is violated
+# or the emotion-bucket distribution drifts.
+#
+# Unlike the full model eval (Docker + GPU, 90 min), this gate
+# runs in seconds and touches nothing heavy, so a weekly cron
+# on the workstation runner is fine: if the machine is off at
+# schedule time the run is simply skipped, and the concurrency
+# group stops missed runs from piling up.
+#
+# The telemetry lives in the app's working copy, not the
+# runner's workspace checkout — VBOT_METRICS_DIR points there
+# (override via repo variable of the same name).
+# ============================================================
+
+name: Vbot Runtime Monitoring
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 13:00 UTC = 20:00 UTC+7, when the workstation is likely on
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: vbot-runtime-monitoring
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: Runtime SLO + drift gate
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 10
+
+    env:
+      VBOT_PYTHON: ${{ vars.VBOT_PYTHON || 'C:\Users\peepz\.conda\envs\vbot\python.exe' }}
+      VBOT_METRICS_DIR: ${{ vars.VBOT_METRICS_DIR || 'C:\Users\peepz\Desktop\Project\Vbot\asset\outputs\runtime_metrics' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Run monitoring gate
+        id: gate
+        shell: pwsh
+        run: |
+          & $env:VBOT_PYTHON scripts/monitoring_report.py --json monitoring_report.json 2>&1 |
+            Tee-Object -FilePath monitoring_report.txt
+          if ($LASTEXITCODE -ne 0) { throw "Runtime monitoring gate failed (SLO violation or drift)" }
+
+      - name: Upload monitoring artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: runtime-monitoring-report
+          if-no-files-found: warn
+          retention-days: 90
+          path: |
+            monitoring_report.json
+            monitoring_report.txt
+
+      - name: Open or update violation issue
+        if: ${{ failure() && steps.gate.outcome == 'failure' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const label = 'runtime-monitoring';
+            let report = '(report output unavailable)';
+            try { report = fs.readFileSync('monitoring_report.txt', 'utf8'); } catch {}
+
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `The scheduled runtime monitoring gate failed on ${new Date().toISOString().slice(0, 10)}.`,
+              '',
+              `Run: ${runUrl}`,
+              '',
+              '```',
+              report.trim(),
+              '```',
+              '',
+              'Budgets live in `evaluation/monitoring_slos.json`; the gate is `scripts/monitoring_report.py`.',
+            ].join('\n');
+
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: label });
+            } catch {
+              await github.rest.issues.createLabel({
+                ...context.repo,
+                name: label,
+                color: 'd93f0b',
+                description: 'Runtime SLO or drift gate violation',
+              });
+            }
+
+            const open = await github.rest.issues.listForRepo({
+              ...context.repo, state: 'open', labels: label, per_page: 1,
+            });
+            if (open.data.length > 0) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: open.data[0].number, body,
+              });
+              core.notice(`Commented on existing issue #${open.data[0].number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                ...context.repo,
+                title: 'Runtime monitoring gate violation (SLO or drift)',
+                labels: [label],
+                body,
+              });
+              core.notice(`Opened issue #${created.data.number}`);
+            }
