@@ -181,6 +181,7 @@ Prompt change procedure:
 2. Run `scripts/llm_benchmark.py`.
 3. Run `scripts/persona_judge.py` against the benchmark artifact.
 4. Compare against the prior version's artifacts with `scripts/compare_llm_artifacts.py`.
+   Use `--enforce-policy` for promotion checks that should fail on a reject verdict.
 5. Land the prompt change and eval evidence together.
 
 ## CI Boundaries
@@ -243,5 +244,5 @@ python scripts/llm_benchmark.py
 python scripts/persona_judge.py
 
 # Prompt experiment comparison
-python scripts/compare_llm_artifacts.py old_benchmark.json new_benchmark.json --old-judge old_judge.json --new-judge new_judge.json
+python scripts/compare_llm_artifacts.py old_benchmark.json new_benchmark.json --old-judge old_judge.json --new-judge new_judge.json --enforce-policy
 ```

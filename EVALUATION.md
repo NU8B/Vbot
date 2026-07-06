@@ -226,7 +226,7 @@ Scored dimensions:
 
 The judge output is used as a character-quality review signal alongside deterministic prompt contracts and runtime benchmarks.
 
-Prompt experiments can be compared with [scripts/compare_llm_artifacts.py](scripts/compare_llm_artifacts.py). It renders old/new benchmark and persona-judge artifacts into a Markdown delta report so prompt changes can be promoted or rejected with evidence instead of vibes.
+Prompt experiments can be compared with [scripts/compare_llm_artifacts.py](scripts/compare_llm_artifacts.py). It renders old/new benchmark and persona-judge artifacts into a Markdown delta report so prompt changes can be promoted or rejected with evidence instead of vibes. Use `--enforce-policy` when the comparison should exit nonzero on a reject verdict.
 
 Current reference summary:
 

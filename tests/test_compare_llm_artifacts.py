@@ -4,7 +4,7 @@ import sys
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "scripts"))
 
-from compare_llm_artifacts import benchmark_table, build_report, judge_table
+from compare_llm_artifacts import benchmark_table, build_report, evaluate_policy, judge_table
 
 
 def _benchmark(path, brevity, safety, versions=None):
@@ -24,6 +24,12 @@ def _benchmark(path, brevity, safety, versions=None):
             }
         },
     }
+
+
+def _benchmark_with_persona(path, persona):
+    artifact = _benchmark(path, brevity=0.7, safety=0.9)
+    artifact["characters"]["Amelia"]["aggregate"]["persona_adherence_rate"] = persona
+    return artifact
 
 
 def _judge(path, voice, break_rate):
@@ -73,3 +79,62 @@ def test_report_includes_prompt_versions_and_input_names():
     assert "- old benchmark: `old.json`" in report
     assert "- old prompt versions: not recorded" in report
     assert "- new prompt versions: Amelia=v2" in report
+    assert "Verdict: `NEEDS REVIEW`" in report
+
+
+def test_policy_rejects_large_tts_safety_or_brevity_regression():
+    result = evaluate_policy(
+        _benchmark("old.json", brevity=0.6, safety=0.9),
+        _benchmark("new.json", brevity=0.4, safety=0.7),
+        _judge("old_judge.json", voice=4.0, break_rate=0.0),
+        _judge("new_judge.json", voice=4.2, break_rate=0.0),
+    )
+
+    assert result["verdict"] == "REJECT"
+    assert any("TTS-safety dropped" in failure for failure in result["failures"])
+    assert any("brevity dropped" in failure for failure in result["failures"])
+
+
+def test_policy_rejects_judge_kayfabe_break_increase():
+    result = evaluate_policy(
+        _benchmark("old.json", brevity=0.6, safety=0.9),
+        _benchmark("new.json", brevity=0.7, safety=0.9),
+        _judge("old_judge.json", voice=4.0, break_rate=0.0),
+        _judge("new_judge.json", voice=4.2, break_rate=0.2),
+    )
+
+    assert result["verdict"] == "REJECT"
+    assert result["failures"] == ["Amelia: judge kayfabe break rate increased by +20%"]
+
+
+def test_policy_warns_on_persona_keyword_drop_without_rejecting():
+    result = evaluate_policy(
+        _benchmark_with_persona("old.json", persona=0.9),
+        _benchmark_with_persona("new.json", persona=0.7),
+        _judge("old_judge.json", voice=4.0, break_rate=0.0),
+        _judge("new_judge.json", voice=4.2, break_rate=0.0),
+    )
+
+    assert result["verdict"] == "NEEDS REVIEW"
+    assert result["failures"] == []
+    assert result["warnings"] == ["Amelia: persona keyword hits dropped by -20%"]
+
+
+def test_policy_promotes_when_contract_and_judge_metrics_do_not_regress():
+    result = evaluate_policy(
+        _benchmark("old.json", brevity=0.6, safety=0.9),
+        _benchmark("new.json", brevity=0.7, safety=0.9),
+        _judge("old_judge.json", voice=4.0, break_rate=0.1),
+        _judge("new_judge.json", voice=4.2, break_rate=0.0),
+    )
+
+    assert result == {
+        "verdict": "PROMOTE",
+        "failures": [],
+        "warnings": [],
+        "policy": {
+            "max_tts_safety_drop": 0.10,
+            "max_brevity_drop": 0.10,
+            "max_persona_hit_drop_warning": 0.10,
+        },
+    }
