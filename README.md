@@ -31,6 +31,30 @@ This README prioritizes implementation details over setup walkthroughs. Vbot is 
 - how training/evaluation/release workflows are separated from normal CI
 - how the project treats model changes as measurable releases, not just asset swaps
 
+## Documentation
+
+### Runtime and architecture
+
+- [LLM.md](LLM.md) - LLM runtime, prompts, hotswap state, and response cleanup
+- [MEMORY_MANAGEMENT.md](MEMORY_MANAGEMENT.md) - runtime VRAM strategy, cache boundaries, lazy loading, and instrumentation
+- [docs/MLOPS.md](docs/MLOPS.md) - closed-loop MLOps/LLMOps lifecycle, runtime monitoring, and promotion architecture
+- [docs/MODEL_CARDS.md](docs/MODEL_CARDS.md) - shipped model summary with current eval numbers
+
+### Animation
+
+- [ANIMATION.md](ANIMATION.md) - animation implementation draft
+- [ANIMATION_MATH.md](ANIMATION_MATH.md) - pose-vector math, harmonic oscillators, gaze easing, speaking-mouth overlay, and THA4 SIREN morphing
+- [THA4_OPTIMIZATION.md](THA4_OPTIMIZATION.md) - THA4 avatar training, GPU bottleneck analysis, and optimization notes
+- [docs/README_THA4_Analysis.md](docs/README_THA4_Analysis.md) - THA4 optimization documentation index
+
+### Data, evaluation, and release
+
+- [EVALUATION.md](EVALUATION.md) - data quality gates, TTS evaluation, benchmarks, and CI eval scope
+- [evaluation/baselines/README.md](evaluation/baselines/README.md) - baseline registry and promotion procedure
+- [Data_prep/segment_reviewer/README.md](Data_prep/segment_reviewer/README.md) - audio review workflow
+- [new_tts_eval_form/README.md](new_tts_eval_form/README.md) - TTS evaluation form
+- [docs/assets/README.md](docs/assets/README.md) - documentation asset map and screenshot/GIF slots
+
 ## Runtime Architecture
 
 ![Vbot runtime architecture](docs/assets/readme/runtime-architecture.svg)
@@ -340,7 +364,7 @@ Vbot/
     `-- screenshots/                 # README images
 ```
 
-## Requirements, Installation, and Setup
+## Installation
 
 Detailed setup instructions are intentionally kept outside the main README:
 
@@ -374,22 +398,6 @@ At a high level, the desktop runtime expects:
 - Human-in-the-loop TTS evaluation plus objective speaker-similarity/WER gates.
 - Emotion, LLM, persona, and TTS eval artifacts tracked through baselines, scorecards, optional MLflow, and model cards.
 - CI designed to test source contracts and data logic without requiring GPU/runtime dependencies.
-
-## Documentation
-
-- [ANIMATION.md](ANIMATION.md) - animation implementation draft
-- [ANIMATION_MATH.md](ANIMATION_MATH.md) - pose-vector math, harmonic oscillators, gaze easing, speaking-mouth overlay, and THA4 SIREN morphing
-- [THA4_OPTIMIZATION.md](THA4_OPTIMIZATION.md) - THA4 avatar training, GPU bottleneck analysis, and optimization notes
-- [LLM.md](LLM.md) - LLM runtime, prompts, hotswap state, and response cleanup
-- [EVALUATION.md](EVALUATION.md) - data quality gates, TTS evaluation, benchmarks, and CI eval scope
-- [MEMORY_MANAGEMENT.md](MEMORY_MANAGEMENT.md) - runtime VRAM strategy, cache boundaries, lazy loading, and instrumentation
-- [docs/MLOPS.md](docs/MLOPS.md) - closed-loop MLOps/LLMOps lifecycle, runtime monitoring, and promotion architecture
-- [docs/MODEL_CARDS.md](docs/MODEL_CARDS.md) - shipped model summary with current eval numbers
-- [evaluation/baselines/README.md](evaluation/baselines/README.md) - baseline registry and promotion procedure
-- [docs/assets/README.md](docs/assets/README.md) - documentation asset map and screenshot/GIF slots
-- [docs/README_THA4_Analysis.md](docs/README_THA4_Analysis.md) - THA4 optimization documentation index
-- [Data_prep/segment_reviewer/README.md](Data_prep/segment_reviewer/README.md) - audio review workflow
-- [new_tts_eval_form/README.md](new_tts_eval_form/README.md) - TTS evaluation form
 
 ## References
 
