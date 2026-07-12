@@ -1,35 +1,25 @@
 # Vbot
 
-Vbot is a Windows desktop AI character system that combines LLM conversation, speech input, character-specific StyleTTS2 voices, emotion routing, and THA4 avatar animation.
+Vbot is a Windows desktop AI character system: LLM conversation, speech input,
+character-specific StyleTTS2 voices, emotion routing, and THA4 avatar animation,
+all running in one session.
 
-This repository is best read as an implementation case study for optimizing a multi-model AI desktop runtime. The interesting work is not only that Vbot can chat. The harder engineering problem is making several heavy components cooperate in one session:
+The chat isn't the hard part. The engineering problem is making several heavy
+models share one runtime without exhausting a consumer GPU or leaking state
+between characters:
 
-- one Dockerized Ollama LLM runtime
-- multiple selectable AI character personas
-- per-character StyleTTS2 checkpoints
-- per-character emotion reference styles
-- RoBERTa emotion classification
-- Faster-Whisper speech input
-- THA4 avatar rendering
-- non-blocking audio playback
-- character hotswapping without rebuilding the entire app state every time
-- VRAM and cache management across the whole runtime
-- model evaluation gates, runtime metrics, and release workflows
+- one Dockerized Ollama LLM runtime, shared across characters instead of loaded per persona
+- per-character StyleTTS2 checkpoints, emotion reference styles, and style-tensor caches
+- one shared RoBERTa emotion classifier, not a duplicate per handler
+- Faster-Whisper speech input, run CPU int8 so the GPU stays free for TTS and the avatar
+- THA4 avatar rendering, driven by the same emotion signal as the voice
+- character hotswap without rebuilding app state, plus VRAM/cache management across all of it
+- evaluation gates, runtime metrics, and release workflows around the model changes
+
+This README stays on that runtime engineering; setup and build steps live in the
+linked docs.
 
 ![Vbot character selection](asset/screenshots/character-selection.png)
-
-## What This README Prioritizes
-
-This README prioritizes implementation details over setup walkthroughs. Vbot is a multi-model desktop AI prototype, so the most useful part of the project is the engineering behind the runtime:
-
-- how the LLM is isolated and reused instead of duplicated per character
-- how each character owns its own TTS stack and style cache
-- how avatar switching reuses cached character data after the first load
-- how CUDA/VRAM pressure is reduced during model initialization and playback
-- how emotion is routed into both voice style and avatar expression
-- how the animation layer turns model output into a live character interface
-- how training/evaluation/release workflows are separated from normal CI
-- how the project treats model changes as measurable releases, not just asset swaps
 
 ## Documentation
 
