@@ -45,6 +45,21 @@ linked docs.
 - [new_tts_eval_form/README.md](new_tts_eval_form/README.md) - TTS evaluation form
 - [docs/assets/README.md](docs/assets/README.md) - documentation asset map and screenshot/GIF slots
 
+## Related Evaluation Infrastructure
+
+Vbot's desktop runtime is self-contained. The following companion repositories
+are separate engineering projects rather than runtime dependencies:
+
+- [RAG Evaluation Platform](https://github.com/p1tap/vbot-rag-eval) -
+  hash-bound evaluation and promotion gates over 10,000 publisher-annotated
+  HotpotQA, Natural Questions, and FEVER cases. The audited system reached
+  60.5% strict joint answer-and-citation correctness with zero fail-closed
+  cases, while weaker retrieval candidates remain recorded as rejected
+  experiments.
+- [LLM Gateway Platform](https://github.com/p1tap/vbot-model-gateway) -
+  multi-provider inference routing, budget controls, circuit breaking,
+  observability, and GitOps delivery for hosted and self-hosted model backends.
+
 ## Runtime Architecture
 
 ![Vbot runtime architecture](docs/assets/readme/runtime-architecture.svg)
